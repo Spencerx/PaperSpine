@@ -32,7 +32,7 @@ DOI_RE = re.compile(
 )
 CROSSREF_URL = "https://api.crossref.org/works/"
 SEMANTIC_SCHOLAR_URL = "https://api.semanticscholar.org/graph/v1/paper/DOI:"
-USER_AGENT = "PaperSpine/2.0 (citation-quality; https://github.com/WUBING2023/PaperSpine)"
+USER_AGENT = "PaperSpine/3.0 (citation-quality; https://github.com/WUBING2023/PaperSpine)"
 
 
 # ---------------------------------------------------------------------------
