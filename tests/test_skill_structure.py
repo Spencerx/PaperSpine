@@ -179,7 +179,7 @@ class SkillStructureTests(unittest.TestCase):
                 continue
             if path.name == "test_skill_structure.py":
                 continue
-            if path.name == "CLAUDE.md":
+            if path.name in ("CLAUDE.md", "AGENTS.md"):
                 continue
             if ".git" in path.parts:
                 continue

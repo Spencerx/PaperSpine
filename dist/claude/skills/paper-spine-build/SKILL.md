@@ -85,6 +85,12 @@ connected to the confirmed motivation, learned examples, target-scene norms, or
 user evidence. If a paragraph or figure claim needs a separate writing decision,
 it needs its own row.
 
+## Humanize Tier
+
+If `paper_spine_config.json` has `humanize_tier` set to `light`, `medium`, or
+`heavy`, read `references/humanize-tiers-{output_language}.md` before writing
+and apply the matching tier's rules throughout all writing phases.
+
 ## Build Rules
 
 - Treat images as potential figure assets, not as verified evidence unless the
