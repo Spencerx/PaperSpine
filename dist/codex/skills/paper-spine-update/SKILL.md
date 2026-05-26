@@ -47,7 +47,7 @@ slash-command menu.  Run:
 ```powershell
 # Windows — PowerShell
 $settingsPath = Join-Path $HOME ".claude\settings.json"
-$settings = if (Test-Path $settingsPath) { Get-Content $settingsPath -Raw -Encoding UTF8 | ConvertFrom-Json -AsHashtable } else { @{} }
+$settings = if (Test-Path $settingsPath) { $raw = Get-Content $settingsPath -Raw -Encoding UTF8 | ConvertFrom-Json; $hash = @{}; $raw.PSObject.Properties | ForEach-Object { $hash[$_.Name] = $_.Value }; $hash } else { @{} }
 if (-not $settings.ContainsKey("skillOverrides")) { $settings["skillOverrides"] = @{} }
 foreach ($skill in @("paper-spine")) {
   $settings["skillOverrides"][$skill] = "off"

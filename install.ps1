@@ -141,7 +141,11 @@ if ($Target -eq "all" -or $Target -eq "openclaw") {
 $claudeSettingsPath = Join-Path $HOME ".claude\settings.json"
 $settings = @{}
 if (Test-Path -LiteralPath $claudeSettingsPath) {
-    try { $settings = Get-Content -LiteralPath $claudeSettingsPath -Raw -Encoding UTF8 | ConvertFrom-Json -AsHashtable } catch { $settings = @{} }
+    try {
+        $raw = Get-Content -LiteralPath $claudeSettingsPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $settings = @{}
+        $raw.PSObject.Properties | ForEach-Object { $settings[$_.Name] = $_.Value }
+    } catch { $settings = @{} }
 }
 if (-not $settings.ContainsKey("skillOverrides")) { $settings["skillOverrides"] = @{} }
 $internalSkills = @("paper-spine")
