@@ -84,6 +84,17 @@ def check_docx(path: Path, min_chars: int) -> WordGuardResult:
         if re.search(pattern, text, flags=re.IGNORECASE):
             findings.append(f"unresolved placeholder pattern found: {pattern}")
 
+    # Chinese encoding checks: detect garbled text / mojibake
+    has_chinese = bool(re.search(r"[一-鿿]", text))
+    if has_chinese:
+        garbled = re.findall(r"[\x80-\xff]{4,}", text)
+        if garbled:
+            findings.append(f"Possible garbled Chinese text: {len(garbled)} suspicious byte sequences. Re-export with UTF-8 encoding.")
+        # Check for common encoding corruption patterns
+        corruption = re.findall(r"鍚堛[劧渚佃繚閫嗘]", text)  # common gbk-decoded-as-utf8 pattern
+        if corruption:
+            findings.append("Chinese encoding corruption detected: GBK text decoded as UTF-8. Re-export with proper encoding.")
+
     return WordGuardResult(str(path), not findings, len(text), paragraph_count, findings)
 
 

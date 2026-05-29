@@ -24,6 +24,7 @@ WORD_OUTPUTS = ("none", "docx")
 TRANSLATION_PACKAGES = ("none", "zh")
 REFERENCE_MODES = ("local_first", "specified_paths", "web")
 HUMANIZE_TIERS = ("none", "light", "medium", "heavy")
+DETECTION_PLATFORMS = ("cnki", "weipu", "general")
 GLOBAL_CONFIG_ENV = "PAPERSPINE_CONFIG_HOME"
 
 CHOICE_FIELDS = {
@@ -35,6 +36,7 @@ CHOICE_FIELDS = {
     "translation_package": TRANSLATION_PACKAGES,
     "reference_mode": REFERENCE_MODES,
     "humanize_tier": HUMANIZE_TIERS,
+    "detection_platform": DETECTION_PLATFORMS,
     "ui_language": UI_LANGUAGES,
 }
 
@@ -54,6 +56,7 @@ FIELD_ORDER = (
     "reference_paths",
     "citation_target_count",
     "special_requirements",
+    "detection_platform",
     "humanize_tier",
     "ui_language",
 )
@@ -98,7 +101,12 @@ CHOICE_HELP = {
         "none": ("不降 AI 痕迹", "No humanization"),
         "light": ("轻度 — 替换连接词，微调句式", "Light — replace connectors, vary sentence length"),
         "medium": ("中度 — 句式打散 + 信息密度 + 第一人称", "Medium — break patterns + density + first-person"),
-        "heavy": ("强度 — 不完美注入 + 结构多变 + 低频词汇", "Heavy — imperfections + varied structure + rare terms"),
+        "heavy": ("强度 — 结构不规整 + 术语变体（保持学术语气）", "Heavy — structural variation + term variants (academic tone)"),
+    },
+    "detection_platform": {
+        "cnki": ("知网 AIGC 检测", "CNKI AIGC detection"),
+        "weipu": ("维普 AIGC 检测", "Weipu AIGC detection"),
+        "general": ("通用策略 — 跨平台兼容", "General — cross-platform compatible"),
     },
 }
 
@@ -120,6 +128,7 @@ LABELS = {
         "translation_package": "生成英文产物后是否翻译",
         "ui_language": "界面语言",
         "humanize_tier": "降 AI 痕迹",
+        "detection_platform": "目标检测平台",
         "target_name": "目标名称",
         "draft_path": "初稿路径",
         "materials_dir": "素材文件夹路径",
@@ -170,6 +179,7 @@ LABELS = {
         "translation_package": "Translate after English output",
         "ui_language": "UI language",
         "humanize_tier": "AI humanization",
+        "detection_platform": "Detection platform",
         "target_name": "Target name",
         "draft_path": "Draft path",
         "materials_dir": "Materials directory",
@@ -224,6 +234,7 @@ class PaperSpineConfig:
     word_output: str
     translation_package: str
     humanize_tier: str
+    detection_platform: str
     ui_language: str
 
 
@@ -251,6 +262,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--citation-target-count", type=int, default=20)
     parser.add_argument("--special-requirement", action="append", default=[])
     parser.add_argument("--humanize-tier", choices=HUMANIZE_TIERS, default="none")
+    parser.add_argument("--detection-platform", choices=DETECTION_PLATFORMS, default="general")
     parser.add_argument("--setup-global", action="store_true", help="Choose and save global PaperSpine UI preferences.")
     parser.add_argument("--no-interactive", action="store_true")
     parser.add_argument("--keyboard-ui", action="store_true", help="Use arrow-key terminal UI when a real Windows terminal is available.")
@@ -1002,6 +1014,7 @@ def base_config_from_args(args: argparse.Namespace, ui_language: str) -> PaperSp
         word_output=args.word_output,
         translation_package=translation_package,
         humanize_tier=args.humanize_tier,
+        detection_platform=args.detection_platform,
         ui_language=ui_language,
     )
     if not args.no_interactive:

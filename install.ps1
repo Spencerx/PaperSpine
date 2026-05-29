@@ -148,7 +148,7 @@ if (Test-Path -LiteralPath $claudeSettingsPath) {
     } catch { $settings = @{} }
 }
 if (-not $settings.ContainsKey("skillOverrides")) { $settings["skillOverrides"] = @{} }
-$internalSkills = @("paper-spine")
+$internalSkills = @("paper-spine","paper-spine-ui","paper-spine-intake","paper-spine-research","paper-spine-citation","paper-spine-rewrite","paper-spine-build","paper-spine-humanize","paper-spine-latex","paper-spine-translate","paper-spine-audit","paper-spine-update")
 foreach ($skill in $internalSkills) { $settings["skillOverrides"][$skill] = "off" }
 $settings | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $claudeSettingsPath -Encoding UTF8
 Write-Output "Updated skillOverrides in $claudeSettingsPath"

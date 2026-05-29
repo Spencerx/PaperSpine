@@ -356,8 +356,15 @@ def install_target(root: Path, target: str) -> list[str]:
 
 
 def sync_skill_overrides(claude_settings_dir: Path) -> None:
-    """Hide the paper-spine orchestrator skill from the slash-command menu."""
-    hidden_skills = {"paper-spine"}
+    """Hide internal PaperSpine skills from the slash-command menu."""
+    hidden_skills = {
+        "paper-spine", "paper-spine-ui", "paper-spine-intake",
+        "paper-spine-research", "paper-spine-citation",
+        "paper-spine-rewrite", "paper-spine-build",
+        "paper-spine-humanize", "paper-spine-latex",
+        "paper-spine-translate", "paper-spine-audit",
+        "paper-spine-update",
+    }
     settings_path = claude_settings_dir / "settings.json"
     existing: dict = {}
     if settings_path.exists():

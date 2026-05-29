@@ -370,10 +370,10 @@ class SuiteHardeningTests(unittest.TestCase):
             self.assertIn("skillOverrides", settings)
             for skill in PAPERSPINE_INTERNAL_SKILLS:
                 self.assertEqual(settings["skillOverrides"].get(skill), "off", skill)
-            # User-facing skills should NOT be in overrides
+            # All suite skills should be hidden
             self.assertEqual(settings["skillOverrides"].get("paper-spine"), "off")
-            self.assertNotIn("paper-spine-update", settings["skillOverrides"])
-            self.assertNotIn("paper-spine-research", settings["skillOverrides"])
+            self.assertEqual(settings["skillOverrides"].get("paper-spine-update"), "off")
+            self.assertEqual(settings["skillOverrides"].get("paper-spine-research"), "off")
 
     def test_sync_skill_overrides_preserves_existing_settings(self) -> None:
         import tempfile
