@@ -166,6 +166,14 @@ def check_matrix(matrix_path: Path, manuscript_text: str, lang: str) -> Humanize
                 "High connector density is a strong AI signal."
             )
 
+    # Check for long dash separators (common AI pattern)
+    dash_pattern = re.search(r"[—\-—―]{3,}", manuscript_text)
+    if dash_pattern:
+        result.findings.append(
+            "Long dash separators detected (e.g. '————'). "
+            "These are a strong AI-generation signal — replace with section headings or blank lines."
+        )
+
     result.ok = not result.findings
     return result
 

@@ -20,7 +20,9 @@ information density, connector frequency/distribution, term-context matching).
 2. Do not change factual content (data, results, conclusions)
 3. Do not add evidence the author has not provided
 4. Keep technical terms as-is (unless heavy tier allows substitution)
-5. **Produce humanize_matrix.md in parallel**: one row per writing unit processed
+5. **Ban long dash separators** (e.g. "————" or 3+ consecutive em-dashes/hyphens).
+   Academic papers do not use decorative dash lines as section breaks. Use blank lines or section headings instead.
+6. **Produce humanize_matrix.md in parallel**: one row per writing unit processed
 
 ## humanize_matrix.md Format
 
