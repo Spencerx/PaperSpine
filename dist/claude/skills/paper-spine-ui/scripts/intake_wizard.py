@@ -499,6 +499,7 @@ def print_welcome_screen(ui_language: str, wait: bool = False) -> None:
         print("PaperSpine v3")
         print(tr(ui_language, "welcome"))
         print(tr(ui_language, "flowline"))
+        print(str(Path.cwd()))
         return
     if wait:
         clear_screen()
@@ -537,6 +538,8 @@ def print_welcome_screen(ui_language: str, wait: bool = False) -> None:
             ansi("Douyin: 91362158854", muted),
             ansi("Xiaohongshu: 4770513150", muted),
             ansi("Bilibili: 彬_2023 (ID: 450856661)", muted),
+            "",
+            ansi(str(Path.cwd()), muted),
             "",
         ]
     )
