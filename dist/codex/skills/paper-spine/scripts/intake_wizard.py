@@ -311,10 +311,19 @@ def _enable_windows_vt() -> bool:
     from ctypes import wintypes
 
     kernel32 = ctypes.windll.kernel32
+    # Declare signatures so 64-bit handle pointers are not truncated to c_int,
+    # which would make GetConsoleMode fail and wrongly disable color.
+    kernel32.GetStdHandle.restype = wintypes.HANDLE
+    kernel32.GetStdHandle.argtypes = [wintypes.DWORD]
+    kernel32.GetConsoleMode.restype = wintypes.BOOL
+    kernel32.GetConsoleMode.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
+    kernel32.SetConsoleMode.restype = wintypes.BOOL
+    kernel32.SetConsoleMode.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+
     ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
     STD_OUTPUT_HANDLE = -11
-    handle = kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
-    if not handle or handle == ctypes.c_void_p(-1).value:
+    handle = kernel32.GetStdHandle(wintypes.DWORD(STD_OUTPUT_HANDLE & 0xFFFFFFFF))
+    if not handle or handle == wintypes.HANDLE(-1).value:
         return False
     mode = wintypes.DWORD()
     if not kernel32.GetConsoleMode(handle, ctypes.byref(mode)):
