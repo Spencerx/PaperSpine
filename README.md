@@ -9,7 +9,7 @@
 
 [**PaperSpine 使用讲解视频（Bilibili）**](https://www.bilibili.com/video/BV1rjVa6ZEYu)
 
-配音贡献：[YiShanZheng](https://github.com/YiShanZheng)
+配音贡献：[https://github.com/YiShanZheng](https://github.com/YiShanZheng)
 
 [**🌍 订阅者星图 · 看看哪些高校和城市在用 PaperSpine**](https://wubing2023.github.io/PaperSpine/)
 
