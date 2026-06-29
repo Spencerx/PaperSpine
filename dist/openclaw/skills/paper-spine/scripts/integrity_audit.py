@@ -19,6 +19,12 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
 from _paper_spine_utils import (
     markdown_tables,
 )
@@ -103,7 +109,7 @@ ARTIFACT_OWNERS: dict[str, str] = {
     "evidence_bank.md": "paper-spine-rewrite / paper-spine-build",
     "rewrite_matrix.md": "paper-spine-rewrite",
     "logic_transfer_audit.md": "paper-spine-rewrite",
-    "material_inventory.md": "paper-spine-build",
+    "source_inventory.md": "paper-spine-build",
 }
 
 ARTIFACT_DESCRIPTIONS: dict[str, str] = {
@@ -127,7 +133,7 @@ def audit_artifacts(out_dir: Path, config: dict) -> AuditDimension:
     if workflow == "rewrite_existing":
         required.extend(["original_logic_map.md", "evidence_bank.md", "rewrite_matrix.md", "logic_transfer_audit.md"])
     else:
-        required.extend(["material_inventory.md"])
+        required.extend(["source_inventory.md"])
 
     for i, artifact in enumerate(required, start=1):
         path = out_dir / artifact
