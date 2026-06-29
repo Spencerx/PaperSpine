@@ -320,8 +320,9 @@ def check_title_in_front(paragraphs: list[str], expected_title: str | None = Non
     # If the expected title is known and present in the front paragraphs, the
     # title is satisfied regardless of ordering.
     if expected_title:
-        front_text = " ".join(front).lower()
-        if expected_title.lower().strip() in front_text:
+        front_text = re.sub(r"\s+", " ", " ".join(front)).lower()
+        expected_norm = re.sub(r"\s+", " ", expected_title).strip().lower()
+        if expected_norm in front_text:
             return None, first_para
 
     # The Word output must OPEN with the paper title. If the very first paragraph
@@ -373,6 +374,16 @@ def check_title_in_front(paragraphs: list[str], expected_title: str | None = Non
     return None, first_para
 
 
+def _normalize_tex_title(raw: str) -> str:
+    """Collapse LaTeX line breaks (``\\``, ``\\*``, ``\\[2mm]``) and ``\\thanks``
+    footnotes in a ``\\title{...}`` body, then squeeze whitespace. pandoc renders
+    ``\\`` as a paragraph break in the .docx, so the extracted expected title must
+    drop it to match the rendered title paragraphs."""
+    title = re.sub(r"\\\\\*?(?:\s*\[[^\]]*\])?", " ", raw)
+    title = re.sub(r"\\thanks\s*\{[^{}]*\}", "", title)
+    return re.sub(r"\s+", " ", title).strip()
+
+
 def extract_title_from_tex(tex_path: Path) -> str | None:
     """Extract the title text from \\title{...} in a .tex file."""
     if not tex_path.exists():
@@ -384,7 +395,7 @@ def extract_title_from_tex(tex_path: Path) -> str | None:
     m = re.search(r"\\title\{([^{}]+)\}", tex)
     if not m:
         return None
-    return m.group(1).strip()
+    return _normalize_tex_title(m.group(1)) or None
 
 
 def extract_title_from_chinese_translation(docx_path: Path) -> str | None:

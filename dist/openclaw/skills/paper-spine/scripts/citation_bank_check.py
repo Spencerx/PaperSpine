@@ -57,8 +57,8 @@ def has_claim_sentence(row: list[str]) -> bool:
 
 
 def has_reference_format(row: list[str]) -> bool:
-    joined = " ".join(row)
-    return any(token in joined for token in ("@", "doi", "DOI", "http", "arXiv", "Proceedings", "Journal"))
+    joined = " ".join(row).lower()
+    return any(token in joined for token in ("@", "doi", "http", "arxiv", "proceedings", "journal"))
 
 
 def find_citation_table(text: str) -> tuple[list[str], list[list[str]]]:

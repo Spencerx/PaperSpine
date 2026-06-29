@@ -301,6 +301,48 @@ class WordGuardTests(unittest.TestCase):
             self.assertNotIn("Traceback", res.stdout + res.stderr)
             self.assertEqual([p.name for p in d.glob("tmp*.docx")], [])
 
+    def test_extract_title_from_tex_drops_linebreaks(self) -> None:
+        # Regression: \title{A \\ B} kept the literal '\\' in the extracted title,
+        # which then never matched the docx where '\\' renders as a line break.
+        sys.path.insert(0, str(ROOT / "src" / "scripts"))
+        from word_guard import extract_title_from_tex  # noqa: PLC0415
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tex = Path(tmp) / "main.tex"
+            tex.write_text(
+                "\\title{Alpha Beta Gamma \\\\[2mm] Delta Epsilon Study}\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                extract_title_from_tex(tex), "Alpha Beta Gamma Delta Epsilon Study"
+            )
+
+    def test_title_with_latex_linebreak_matches_split_paragraphs(self) -> None:
+        # Regression: a \title{...} with a '\\' line break renders as TWO docx
+        # paragraphs; the title check used to FAIL because the extracted expected
+        # title still carried the literal '\\'. End-to-end via --tex.
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp)
+            docx = d / "paper.docx"
+            make_docx(docx, [
+                "Parameter-Efficient Fine-Tuning",
+                "for Multilingual Sequence Labeling Tasks",
+                "Abstract",
+                "This work studies parameter-efficient adaptation across languages. " * 6,
+            ])
+            tex = d / "main.tex"
+            tex.write_text(
+                "\\title{Parameter-Efficient Fine-Tuning \\\\ for Multilingual Sequence Labeling Tasks}\n",
+                encoding="utf-8",
+            )
+            result = subprocess.run(
+                [sys.executable, "src/scripts/word_guard.py", str(docx),
+                 "--tex", str(tex), "--language", "en", "--markdown", "--min-chars", "50"],
+                cwd=ROOT, text=True, capture_output=True, check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            self.assertNotIn("not found in first 5 paragraphs", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

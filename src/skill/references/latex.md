@@ -114,3 +114,10 @@ python scripts/word_guard.py paper_rewriting_output/final_paper/paper.zh.docx \
 list it as the only Chinese deliverable.
 Chinese Word must use SimSun/宋体 for East Asian text and Times New Roman for
 Latin text. If the font gate fails, repair the docx and re-run the report.
+
+**Chinese abstract heading:** In a Chinese `main.tex`, author the abstract as
+`\section*{摘要}` followed by the abstract paragraph rather than the LaTeX
+`abstract` environment. pandoc renders `\begin{abstract}` as an English
+"Abstract" heading in the .docx even for a Chinese paper (the `lang` variable
+does not localize it); `\section*{摘要}` produces 摘要 in both the ctex PDF and
+the Word file.

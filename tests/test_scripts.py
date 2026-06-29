@@ -53,6 +53,18 @@ Prior work (Smith et al., 2019) and (Jones and Lee, 2021) studied this problem.
             self.assertEqual(result.returncode, 1, result.stderr + result.stdout)
             self.assertIn("Author-year citation", result.stdout)
 
+    def test_citation_bank_reference_format_is_case_insensitive(self) -> None:
+        # Regression: has_reference_format matched only capital-P "Proceedings"/
+        # "Journal"/"arXiv", so a legitimate lowercase channel label like
+        # "Conference proceedings" was wrongly treated as missing a reference.
+        sys.path.insert(0, str(ROOT / "src" / "scripts"))
+        from citation_bank_check import has_reference_format  # noqa: PLC0415
+
+        self.assertTrue(has_reference_format(["C1", "Conference proceedings", "2023"]))
+        self.assertTrue(has_reference_format(["C2", "arxiv:2305.14314"]))
+        self.assertTrue(has_reference_format(["C3", "Journal of ML"]))
+        self.assertFalse(has_reference_format(["C4", "just a claim sentence."]))
+
     def test_style_metrics_reports_sections(self) -> None:
         result = run_script("src/scripts/style_metrics.py", str(FIXTURES / "mini_paper.tex"), "--markdown")
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
