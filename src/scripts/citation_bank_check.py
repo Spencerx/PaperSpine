@@ -6,10 +6,13 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from _paper_spine_utils import table_rows, year_from_row
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from _paper_spine_utils import markdown_tables, year_from_row
 
 CURRENT_YEAR = 2026
 DEFAULT_TARGET_COUNT = 20
@@ -38,6 +41,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--recent-ratio", type=float, default=DEFAULT_RECENT_RATIO)
     parser.add_argument("--markdown", action="store_true")
     parser.add_argument("--json", action="store_true")
+    parser.add_argument(
+        "--write",
+        action="store_true",
+        help="Write citation_bank_check.md next to citation_support_bank.md.",
+    )
     return parser.parse_args()
 
 
@@ -53,6 +61,20 @@ def has_reference_format(row: list[str]) -> bool:
     return any(token in joined for token in ("@", "doi", "DOI", "http", "arXiv", "Proceedings", "Journal"))
 
 
+def find_citation_table(text: str) -> tuple[list[str], list[list[str]]]:
+    for table in markdown_tables(text):
+        if not table:
+            continue
+        header = table[0]
+        header_text = " ".join(cell.lower() for cell in header)
+        has_reference = any(term in header_text for term in ("citation", "reference", "bibtex"))
+        has_claim = "claim" in header_text
+        has_sentence = "sentence" in header_text
+        if has_reference and has_claim and has_sentence:
+            return header, table[1:]
+    return [], []
+
+
 def validate(path: Path, target_count: int, multiplier: int, recent_years: int, recent_ratio: float) -> CitationBankResult:
     required_candidates = target_count * multiplier
     required_recent_count = int(required_candidates * recent_ratio + 0.999)
@@ -61,7 +83,7 @@ def validate(path: Path, target_count: int, multiplier: int, recent_years: int, 
         return CitationBankResult(str(path), False, target_count, required_candidates, 0, 0, required_recent_count, ["file does not exist"])
 
     text = path.read_text(encoding="utf-8", errors="ignore")
-    header, rows = table_rows(text)
+    header, rows = find_citation_table(text)
     if not header:
         findings.append("citation_support_bank.md must contain a Markdown table.")
     header_text = " ".join(cell.lower() for cell in header)
@@ -128,11 +150,16 @@ def to_markdown(result: CitationBankResult) -> str:
 
 def main() -> int:
     args = parse_args()
-    result = validate(Path(args.path), args.target_count, args.multiplier, args.recent_years, args.recent_ratio)
+    path = Path(args.path)
+    result = validate(path, args.target_count, args.multiplier, args.recent_years, args.recent_ratio)
+    markdown = to_markdown(result)
+    if args.write:
+        report_path = path.parent / "citation_bank_check.md"
+        report_path.write_text(markdown, encoding="utf-8")
     if args.json:
         print(json.dumps(result.__dict__, ensure_ascii=False, indent=2))
     if args.markdown or not args.json:
-        print(to_markdown(result))
+        print(markdown)
     return 0 if result.ok else 1
 
 

@@ -225,6 +225,41 @@ def check_alignment_tabs(text: str) -> list[Finding]:
     return findings
 
 
+def check_title_and_maketitle(text: str) -> list[Finding]:
+    findings: list[Finding] = []
+    if "\\title{" not in text:
+        findings.append(Finding("error", "title", "Missing \\title{...}. Paper title is required."))
+    if "\\maketitle" not in text:
+        findings.append(Finding("error", "title", "Missing \\maketitle. Title page/heading is required."))
+    return findings
+
+
+def check_citation_format(text: str) -> list[Finding]:
+    findings: list[Finding] = []
+    doc_start = text.find("\\begin{document}")
+    if doc_start == -1:
+        return findings
+    body = text[doc_start:]
+
+    # Remove math mode spans so we don't flag brackets inside math.
+    body_no_math = re.sub(r"\$\$.*?\$\$", " ", body, flags=re.DOTALL)
+    body_no_math = re.sub(r"\\\[.*?\\\]", " ", body_no_math, flags=re.DOTALL)
+    body_no_math = re.sub(r"\$[^$]*?\$", " ", body_no_math)
+
+    # Find parenthesized bracket citations: ([15]), ([3,12]).
+    # Plain [1] / [3,12,13] is the required style.
+    paren_pattern = re.compile(r"\(\[\d+(?:\s*[,–-]\s*\d+)*\]\)")
+    for match in paren_pattern.finditer(body_no_math):
+        line = line_number(text, doc_start + match.start())
+        findings.append(Finding(
+            "error", "citation-format",
+            f"Parenthesized citation {match.group(0)} should be plain square-bracket numeric style, e.g. [1].",
+            line,
+        ))
+
+    return findings
+
+
 def run_checks(tex_path: Path, bib_path: Path | None) -> list[Finding]:
     raw = read_text(tex_path)
     text = strip_comments(raw)
@@ -239,6 +274,8 @@ def run_checks(tex_path: Path, bib_path: Path | None) -> list[Finding]:
     findings.extend(check_graphics(text, tex_path))
     findings.extend(check_placeholders(text))
     findings.extend(check_alignment_tabs(text))
+    findings.extend(check_title_and_maketitle(text))
+    findings.extend(check_citation_format(text))
     return findings
 
 

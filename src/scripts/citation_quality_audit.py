@@ -23,15 +23,58 @@ from difflib import SequenceMatcher
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-from _paper_spine_utils import table_rows
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
+from _paper_spine_utils import markdown_tables
 
 DOI_RE = re.compile(
     r"\b(?:doi\s*[:=]\s*|https?://doi\.org/|https?://dx\.doi\.org/)?(10\.\d{4,}/[^\s,;)\]]+)",
     re.IGNORECASE,
 )
+ARXIV_RE = re.compile(r"\barxiv\s*:?\s*(\d{4}\.\d{4,5}(?:v\d+)?)\b", re.IGNORECASE)
+URL_RE = re.compile(r"https?://[^\s)\]]+", re.IGNORECASE)
 CROSSREF_URL = "https://api.crossref.org/works/"
 SEMANTIC_SCHOLAR_URL = "https://api.semanticscholar.org/graph/v1/paper/DOI:"
 USER_AGENT = "PaperSpine/3.0 (citation-quality; https://github.com/WUBING2023/PaperSpine)"
+VALID_VERIFICATION_VALUES = {"yes", "verified", "pass", "true"}
+EXTERNAL_CHANNEL_TOKENS = (
+    "web",
+    "mcp",
+    "crossref",
+    "pubmed",
+    "scholar",
+    "semantic scholar",
+    "ieee",
+    "cnki",
+    "wos",
+    "publisher",
+    "journal",
+    "conference",
+    "proceedings",
+    "arxiv",
+    "preprint",
+    "regulatory",
+    "database",
+)
+MANUAL_VERIFICATION_TOKENS = (
+    "confirmed",
+    "verified",
+    "accessed",
+    "publisher",
+    "official",
+    "crossref",
+    "pubmed",
+    "arxiv",
+    "database",
+    "metadata",
+    "proceedings",
+    "repository",
+    "website",
+)
 
 
 # ---------------------------------------------------------------------------
@@ -93,6 +136,10 @@ class CitationQualityEntry:
     doi: str
     reference: str
     year: str
+    source: str = ""
+    source_channel: str = ""
+    verified: str = ""
+    verification_note: str = ""
     # verification
     doi_resolves: bool = False
     crossref_title: str | None = None
@@ -108,6 +155,7 @@ class CitationQualityEntry:
     status: str = "pending"     # verified | mismatched | dead | error
     issues: list[str] = field(default_factory=list)
     teaching_note: str = ""
+    manual_identifier: str = ""
 
 
 @dataclass
@@ -132,6 +180,14 @@ class CitationQualityReport:
     def mismatched_count(self) -> int:
         return sum(1 for e in self.entries if e.status == "mismatched")
 
+    @property
+    def error_count(self) -> int:
+        return sum(1 for e in self.entries if e.status == "error")
+
+    @property
+    def pending_count(self) -> int:
+        return sum(1 for e in self.entries if e.status == "pending")
+
 
 # ---------------------------------------------------------------------------
 # CLI
@@ -147,6 +203,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--delay", type=float, default=1.0)
     parser.add_argument("--no-api", action="store_true", help="Skip API calls; analyze structure only")
     parser.add_argument("--max-dois", type=int, default=30, help="Maximum DOIs to verify via API (default: 30)")
+    parser.add_argument("--min-score", type=int, default=60, help="Minimum overall score for PASS (default: 60)")
+    parser.add_argument("--max-error-ratio", type=float, default=0.30, help="Maximum error ratio for PASS (default: 0.30)")
+    parser.add_argument("--max-pending-ratio", type=float, default=0.50, help="Maximum pending ratio for PASS (default: 0.50)")
     return parser.parse_args()
 
 
@@ -170,22 +229,58 @@ def parse_citation_rows(path: Path) -> list[dict[str, str]]:
     if not path.exists():
         return []
     text = path.read_text(encoding="utf-8", errors="ignore")
-    header, rows = table_rows(text)
+    header, rows = find_citation_table(text)
     if not rows:
         return []
     result: list[dict[str, str]] = []
+
+    index = {normalize_header(cell): i for i, cell in enumerate(header)}
+
+    def cell(row: list[str], *names: str, fallback: int | None = None) -> str:
+        for name in names:
+            idx = index.get(name)
+            if idx is not None and idx < len(row):
+                return row[idx]
+        if fallback is not None and fallback < len(row):
+            return row[fallback]
+        return ""
+
     for row in rows:
         if len(row) < 6:
             continue
         joined = " ".join(row)
         dois = extract_dois(joined)
         result.append({
-            "candidate_id": row[0] if len(row) > 0 else "",
-            "reference": row[1] if len(row) > 1 else "",
-            "year": row[2] if len(row) > 2 else "",
+            "candidate_id": cell(row, "candidate id", "id", fallback=0),
+            "reference": cell(row, "reference/bibtex", "reference", "citation", "bibtex", fallback=1),
+            "year": cell(row, "year", fallback=2),
             "doi": dois[0] if dois else "",
+            "source": cell(row, "source"),
+            "source_channel": cell(row, "source channel"),
+            "verified": cell(row, "verified"),
+            "verification_note": cell(row, "verification note"),
         })
     return result
+
+
+def normalize_header(value: str) -> str:
+    value = re.sub(r"<[^>]+>", " ", value)
+    value = re.sub(r"[*_`]", "", value)
+    return re.sub(r"\s+", " ", value.strip().lower())
+
+
+def find_citation_table(text: str) -> tuple[list[str], list[list[str]]]:
+    for table in markdown_tables(text):
+        if not table:
+            continue
+        header = table[0]
+        header_text = " ".join(cell.lower() for cell in header)
+        has_reference = any(term in header_text for term in ("citation", "reference", "bibtex"))
+        has_claim = "claim" in header_text
+        has_sentence = "sentence" in header_text
+        if has_reference and has_claim and has_sentence:
+            return header, table[1:]
+    return [], []
 
 
 def title_similarity(a: str, b: str) -> float:
@@ -198,6 +293,38 @@ def title_similarity(a: str, b: str) -> float:
     jaccard = len(a_set & b_set) / len(a_set | b_set)
     sm = SequenceMatcher(None, " ".join(a_words), " ".join(b_words))
     return round(jaccard * 0.5 + sm.ratio() * 0.5, 4)
+
+
+def extract_reference_title(reference: str) -> str:
+    """Extract the cited work title from a reference cell.
+
+    The audit should compare Crossref's title against the paper title, not the
+    whole reference string with authors, venue, pages, DOI, and notes.
+    """
+    if not reference:
+        return ""
+    bibtex = re.search(r"title\s*=\s*[\{\"]([^{}\"]+)[\}\"]", reference, re.IGNORECASE)
+    if bibtex:
+        return re.sub(r"\s+", " ", bibtex.group(1)).strip()
+
+    quoted = re.search(r'["“”]([^"“”]{8,})["“”]', reference)
+    if quoted:
+        return re.sub(r"\s+", " ", quoted.group(1)).strip(" .")
+
+    text = re.sub(r"\b(?:doi\s*[:=]\s*|https?://doi\.org/|https?://dx\.doi\.org/)?10\.\d{4,}/\S+", " ", reference, flags=re.IGNORECASE)
+    text = re.sub(r"\s+", " ", text).strip()
+    year_match = re.search(r"\((?:19|20)\d{2}\)\.\s+", text)
+    if year_match:
+        start = year_match.end()
+        tail = text[start:]
+        venue_match = re.search(r"\.\s+(?:\*|[A-Z][A-Za-z& ]{2,}[,;]|\barXiv:|\b[A-Z]{2,}\b)", tail)
+        title = tail[: venue_match.start()] if venue_match else tail
+        return title.strip(" \"'“”‘’.")
+
+    # Fallback: remove obvious leading author/year fragments and stop before DOI.
+    text = re.sub(r"^.*?\b(?:19|20)\d{2}\b[).,:]*\s*", "", text)
+    text = re.sub(r"\s+(?:DOI|doi|https?://).*$", "", text).strip()
+    return text.strip(" \"'“”‘’.")
 
 
 def fetch_crossref(doi: str, timeout: int) -> dict | None:
@@ -213,6 +340,35 @@ def fetch_crossref(doi: str, timeout: int) -> dict | None:
             return {"title": title_list[0] if title_list else None, "year": year}
     except Exception:
         return None
+
+
+def extract_manual_identifier(record: dict[str, str]) -> str:
+    joined = " ".join(record.get(key, "") for key in ("reference", "source", "verification_note"))
+    arxiv = ARXIV_RE.search(joined)
+    if arxiv:
+        return f"arXiv:{arxiv.group(1)}"
+    url = URL_RE.search(joined)
+    if url:
+        return url.group(0).rstrip(".,;")
+    return ""
+
+
+def is_external_channel(source_channel: str, source: str = "") -> bool:
+    text = f"{source_channel} {source}".lower()
+    return any(token in text for token in EXTERNAL_CHANNEL_TOKENS)
+
+
+def has_manual_verification(record: dict[str, str]) -> bool:
+    verified = normalize_header(record.get("verified", ""))
+    note = record.get("verification_note", "").strip()
+    if verified not in VALID_VERIFICATION_VALUES or len(note) < 12:
+        return False
+    note_lower = note.lower()
+    if any(token in note_lower for token in ("todo", "tbd", "pending", "[verify]", "unknown")):
+        return False
+    if any(token in note_lower for token in MANUAL_VERIFICATION_TOKENS):
+        return True
+    return bool(extract_manual_identifier(record))
 
 
 def classify_citation_type(reference: str) -> str:
@@ -277,15 +433,43 @@ def audit_citations(output_dir: Path, no_api: bool, timeout: int, delay: float, 
             doi=record["doi"],
             reference=record["reference"],
             year=record["year"],
+            source=record.get("source", ""),
+            source_channel=record.get("source_channel", ""),
+            verified=record.get("verified", ""),
+            verification_note=record.get("verification_note", ""),
             citation_type=classify_citation_type(record["reference"]),
             recency_score=compute_recency_score(record["year"]),
         )
 
         if not entry.doi:
-            entry.status = "error"
-            entry.issues.append("No DOI found in citation entry")
-            entry.teaching_note = "Every citation should include a DOI. Without one, the reference cannot be verified and readers cannot easily locate the source."
-            entry.resolvability_score = 0
+            entry.manual_identifier = extract_manual_identifier(record)
+            if has_manual_verification(record):
+                entry.status = "verified"
+                entry.doi_resolves = True
+                entry.resolvability_score = 80 if entry.manual_identifier else 70
+                entry.teaching_note = (
+                    "Citation verified through a non-DOI channel recorded in the citation bank. "
+                    "This is acceptable for arXiv preprints, official policy pages, proceedings, "
+                    "and publisher/database records when the verification note is specific."
+                )
+            else:
+                entry.status = "error"
+                if is_external_channel(entry.source_channel, entry.source):
+                    entry.issues.append(
+                        "No DOI found and no sufficient external verification note was recorded"
+                    )
+                    entry.teaching_note = (
+                        "Non-DOI sources are acceptable only when the bank records a stable identifier "
+                        "(such as arXiv ID or URL), Verified=yes/verified/pass/true, and a concrete "
+                        "verification note naming the official page, publisher, database, or metadata check."
+                    )
+                else:
+                    entry.issues.append("No DOI or stable external identifier found in citation entry")
+                    entry.teaching_note = (
+                        "Every citation should include a DOI, URL, arXiv ID, or local metadata note. "
+                        "Without one, the reference cannot be verified and readers cannot easily locate the source."
+                    )
+                entry.resolvability_score = 0
             report.entries.append(entry)
             continue
 
@@ -309,8 +493,10 @@ def audit_citations(output_dir: Path, no_api: bool, timeout: int, delay: float, 
         entry.crossref_title = crossref.get("title")
         entry.api_year = crossref.get("year")
 
-        if entry.crossref_title and entry.reference:
-            sim = title_similarity(entry.crossref_title, entry.reference)
+        reference_title = extract_reference_title(entry.reference)
+        comparison_title = reference_title or entry.reference
+        if entry.crossref_title and comparison_title:
+            sim = title_similarity(entry.crossref_title, comparison_title)
             entry.title_similarity = sim
             if sim >= 0.75:
                 entry.status = "verified"
@@ -377,7 +563,7 @@ def audit_citations(output_dir: Path, no_api: bool, timeout: int, delay: float, 
 # Markdown output
 # ---------------------------------------------------------------------------
 
-def to_markdown(report: CitationQualityReport) -> str:
+def to_markdown(report: CitationQualityReport, status: str = "") -> str:
     lines = [
         "# Citation Quality Audit",
         "",
@@ -387,6 +573,10 @@ def to_markdown(report: CitationQualityReport) -> str:
         f"- Entries analyzed: {len(report.entries)}",
         f"- Verified: {report.verified_count} | Mismatched: {report.mismatched_count} | Dead: {report.dead_count}",
         f"- Overall quality score: {report.overall_score}/100",
+    ]
+    if status:
+        lines.append(f"- Status: {status}")
+    lines.extend([
         "",
         "> Each entry below includes a teaching note explaining *why* the citation quality matters.",
         "",
@@ -394,10 +584,11 @@ def to_markdown(report: CitationQualityReport) -> str:
         "",
         "| ID | DOI | Type | Resolves | Title Match | Year Match | Score | Status |",
         "|---|---|---|---|---|---|---|---|",
-    ]
+    ])
     for e in report.entries:
+        identifier = e.doi[:30] if e.doi else (e.manual_identifier[:30] if e.manual_identifier else "-")
         lines.append(
-            f"| {e.candidate_id} | {e.doi[:30] if e.doi else '—'} | {e.citation_type} | "
+            f"| {e.candidate_id} | {identifier} | {e.citation_type} | "
             f"{'yes' if e.doi_resolves else 'no'} | {e.title_similarity:.0%} | "
             f"{'yes' if e.year_matches else 'no'} | {((e.resolvability_score + e.recency_score) // 2)} | "
             f"{e.status} |"
@@ -471,22 +662,41 @@ def main() -> int:
 
     report = audit_citations(out_dir, args.no_api, args.timeout, args.delay, args.max_dois)
 
+    total = len(report.entries) or 1
+    error_ratio = report.error_count / total
+    pending_ratio = report.pending_count / total
+    failures: list[str] = []
+
+    if report.overall_score < args.min_score:
+        failures.append(f"Overall score {report.overall_score} below minimum {args.min_score}")
+    if error_ratio > args.max_error_ratio:
+        failures.append(f"Error ratio {error_ratio:.2f} exceeds maximum {args.max_error_ratio}")
+    if pending_ratio > args.max_pending_ratio:
+        failures.append(f"Pending ratio {pending_ratio:.2f} exceeds maximum {args.max_pending_ratio}")
+
+    status = "PASS" if not failures else "FAIL"
+
     if args.json:
         print(json.dumps({
             "output_dir": str(out_dir), "scene": report.scene,
             "verified": report.verified_count, "mismatched": report.mismatched_count,
             "dead": report.dead_count, "overall_score": report.overall_score,
+            "status": status, "error_count": report.error_count,
+            "pending_count": report.pending_count,
+            "error_ratio": round(error_ratio, 4),
+            "pending_ratio": round(pending_ratio, 4),
+            "failures": failures,
             "gap_analysis": report.gap_analysis,
         }, ensure_ascii=False, indent=2))
     if args.markdown or not args.json:
-        print(to_markdown(report))
+        print(to_markdown(report, status))
 
     if args.write:
         report_path = out_dir / "citation_quality_audit.md"
-        report_path.write_text(to_markdown(report), encoding="utf-8")
+        report_path.write_text(to_markdown(report, status), encoding="utf-8")
         print(f"Wrote {report_path}", file=sys.stderr)
 
-    return 1 if report.dead_count > 0 else 0
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":

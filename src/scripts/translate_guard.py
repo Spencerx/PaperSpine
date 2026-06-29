@@ -15,8 +15,12 @@ import argparse
 import json
 import re
 import sys
+import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
+from xml.etree import ElementTree
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from _paper_spine_utils import table_rows
 
@@ -401,6 +405,193 @@ def check_manifest(trans_dir: Path, config: dict) -> list[TranslationFinding]:
     return findings
 
 
+def word_output_requested(config: dict) -> bool:
+    value = config.get("word_output", "docx")
+    if value is False:
+        return False
+    return str(value).strip().lower() not in {"none", "false", "no", "0"}
+
+
+def check_chinese_word_delivery(trans_dir: Path, out_dir: Path, config: dict) -> list[TranslationFinding]:
+    findings: list[TranslationFinding] = []
+    if not word_output_requested(config):
+        return findings
+
+    full_translation = trans_dir / "full_paper_translation.zh.md"
+    zh_docx = out_dir / "final_paper" / "paper.zh.docx"
+    zh_report = out_dir / "word_report.zh.md"
+
+    if full_translation.exists() and not zh_docx.exists():
+        findings.append(TranslationFinding(
+            id="DOCX-001",
+            severity="BLOCKER",
+            what="translation_zh/full_paper_translation.zh.md exists but final_paper/paper.zh.docx is missing",
+            fix="Use pandoc to convert full_paper_translation.zh.md into final_paper/paper.zh.docx, then run word_guard.py and write word_report.zh.md.",
+            teaching="translation_zh/ is the Chinese translation audit package. The user-facing Chinese deliverable must be one Word document: final_paper/paper.zh.docx.",
+        ))
+
+    if zh_docx.exists() and not zh_report.exists():
+        findings.append(TranslationFinding(
+            id="DOCX-002",
+            severity="BLOCKER",
+            what="final_paper/paper.zh.docx exists but word_report.zh.md is missing",
+            fix="Run word_guard.py on final_paper/paper.zh.docx and write the report to word_report.zh.md.",
+            teaching="A Chinese Word file is not complete until the Word guard verifies that it is readable and not corrupted.",
+        ))
+
+    if zh_docx.exists() and zh_report.exists():
+        findings.append(TranslationFinding(
+            id="DOCX-000",
+            severity="INFO",
+            what="User-facing Chinese Word document exists: final_paper/paper.zh.docx",
+            fix="",
+            teaching="translation_zh/ remains the audit package; paper.zh.docx is the single file users open.",
+        ))
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Check 6 — Chinese Content Quality
+# ---------------------------------------------------------------------------
+
+MARKDOWN_BOLD_RE = re.compile(r"\*\*[^*\n]+\*\*")
+MARKDOWN_ITALIC_RE = re.compile(r"(?<![a-zA-Z0-9_])\*[a-zA-Z][^*\n]*[a-zA-Z]\*(?![a-zA-Z0-9_])")
+CHINESE_CHAR_RE = re.compile(r"[\u4e00-\u9fff]")
+ENGLISH_WORD_RE = re.compile(r"[a-zA-Z]{3,}")
+
+
+def visible_docx_text(path: Path) -> str:
+    """Extract visible paragraph text from a docx using only the standard library."""
+    if not path.exists() or path.suffix.lower() != ".docx":
+        return ""
+    try:
+        with zipfile.ZipFile(path) as docx:
+            if "word/document.xml" not in docx.namelist():
+                return ""
+            root = ElementTree.fromstring(docx.read("word/document.xml"))
+    except (zipfile.BadZipFile, ElementTree.ParseError, OSError):
+        return ""
+    ns = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
+    paragraphs: list[str] = []
+    for paragraph in root.findall(".//w:p", ns):
+        text = "".join(node.text or "" for node in paragraph.findall(".//w:t", ns)).strip()
+        if text:
+            paragraphs.append(text)
+    return "\n".join(paragraphs)
+
+
+def chinese_ratio(text: str) -> tuple[float, int, int]:
+    chinese_chars = len(CHINESE_CHAR_RE.findall(text))
+    english_words = len(ENGLISH_WORD_RE.findall(text))
+    total = chinese_chars + english_words
+    return (chinese_chars / total if total else 0.0), chinese_chars, english_words
+
+
+def markdown_marker_finding(text: str, location: str, finding_id: str, severity: str = "BLOCKER") -> TranslationFinding | None:
+    bold_hits = MARKDOWN_BOLD_RE.findall(text)
+    italic_hits = MARKDOWN_ITALIC_RE.findall(text)
+    if not bold_hits and not italic_hits:
+        return None
+    parts: list[str] = []
+    if bold_hits:
+        parts.append(f"{len(bold_hits)} bold (e.g. {', '.join(h[:50] for h in bold_hits[:3])})")
+    if italic_hits:
+        parts.append(f"{len(italic_hits)} italic (e.g. {', '.join(h[:50] for h in italic_hits[:3])})")
+    return TranslationFinding(
+        id=finding_id,
+        severity=severity,
+        what=f"Raw Markdown emphasis markers found in {location}: {', '.join(parts)}",
+        fix="Remove all **...** and *...* Markdown emphasis markers, or render them as real Word formatting before delivery.",
+        teaching="Visible asterisks are source Markdown syntax, not polished Word output. They make the translation look like unrendered intermediate text.",
+    )
+
+
+def check_chinese_content_quality(trans_dir: Path, out_dir: Path, config: dict) -> list[TranslationFinding]:
+    findings: list[TranslationFinding] = []
+
+    package = str(config.get("translation_package") or "").lower()
+    language = str(config.get("output_language") or "").lower()
+    if package != "zh" and language != "zh":
+        return findings
+
+    # Check full_paper_translation.zh.md for Chinese content ratio
+    fp_path = trans_dir / "full_paper_translation.zh.md"
+    if fp_path.exists():
+        try:
+            text = fp_path.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            return findings
+
+        ratio, chinese_chars, english_words = chinese_ratio(text)
+        total = chinese_chars + english_words
+        if total > 100:
+            if ratio < 0.30:
+                findings.append(TranslationFinding(
+                    id="ZH-RATIO-001",
+                    severity="BLOCKER",
+                    what=f"full_paper_translation.zh.md appears mostly English "
+                         f"({ratio:.0%} Chinese characters, {chinese_chars} Chinese chars / {english_words} English words). "
+                         "The Chinese Word must contain Chinese content, not English content under a Chinese title.",
+                    fix="Translate the full paper body into Chinese. "
+                        "Do not produce a Chinese-formatted wrapper around English prose.",
+                    teaching="paper.zh.docx is the reader-facing Chinese Word deliverable. "
+                            "It must contain predominantly Chinese text so Chinese readers can read the paper.",
+                ))
+
+        marker_finding = markdown_marker_finding(text, "full_paper_translation.zh.md", "ZH-MARKDOWN-001")
+        if marker_finding:
+            findings.append(marker_finding)
+
+    # Check the final user-facing Chinese Word itself. This catches cases where
+    # the Markdown translation is correct but paper.zh.docx was built from the
+    # English source or from unrendered Markdown.
+    zh_docx = out_dir / "final_paper" / "paper.zh.docx"
+    docx_text = visible_docx_text(zh_docx)
+    if docx_text:
+        ratio, chinese_chars, english_words = chinese_ratio(docx_text)
+        total = chinese_chars + english_words
+        if total > 100 and ratio < 0.30:
+            findings.append(TranslationFinding(
+                id="ZH-DOCX-RATIO-001",
+                severity="BLOCKER",
+                what=f"final_paper/paper.zh.docx appears mostly English "
+                     f"({ratio:.0%} Chinese characters, {chinese_chars} Chinese chars / {english_words} English words).",
+                fix="Regenerate paper.zh.docx from the full Chinese translation, not from the English paper source.",
+                teaching="When translation_package=zh, paper.zh.docx is the Chinese reader-facing Word file. "
+                         "It must be a translation of the English paper, not English prose under a Chinese title.",
+            ))
+        marker_finding = markdown_marker_finding(docx_text, "final_paper/paper.zh.docx", "ZH-DOCX-MARKDOWN-001")
+        if marker_finding:
+            findings.append(marker_finding)
+
+    # Check word_report.zh.md for Markdown emphasis markers
+    zh_report = out_dir / "word_report.zh.md"
+    if zh_report.exists():
+        try:
+            report_text = zh_report.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            report_text = ""
+        if MARKDOWN_BOLD_RE.search(report_text) or MARKDOWN_ITALIC_RE.search(report_text):
+            findings.append(TranslationFinding(
+                id="ZH-MARKDOWN-002",
+                severity="WARNING",
+                what="Raw Markdown emphasis markers found in word_report.zh.md",
+                fix="Check the Chinese Word output for visible **...** asterisks. "
+                    "If present, re-convert with proper Markdown-to-Word processing.",
+                teaching="A Word report that still contains Markdown markers means the docx itself likely does too.",
+            ))
+
+    if not findings:
+        findings.append(TranslationFinding(
+            id="ZH-QUALITY-000",
+            severity="INFO",
+            what="Chinese content quality checks passed",
+            fix="",
+            teaching="",
+        ))
+    return findings
+
+
 # ---------------------------------------------------------------------------
 # Markdown output
 # ---------------------------------------------------------------------------
@@ -460,6 +651,8 @@ def main() -> int:
     all_findings.extend(check_content_density(trans_dir, out_dir))
     all_findings.extend(check_full_paper_coverage(trans_dir, out_dir))
     all_findings.extend(check_manifest(trans_dir, config))
+    all_findings.extend(check_chinese_word_delivery(trans_dir, out_dir, config))
+    all_findings.extend(check_chinese_content_quality(trans_dir, out_dir, config))
 
     report = TranslationGuardReport(str(out_dir), config.get("workflow", "rewrite_existing"), all_findings)
 

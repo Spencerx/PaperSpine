@@ -19,19 +19,11 @@ DIST_CLAUDE_COMMANDS = ROOT / "dist" / "claude" / "commands"
 DIST_OPENCLAW_SKILLS = ROOT / "dist" / "openclaw" / "skills"
 DIST_VERSION_MANIFEST = ROOT / "dist" / "paperspine_version.json"
 
+# Stage 2a: published suite is a single orchestrator skill.  Legacy worker
+# directories (paper-spine-*) are retained for compatibility but are no longer
+# listed here — they are not installed or fanned-out to hosts.
 SUITE_SKILLS = (
     "paper-spine",
-    "paper-spine-ui",
-    "paper-spine-intake",
-    "paper-spine-research",
-    "paper-spine-citation",
-    "paper-spine-rewrite",
-    "paper-spine-build",
-    "paper-spine-latex",
-    "paper-spine-audit",
-    "paper-spine-translate",
-    "paper-spine-humanize",
-    "paper-spine-update",
 )
 
 
@@ -135,6 +127,17 @@ def clean_legacy(args: argparse.Namespace) -> None:
     paths.extend(args.codex_skills_dir / skill for skill in SUITE_SKILLS)
     paths.extend(args.claude_skills_dir / skill for skill in SUITE_SKILLS)
     paths.extend(args.openclaw_skills_dir / skill for skill in SUITE_SKILLS)
+    # Stage 2b migration: also clean legacy paper-spine-* worker directories
+    # that are no longer in SUITE_SKILLS.
+    for skills_dir in (
+        args.codex_skills_dir,
+        args.claude_skills_dir,
+        args.openclaw_skills_dir,
+    ):
+        if skills_dir.exists():
+            for child in skills_dir.iterdir():
+                if child.is_dir() and child.name.startswith("paper-spine-"):
+                    paths.append(child)
     for path in paths:
         remove_path(path)
 
@@ -187,6 +190,28 @@ def sync_dist_only() -> None:
     dist_root = ROOT / "dist"
 
     synced = 0
+    skill_roots = [
+        dist_root / "claude" / "skills" / "paper-spine",
+        dist_root / "codex" / "skills" / "paper-spine",
+        dist_root / "openclaw" / "skills" / "paper-spine",
+        dist_root / "codex" / "paper-spine",
+    ]
+    for skill_root in skill_roots:
+        scripts_target = skill_root / "scripts"
+        references_target = skill_root / "references"
+        if scripts_target.is_dir():
+            for src_file in list(src_scripts.glob("*.py")) + list(src_scripts.glob("*.sh")) + list(src_scripts.glob("*.ps1")):
+                target = scripts_target / src_file.name
+                if not target.exists() or target.read_bytes() != src_file.read_bytes():
+                    shutil.copy2(src_file, target)
+                    synced += 1
+        if references_target.is_dir():
+            for src_file in src_references.glob("*.md"):
+                target = references_target / src_file.name
+                if not target.exists() or target.read_bytes() != src_file.read_bytes():
+                    shutil.copy2(src_file, target)
+                    synced += 1
+
     source_files = (
         list(src_scripts.glob("*.py"))
         + list(src_scripts.glob("*.sh"))

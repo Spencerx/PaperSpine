@@ -24,24 +24,15 @@ from typing import Any
 DEFAULT_MANIFEST_URL = (
     "https://raw.githubusercontent.com/WUBING2023/PaperSpine/main/dist/paperspine_version.json"
 )
-DEFAULT_ARCHIVE_URL = "https://github.com/WUBING2023/PaperSpine/archive/refs/heads/main.zip"
+# Stage 5a: archive_url points to a fixed tag so users never pull in-flight main.
+DEFAULT_ARCHIVE_URL = "https://github.com/WUBING2023/PaperSpine/archive/refs/tags/v3.3.0.zip"
 CONFIG_HOME_ENV = "PAPERSPINE_CONFIG_HOME"
 VERSION_FILE = "paperspine_version.json"
 INSTALL_STATE_FILE = "install_state.json"
 
+# Stage 2a: published suite is a single orchestrator skill.
 SUITE_SKILLS = (
     "paper-spine",
-    "paper-spine-ui",
-    "paper-spine-intake",
-    "paper-spine-research",
-    "paper-spine-citation",
-    "paper-spine-rewrite",
-    "paper-spine-build",
-    "paper-spine-latex",
-    "paper-spine-audit",
-    "paper-spine-translate",
-    "paper-spine-humanize",
-    "paper-spine-update",
 )
 
 
@@ -242,12 +233,11 @@ def validate_repo(root: Path) -> dict[str, Any]:
     if not discovered_skills:
         missing.append("dist/claude/skills/*/SKILL.md — no skills discovered")
     if set(discovered_skills) != set(SUITE_SKILLS):
-        extra = set(discovered_skills) - set(SUITE_SKILLS)
         lacking = set(SUITE_SKILLS) - set(discovered_skills)
-        if extra:
-            missing.append(f"Unexpected skills in dist: {', '.join(sorted(extra))}")
         if lacking:
             missing.append(f"Missing skills from dist: {', '.join(sorted(lacking))}")
+        # Stage 2a: legacy worker directories (paper-spine-*) may co-exist
+        # with the main skill.  They are not errors.
     for skill in discovered_skills:
         for host in ("claude", "codex", "openclaw"):
             path = root / "dist" / host / "skills" / skill / "SKILL.md"
