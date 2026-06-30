@@ -57,6 +57,11 @@ section location.
 - Select citations sentence by sentence from `citation_support_bank.md`.
 - `rewrite_matrix.md` maps original to final units, classifying each change.
 
+For a deeper, literature-informed pass — motivation-thread extraction,
+move-guided section rewrite, structural-coherence pass, and a numerical /
+cross-section motivation audit — apply the staged method in
+`references/round1-literature-revision.md`.
+
 ## Pre-LaTeX Gate
 
 ```bash

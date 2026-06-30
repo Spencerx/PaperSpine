@@ -8,6 +8,15 @@ Assemble the LaTeX project, compile PDF when possible, and produce Word output.
 Word (.docx) is a standard required artifact, not optional. Do not change
 manuscript logic during assembly.
 
+For a section-by-section, template-first conversion (copy the base `.tex`,
+`Edit` only prose paragraphs, preserve preamble / floats / equations /
+`\maketitle` / bibliography commands) and the compile-and-fix + content-integrity
+steps, follow `references/round3-latex-polish.md` then
+`references/round4-template-integration.md`. They also walk the proper citation
+mechanism — `\cite` + `\bibliographystyle`/`\bibliography` resolved by bibtex —
+which is exactly the linkage `latex_guard.py` now enforces (see the citation
+hard rule below).
+
 ## Required Outputs
 
 - `final_paper/main.tex`

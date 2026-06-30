@@ -51,6 +51,18 @@ findings into Required Findings (blocking) and Advisory Findings (non-blocking).
 At most 3 rounds. In each round, fix required dimensions' FAIL/WARNING findings.
 Advisory findings: review but do not over-rewrite.
 
+## Target-Journal Style Conformity (optional deeper method)
+
+AIGC reduction (D1–D5) is about detector-risk signals; matching the *target
+journal's* voice is a separate axis. When the deep-read journal corpus and
+`journal-style-analysis.md` (JS templates) are available, apply the CASPArS
+"Three R's" calibration in `references/round2-journal-revision.md`
+(R1 Recalibration → R2 Replacement → R3 Redevelopment) to align word frequency,
+hedging/connector choice, claim-strength distribution, and sentence rhythm with
+the corpus, and build its Style Conformity Checklist. Record the analysis in
+`restructuring_notes.md`. This complements, and does not replace, the humanize
+metrics above.
+
 ## Humanize Threshold Overrides
 
 Individual detection thresholds can be overridden via `paper_spine_config.json`

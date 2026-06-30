@@ -20,3 +20,16 @@ PaperSpine is a single orchestrator skill. Each stage reads its playbook from
 > Historical worker skills (`paper-spine-ui`, `paper-spine-intake`, etc.) were
 > removed in architecture convergence Stage 2b.  All stage logic now lives in
 > `references/*.md` playbooks.
+
+## Supplementary Deep-Revision Methods
+
+These are detailed, optional sub-methods invoked from a stage playbook above, not
+separate stages. Use them when the inputs they need (e.g. a deep-read journal
+corpus) are available:
+
+| Method | Invoked from | What it adds |
+|---|---|---|
+| `references/round1-literature-revision.md` | `rewrite.md` | motivation-thread extraction, move-guided section rewrite, numerical + cross-section audit |
+| `references/round2-journal-revision.md` | `humanize.md` | CASPArS "Three R's" corpus-based style calibration + Style Conformity Checklist |
+| `references/round3-latex-polish.md` | `latex.md` | template-first Markdown→LaTeX conversion + native-English polishing |
+| `references/round4-template-integration.md` | `latex.md` | journal-template integration, compile-and-fix, content-integrity verification |
