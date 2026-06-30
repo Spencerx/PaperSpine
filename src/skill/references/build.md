@@ -54,5 +54,11 @@ After drafting, every `Final Text Check` value must start with `PASS` or
 - Quote paths with spaces or non-ASCII chars.
 - Use `output_language` from config.
 - Select citations sentence by sentence.
+- Draft from `section_blueprints.md` / `writing_rationale_matrix.md`, but keep
+  their scaffolding internal: the manuscript body must never name supervisors,
+  reviewers, review comments, an earlier draft, or narrate that the paper was
+  reorganized to address feedback, and must never transcribe an `A -> B -> C`
+  planning throughline as prose. `integrity_audit.py` hard-fails this.
+- Cite with `\cite{key}` linked to a bibliography; never type literal `[1]` text.
 - Run integrity audit + structured review before LaTeX.
 - Build final LaTeX under `final_paper/`.

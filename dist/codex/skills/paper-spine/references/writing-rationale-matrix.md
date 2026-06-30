@@ -88,6 +88,17 @@ should be traceable to the original logic map and/or a deliberate structural
 change. For build-from-materials tasks, each row should be traceable to the
 source inventory, evidence bank, claim register, or figure asset map.
 
+**Scaffolding stays internal (fourth-wall rule).** The matrix's reasoning
+columns — the motivation link, the "close-the-supervisor/reviewer-comment"
+justifications, the planned structural moves, and any `A -> B -> C` throughline —
+are PLANNING NOTATION. Draft *from* them, but never copy them into the
+manuscript. The reader-facing prose must never name the writing process, a
+supervisor or reviewer, their comments/feedback, an earlier or previous draft,
+or narrate that the paper was "reorganized/restructured" to address anything.
+A sentence like "针对导师对前期初稿的审阅意见，本文沿一条主线重新组织：…→…→…" is
+a leak of this matrix row into the body — render it instead as a direct
+motivation statement. `integrity_audit.py` hard-fails such process language.
+
 After drafting, update the `Final Text Check` column. The value must start with
 `PASS` or `FAIL`, then give the final location or the reason it still fails.
 Examples: `PASS: Section 2 paragraph 3 now states the claim after citation C12.`

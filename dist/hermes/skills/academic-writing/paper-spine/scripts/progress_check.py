@@ -272,7 +272,30 @@ def _run_final_audit_gate(output_dir: Path, config: dict) -> tuple[bool, str, li
             if rc != 0:
                 failures.append(f"word_guard.py ({docx_rel}) exit {rc}")
 
-    # 6. Contribution-first / reviewer-aware methodology gates (V4).
+    # 6. Body-level guards (V4): citation linkage + section economy. These read
+    #    the manuscript itself, so they only run once main.tex exists; if it is
+    #    missing the artifact/drafting gates already fail.
+    tex_path = output_dir / "final_paper" / "main.tex"
+    if tex_path.exists():
+        lg_args = [str(tex_path), "--markdown"]
+        bib_path = output_dir / "final_paper" / "references.bib"
+        if bib_path.exists():
+            lg_args.extend(["--bib", str(bib_path)])
+        rc, _stdout, _stderr = _run_script(scripts_dir, "latex_guard.py", lg_args)
+        if rc != 0:
+            failures.append(f"latex_guard.py exit {rc}")
+        try:
+            max_sections = int(config.get("max_sections", 6))
+        except (ValueError, TypeError):
+            max_sections = 6
+        rc, _stdout, _stderr = _run_script(
+            scripts_dir, "section_economy_check.py",
+            [str(tex_path), "--max-sections", str(max_sections), "--markdown"],
+        )
+        if rc != 0:
+            failures.append(f"section_economy_check.py exit {rc}")
+
+    # 7. Contribution-first / reviewer-aware methodology gates (V4).
     for script in ("contribution_check.py", "reviewer_audit_check.py"):
         rc, _stdout, _stderr = _run_script(scripts_dir, script, [str(output_dir), "--markdown", "--write"])
         if rc != 0:

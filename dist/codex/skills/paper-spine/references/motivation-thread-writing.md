@@ -12,6 +12,18 @@ Field problem -> specific gap -> design response -> evidence -> interpretation -
 
 Every section should advance that arc. The arc should be visible at strategic reader touchpoints: title if editable, abstract order, Introduction promise, direct-evidence section, key transitions, figure/table callouts, and Discussion closure. Do not force the same motivation keyword into every subsection heading.
 
+**The arrow-chain is internal planning notation, not prose.** The
+`A -> B -> C` throughline above is a design device for *you*. Render it as
+flowing argument in the manuscript; never transcribe the literal arrow chain
+(`传统客服痛点 → 大模型机遇 → ...`) into a sentence the reader sees. Likewise the
+manuscript must never name its own writing process — no mention of supervisors,
+reviewers, review comments, an earlier/previous draft, or "this paper is
+reorganized/restructured to address X". State the motivation as a fact about the
+work, not as a response to feedback. (A legitimate *analytical* arrow chain that
+describes content — a failure pathway or data flow such as
+`指代缺失 → 意图漂移 → 错误检索` — is fine; what is forbidden is narrating the
+plan or the review process.)
+
 ## Motivation Confirmation Comes First
 
 Before building the motivation thread model, create or verify `paper_rewriting_output/confirmed_motivation.md`. The user's confirmed motivation is the spine. Exemplar papers may teach rhetorical moves, but they must not choose the paper's motivation for the user.

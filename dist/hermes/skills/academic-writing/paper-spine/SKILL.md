@@ -268,10 +268,16 @@ Read `references/latex.md` for LaTeX assembly, PDF compilation, and Word output.
 Word (.docx) is a standard required artifact. Produce and check it unless
 `word_output` is explicitly `none`.
 
-**Citation format (hard rule):** All in-text citations must be plain
-square-bracket numeric citations, e.g. `[1]` or `[3,12,13]`. Do not use
-author-year citations and do not wrap numeric citations in extra parentheses
-such as `([15])`. `latex_guard.py` and `word_guard.py` check this.
+**Citation mechanism (hard rule):** Every in-text citation must be a real
+`\cite{key}` linked to a bibliography entry — either `\bibliographystyle{unsrt}`
+(or `plain`/`ieeetr`) + `\bibliography{references.bib}`, or a `thebibliography`
+block whose `\bibitem{key}` entries are reached by `\cite{key}`. Never type the
+bracket number as literal text: a hand-typed `[1]` is inert and does not link to
+the reference list (in the PDF or the .docx). A numeric `bibliographystyle`/CSL
+still renders as `[1]` or `[3,12,13]`, so the visible plain-numeric style is
+preserved. Do not use author-year citations and do not wrap numeric citations in
+extra parentheses such as `([15])`. `latex_guard.py` fails literal-bracket
+citations with no `\cite` and out-of-sync numbering; it also checks the format.
 
 **Title (hard rule):** `main.tex` must contain `\title{...}` and `\maketitle`.
 Word output must begin with the paper title — not Abstract, Keywords, or body
@@ -282,8 +288,18 @@ When `output_language` is `zh`, the paper is Chinese. Produce
 `paper.docx` — the `.zh.docx` suffix marks the language, not a translation:
 
 ```bash
-pandoc paper_rewriting_output/final_paper/main.tex -o paper_rewriting_output/final_paper/paper.zh.docx --from latex --to docx --resource-path=paper_rewriting_output/final_paper --number-sections
+pandoc paper_rewriting_output/final_paper/main.tex -o paper_rewriting_output/final_paper/paper.zh.docx --from latex --to docx --resource-path=paper_rewriting_output/final_paper --number-sections --citeproc --bibliography=paper_rewriting_output/final_paper/references.bib
 python scripts/word_guard.py paper_rewriting_output/final_paper/paper.zh.docx --language zh --fix-fonts
+```
+
+`--citeproc --bibliography=...` resolves `\cite` to linked `[1]` numbers in the
+.docx (matching the English command). Use it when citations come from a
+`references.bib`. If the paper instead carries a `thebibliography` block with
+`\bibitem`, drop `--citeproc --bibliography=...` — pandoc resolves `\cite`
+against `\bibitem` natively; either way the source must use `\cite`, never
+literal bracket text.
+
+```bash
 python scripts/word_guard.py paper_rewriting_output/final_paper/paper.zh.docx --language zh --markdown --output paper_rewriting_output/word_report.zh.md
 ```
 

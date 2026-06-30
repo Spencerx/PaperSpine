@@ -33,11 +33,18 @@ python scripts/word_guard.py paper_rewriting_output/final_paper/paper.docx --tex
 never leave an older `paper.pdf` beside a newer `main.pdf`.
 `artifact_check.py` fails stale or mismatched `paper.pdf`.
 
-**Citation format (hard rule):** All in-text citations must be plain
-square-bracket numeric citations, e.g. `[1]`, `[3,12,13]`. Author-year
+**Citation mechanism (hard rule):** Every in-text citation must be a real
+`\cite{key}` linked to a bibliography entry — either `\bibliographystyle{unsrt}`
+(or `plain`/`ieeetr`) + `\bibliography{references.bib}`, or a `thebibliography`
+block whose `\bibitem{key}` entries are reached by `\cite{key}`. Never type the
+bracket number as literal text: a hand-typed `[1]` is inert and links to nothing
+in either the PDF or the .docx, and the numbering silently desyncs if the
+reference list reorders. A numeric `bibliographystyle`/CSL still renders as `[1]`
+or `[3,12,13]`, so the visible plain-numeric style is preserved. Author-year
 citations and extra-parenthesized numeric citations such as `([15])` are
 forbidden. Do not use superscript for these citations unless the target journal
-explicitly requires it.
+explicitly requires it. `latex_guard.py` fails literal-bracket citations that
+have no `\cite` and flags numbering that exceeds the reference-entry count.
 
 **Title (hard rule):** `main.tex` must contain `\title{...}` (with the paper's
 title) and `\maketitle` after `\begin{document}`. Word output must begin with

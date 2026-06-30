@@ -278,6 +278,66 @@ def check_citation_format(text: str) -> list[Finding]:
     return findings
 
 
+def check_citation_linkage(text: str, bib_keys: set[str]) -> list[Finding]:
+    """Catch in-text citations that are inert text instead of linked references.
+
+    A numeric bibliographystyle still renders ``\\cite{key}`` as ``[1]``, so the
+    visible plain-numeric style is preserved; what this check forbids is typing
+    the bracket number as literal text with no ``\\cite`` behind it, which leaves
+    the citation unlinked to the reference list in both the PDF and the .docx.
+    """
+    findings: list[Finding] = []
+    doc_start = text.find("\\begin{document}")
+    if doc_start == -1:
+        return findings
+    body = text[doc_start:]
+
+    # In-text citations live before the reference list itself.
+    bib_match = re.search(r"\\begin\{thebibliography\}|\\bibliography\b", body)
+    intext = body[: bib_match.start()] if bib_match else body
+
+    # Drop math so bracketed numbers inside math are not read as citations.
+    intext_no_math = re.sub(r"\$\$.*?\$\$", " ", intext, flags=re.DOTALL)
+    intext_no_math = re.sub(r"\\\[.*?\\\]", " ", intext_no_math, flags=re.DOTALL)
+    intext_no_math = re.sub(r"\$[^$]*?\$", " ", intext_no_math)
+
+    cite_macros = re.findall(r"\\cite\w*\*?(?:\[[^\]]*\]){0,2}\{([^{}]+)\}", body)
+    literal_pattern = re.compile(r"(?<!\w)\[\d+(?:\s*[,–-]\s*\d+)*\]")
+    literal_marks = list(literal_pattern.finditer(intext_no_math))
+    bibitem_keys = re.findall(r"\\bibitem(?:\[[^\]]*\])?\{([^{}]+)\}", body)
+    entry_count = len(bibitem_keys) or len(bib_keys)
+
+    if literal_marks and not cite_macros:
+        loc = literal_pattern.search(intext)
+        line = line_number(text, doc_start + loc.start()) if loc else None
+        findings.append(Finding(
+            "error", "citation-linkage",
+            f"In-text citations use literal bracket numbers (e.g. {literal_marks[0].group(0)}) "
+            "with no \\cite command, so they are inert text with no link to the reference list. "
+            "Cite with \\cite{key} backed by a numeric bibliographystyle or \\bibitem entries; a "
+            "numeric style still renders as [1].",
+            line,
+        ))
+        numbers = [int(value) for match in literal_marks for value in re.findall(r"\d+", match.group(0))]
+        if entry_count and numbers and max(numbers) > entry_count:
+            findings.append(Finding(
+                "error", "citation-linkage",
+                f"Highest in-text citation number [{max(numbers)}] exceeds the {entry_count} "
+                "reference entries; the manual numbering is out of sync with the bibliography.",
+            ))
+    elif cite_macros and bibitem_keys:
+        used = {key.strip() for group in cite_macros for key in group.split(",") if key.strip()}
+        uncited = [key for key in bibitem_keys if key not in used]
+        if uncited:
+            sample = ", ".join(uncited[:5])
+            findings.append(Finding(
+                "warning", "citation-linkage",
+                f"{len(uncited)} reference entr{'y' if len(uncited) == 1 else 'ies'} are never "
+                f"cited (e.g. {sample}); every \\bibitem should be cited with \\cite.",
+            ))
+    return findings
+
+
 def run_checks(tex_path: Path, bib_path: Path | None) -> list[Finding]:
     raw = read_text(tex_path)
     text = strip_comments(raw)
@@ -294,6 +354,7 @@ def run_checks(tex_path: Path, bib_path: Path | None) -> list[Finding]:
     findings.extend(check_alignment_tabs(text))
     findings.extend(check_title_and_maketitle(text))
     findings.extend(check_citation_format(text))
+    findings.extend(check_citation_linkage(text, bib_keys))
     return findings
 
 

@@ -14,6 +14,10 @@ Produce an independent review with findings organized by:
 - Structure and argument flow
 - Paragraph-level coherence
 - Register and target-scene appropriateness
+- Meta-narrative / fourth-wall leaks: flag any prose that names the writing
+  process — supervisors, reviewers, review comments, an earlier draft — or that
+  narrates reorganizing the paper, or transcribes an `A -> B -> C` planning
+  throughline. This belongs in the blueprint, never in the manuscript.
 - AIGC signal patterns (D1–D5) from `humanize_report.md`
 
 Do not see other reviewers' outputs. Write only your own review file.

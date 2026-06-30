@@ -78,9 +78,19 @@ it. The following are hard errors that prevent completion:
 Before declaring the workflow complete, run the checks below in order.
 `progress_check.py --gate final_audit` is the authoritative hard gate: it
 re-runs `artifact_check.py`, `citation_bank_check.py`, `integrity_audit.py`,
-`citation_quality_audit.py`, and the required `word_guard.py` check, then fails
-on any non-zero exit code.
+`citation_quality_audit.py`, the required `word_guard.py` check, and — once
+`final_paper/main.tex` exists — `latex_guard.py` and `section_economy_check.py`,
+then fails on any non-zero exit code.
 Do not treat existing report files as enough evidence of completion.
+
+These last two read the manuscript body, not just report shapes:
+`latex_guard.py` fails literal-bracket citations that are not real `\cite`
+links and out-of-sync numbering; `integrity_audit.py` fails writing-process /
+meta-narrative language (supervisor or reviewer mentions, "reorganized the
+paper", transcribed `A -> B -> C` plan chains) leaking into the prose; and
+`section_economy_check.py` fails a top-level section count above the
+applied-paper budget (4-6). A clean report file is not enough — the body must
+pass.
 
 ```bash
 python scripts/artifact_check.py paper_rewriting_output --markdown --write

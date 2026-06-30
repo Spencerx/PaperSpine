@@ -6,7 +6,7 @@
 
 | Check | Expect | Exit | Verdict |
 |---|---|---|---|
-| full test suite (Ran 205 tests in 44.107s)  | pass | 0 | ✅ |
+| full test suite (Ran 212 tests in 38.031s)  | pass | 0 | ✅ |
 | ruff lint  | pass | 0 | ✅ |
 | dist-sync drift (dist/ matches src)  | pass | 0 | ✅ |
 | install runs  | pass | 0 | ✅ |
