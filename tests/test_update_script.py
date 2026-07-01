@@ -190,10 +190,32 @@ class ValidateRepoTests(unittest.TestCase):
         return paperspine_update
 
     def test_validate_repo_accepts_actual_repository(self) -> None:
-        """Guards against validate_repo drifting from the real dist layout."""
+        """Guards against validate_repo drifting from the real dist layout (issue #6)."""
         updater = self._import_updater()
         manifest = updater.validate_repo(ROOT)
         self.assertIn("version", manifest)
+        expected = json.loads((ROOT / "dist" / "paperspine_version.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["version"], expected["version"])
+
+    def test_validate_repo_warns_but_accepts_missing_optional(self) -> None:
+        # Issue #13 forward-compat: a doc/installer renamed or dropped in a newer
+        # package must NOT abort the upgrade — validate_repo warns and returns.
+        updater = self._import_updater()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = create_repo(Path(tmp) / "PaperSpine-main", "9.9.9")
+            (root / "README.en.md").unlink()
+            (root / "install.ps1").unlink()
+            manifest = updater.validate_repo(root)
+            self.assertEqual(manifest["version"], "9.9.9")
+
+    def test_validate_repo_rejects_missing_core(self) -> None:
+        # Core payload (the skill the updater installs) is still hard-required.
+        updater = self._import_updater()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = create_repo(Path(tmp) / "PaperSpine-main", "9.9.9")
+            (root / "dist" / "claude" / "skills" / "paper-spine" / "SKILL.md").unlink()
+            with self.assertRaises(updater.UpdateError):
+                updater.validate_repo(root)
 
     def test_update_reference_points_to_installed_script_path(self) -> None:
         """update.md must reference the real installed path, not the legacy skill."""

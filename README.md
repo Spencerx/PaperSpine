@@ -303,6 +303,13 @@ python src/scripts/paperspine_update.py --yes
 python src/scripts/paperspine_update.py --check-only
 ```
 
+**升级失败?（旧版本自更新报 "incomplete"）** 如果你停留在较旧版本，`paperspine_update.py --yes` 报 `Downloaded PaperSpine package is incomplete`，这是**旧版校验器拒收新版包**导致的（issue #13）——升级时跑的是本地旧校验器。一次性手动重装即可打通，之后自更新恢复正常：
+
+- Windows：`powershell -File install.ps1`（可加 `-CleanLegacy` 清理旧的分散 skill）
+- macOS/Linux：`bash install.sh`（可加 `--clean-legacy`）
+
+或直接从 `main` 复制 `dist/claude/skills/*` 与 `dist/claude/commands/paperspine.md` 到 `~/.claude/skills/`、`~/.claude/commands/`。4.0.0 起的更新器对可选文件（README / 安装脚本）只告警不中止，此问题不再复发。
+
 ## PaperSpine 试图避免的问题
 
 - 只改句子，不改论文逻辑或贡献。

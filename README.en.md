@@ -301,6 +301,13 @@ It compares the version recorded in `~/.paperspine/install_state.json` with the 
 python src/scripts/paperspine_update.py --check-only
 ```
 
+**Upgrade failing? (old versions self-updating report "incomplete")** If you are on an older version and `paperspine_update.py --yes` reports `Downloaded PaperSpine package is incomplete`, it is because the **old validator rejects the new package** (issue #13) — the upgrade runs your *local, old* validator. A one-time manual reinstall fixes it, and self-update works again afterwards:
+
+- Windows: `powershell -File install.ps1` (add `-CleanLegacy` to remove the old split skills)
+- macOS/Linux: `bash install.sh` (add `--clean-legacy`)
+
+Or copy `dist/claude/skills/*` and `dist/claude/commands/paperspine.md` from `main` into `~/.claude/skills/` and `~/.claude/commands/`. From 4.0.0 on, the updater only warns (never aborts) on optional files (README / installers), so this no longer recurs.
+
 ## What PaperSpine Tries To Prevent
 
 - Polishing sentences without changing the paper's logic or contribution.

@@ -25,7 +25,7 @@ DEFAULT_MANIFEST_URL = (
     "https://raw.githubusercontent.com/WUBING2023/PaperSpine/main/dist/paperspine_version.json"
 )
 # Stage 5a: archive_url points to a fixed tag so users never pull in-flight main.
-DEFAULT_ARCHIVE_URL = "https://github.com/WUBING2023/PaperSpine/archive/refs/tags/v3.3.0.zip"
+DEFAULT_ARCHIVE_URL = "https://github.com/WUBING2023/PaperSpine/archive/refs/tags/v4.0.0.zip"
 CONFIG_HOME_ENV = "PAPERSPINE_CONFIG_HOME"
 VERSION_FILE = "paperspine_version.json"
 INSTALL_STATE_FILE = "install_state.json"
@@ -213,35 +213,47 @@ def latest_manifest(args: argparse.Namespace) -> dict[str, Any]:
 def validate_repo(root: Path) -> dict[str, Any]:
     """Validate a downloaded V4 single-skill PaperSpine package.
 
-    Stage V4 / issues #13 + #6: the suite is now a single ``paper-spine``
-    orchestrator skill published per host.  Validation only demands the files
-    that genuinely must exist in the current layout; it deliberately never
-    requires legacy artifacts removed across versions (e.g. README.zh-CN.md,
-    paper-spine.md, paperspine-legacy.md, dist/codex/paper-spine/SKILL.md).
-    """
-    # Files that must exist at the repository root in every published version.
-    required: list[str] = [
-        "install.ps1",
-        "install.sh",
-        "README.md",
-        "README.en.md",
-        "dist/paperspine_version.json",
-    ]
-    # The single orchestrator skill, published once per agent host.
-    for skill in SUITE_SKILLS:
-        required.append(f"dist/claude/skills/{skill}/SKILL.md")
-        required.append(f"dist/codex/skills/{skill}/SKILL.md")
-        required.append(f"dist/openclaw/skills/{skill}/SKILL.md")
-        # Hermes nests the skill under the academic-writing namespace.
-        required.append(f"dist/hermes/skills/academic-writing/{skill}/SKILL.md")
-    # Slash-command / prompt entry points for Claude and Codex.
-    required.append("dist/claude/commands/paperspine.md")
-    required.append("dist/codex/prompts/paperspine.md")
+    Stage V4 / issues #13 + #6: the suite is a single ``paper-spine``
+    orchestrator skill published per host.
 
-    missing = [rel for rel in required if not (root / rel).exists()]
-    if missing:
+    Forward-compatibility (issue #13): only *core* payload — the version
+    manifest, the per-host skill, and the command/prompt entry points the
+    updater actually installs — is required, and a missing core file aborts.
+    Docs and root installers (``README*``, ``install.*``) are *optional*: a
+    missing optional file only warns, so a stale updater no longer rejects a
+    newer package that renamed or dropped a doc (the exact failure in #13, e.g.
+    ``README.zh-CN.md``). Legacy artifacts removed across versions
+    (``paper-spine.md``, ``paperspine-legacy.md``, ``dist/codex/paper-spine/SKILL.md``)
+    are never required.
+    """
+    # Core payload: without these the package cannot be installed — fatal.
+    core: list[str] = ["dist/paperspine_version.json"]
+    for skill in SUITE_SKILLS:
+        core.append(f"dist/claude/skills/{skill}/SKILL.md")
+        core.append(f"dist/codex/skills/{skill}/SKILL.md")
+        core.append(f"dist/openclaw/skills/{skill}/SKILL.md")
+        # Hermes nests the skill under the academic-writing namespace.
+        core.append(f"dist/hermes/skills/academic-writing/{skill}/SKILL.md")
+    # Slash-command / prompt entry points for Claude and Codex.
+    core.append("dist/claude/commands/paperspine.md")
+    core.append("dist/codex/prompts/paperspine.md")
+
+    # Optional: docs + root installers. These churn across versions, so a
+    # missing one must never abort an upgrade — warn and continue.
+    optional: list[str] = ["install.ps1", "install.sh", "README.md", "README.en.md"]
+
+    missing_core = [rel for rel in core if not (root / rel).exists()]
+    if missing_core:
         raise UpdateError(
-            "Downloaded PaperSpine package is incomplete:\n" + "\n".join(missing[:20])
+            "Downloaded PaperSpine package is incomplete (missing core files):\n"
+            + "\n".join(missing_core[:20])
+        )
+    missing_optional = [rel for rel in optional if not (root / rel).exists()]
+    if missing_optional:
+        print(
+            "PaperSpine update: optional files absent (continuing anyway): "
+            + ", ".join(missing_optional),
+            file=sys.stderr,
         )
     return read_json(root / "dist" / VERSION_FILE)
 
