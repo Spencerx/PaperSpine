@@ -15,10 +15,10 @@
   "build": {
     "installCommand": "powershell -ExecutionPolicy Bypass -File <extracted-package>/install.ps1 -Target codex",
     "verifyCommands": [
-      "python scripts/verify_paperspine5_release.py",
+      "python paperspine5/release_tools/verify_release.py",
       "python -m unittest discover -s tests -p test_atlas_pipeline.py"
     ],
-    "buildCommand": "python scripts/build_paperspine5_site.py"
+    "buildCommand": "python paperspine5/release_tools/build_site.py"
   },
   "release": {
     "tagTemplate": "v{version}",

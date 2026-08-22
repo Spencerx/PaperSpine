@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 VERSION = "0.3.0-rc.1"
 EXPECTED_CORE = "9eed412bf2a40b1e00787cd04de2adf696a662055ea31152ebc8f2899e2ba95f"
 EXPECTED_ARTIFACTS = {

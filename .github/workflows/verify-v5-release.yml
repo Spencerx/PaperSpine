@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Verify committed release source and manifest
-        run: python scripts/verify_paperspine5_release.py
+        run: python paperspine5/release_tools/verify_release.py
       - name: Download immutable public assets
         env:
           GH_TOKEN: ${{ github.token }}
