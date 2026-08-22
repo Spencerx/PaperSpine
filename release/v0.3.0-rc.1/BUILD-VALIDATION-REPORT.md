@@ -4,7 +4,7 @@
 - 构建身份：`paperspine5-0.3.0-rc.1-build.20260823.1`
 - 结果：**PASS**
 - 同版核心摘要：`9eed412bf2a40b1e00787cd04de2adf696a662055ea31152ebc8f2899e2ba95f`（每包 176 个核心文件，逐字节一致）
-- 发布状态：仅本地 release staging；未推送 GitHub，未改变公开下载 URL。
+- 发布状态：已作为 `v0.3.0-rc.1` GitHub prerelease 发布；公开 Release 页面与下载 URL 是最终发布权威。
 
 ## 产物
 

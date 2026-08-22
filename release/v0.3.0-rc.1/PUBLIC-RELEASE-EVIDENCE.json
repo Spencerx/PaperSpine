@@ -4,7 +4,7 @@
   "version": "0.3.0-rc.1",
   "tag": "v0.3.0-rc.1",
   "build_id": "paperspine5-0.3.0-rc.1-build.20260823.1",
-  "status": "prepared",
+  "status": "published",
   "immutable_artifacts": [
     {
       "file": "paperspine5-skill-0.3.0-rc.1.zip",
@@ -40,6 +40,6 @@
     "ZIP files were copied byte-for-byte from the validated staging directory.",
     "The unpacked staging directory contained no __pycache__ directories at preparation time.",
     "Machine-local paths were removed from the public validation evidence.",
-    "Public download verification remains pending until the GitHub prerelease exists."
+    "The four immutable ZIPs passed authenticated draft re-download and anonymous public re-download SHA-256 verification on 2026-08-23."
   ]
 }
