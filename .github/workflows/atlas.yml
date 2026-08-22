@@ -4,10 +4,13 @@ on:
   schedule:
     - cron: "0 1 * * *"   # 每天 UTC 01:00（北京时间 09:00）刷新数据并重新发布
   workflow_dispatch:
+  release:
+    types: [published, prereleased]
   push:
     branches: [main]
     paths:
       - "atlas/**"
+      - "website/**"
       - ".github/workflows/atlas.yml"
 
 permissions:
@@ -58,6 +61,8 @@ jobs:
         run: |
           mkdir _site
           cp atlas/index.html atlas/echarts.min.js atlas/worldgeo.js atlas/data.js _site/
+          mkdir -p _site/v5
+          cp -R website/. _site/v5/
 
       - uses: actions/configure-pages@v5
         with:

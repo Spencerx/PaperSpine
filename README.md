@@ -6,7 +6,13 @@
 
 配音贡献：[https://github.com/YiShanZheng](https://github.com/YiShanZheng)
 
-[**🌍 订阅者星图 · 看看哪些高校和城市在用 PaperSpine**](https://wubing2023.github.io/PaperSpine/)
+[**🌍 社区 Stargazer 星图 · 公开 GitHub 社区信号**](https://wubing2023.github.io/PaperSpine/)
+
+## PaperSpine5 发布候选版
+
+PaperSpine5 `0.3.0-rc.1` 在保留本仓库 V4 安装与更新身份的基础上，增加五阶段本地科研生产工作区。请从[中文发布页](https://wubing2023.github.io/PaperSpine/v5/)开始：先把完整的零起点安装指令交给 AI，也可以按宿主选择 Codex、Claude Code 或 DSH 插件包。[GitHub prerelease](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.3.0-rc.1)提供四个原样 ZIP、SHA-256、manifest 与验证证据。
+
+V5 当前是显式选择的 RC，不会替换 V4 的 `dist/paperspine_version.json` 更新源。更新检查默认关闭；发布软件也不代表授权任何论文外部投稿。精确范围、限制与回滚方式见 [`RELEASE-NOTES-v0.3.0-rc.1.md`](RELEASE-NOTES-v0.3.0-rc.1.md) 和 [`ROLLBACK.md`](ROLLBACK.md)。
 
 
 > PaperSpine 是一个以「贡献为先、面向审稿人」为核心的学术写作系统，支持 Claude Code、Codex、OpenClaw 和 Hermes CLI 四个宿主。
