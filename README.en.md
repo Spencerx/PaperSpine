@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="website/assets/brand/paperspine-mark.svg" width="112" alt="PaperSpine Ridge Seal logo">
+</p>
+
 # PaperSpine
 
 [English](README.en.md) | [中文](README.md)

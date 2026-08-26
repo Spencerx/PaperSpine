@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="website/assets/brand/paperspine-mark.svg" width="112" alt="PaperSpine 山脊印章标志">
+</p>
+
 # PaperSpine
 
 [English](README.en.md) | [中文](README.md)

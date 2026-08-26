@@ -100,8 +100,9 @@ p { text-wrap: pretty; }
   backdrop-filter: blur(18px) saturate(1.12);
 }
 
-.wordmark { display: inline-flex; width: max-content; min-height: 44px; align-items: center; font-size: 19px; font-weight: 700; letter-spacing: -.045em; }
-.wordmark b { margin-left: 3px; color: var(--clay); font-size: .82em; }
+.wordmark { display: inline-flex; width: max-content; min-height: 44px; align-items: center; gap: 8px; font-size: 19px; font-weight: 700; letter-spacing: -.045em; }
+.wordmark img { width: 28px; height: 28px; flex: 0 0 auto; }
+.wordmark b { margin-left: -5px; color: var(--clay); font-size: .82em; }
 .site-header nav { display: flex; align-items: center; gap: clamp(16px, 2.4vw, 34px); }
 .site-header nav a { position: relative; padding: 22px 0 20px; color: var(--ink-2); font-size: 13px; font-weight: 600; }
 .site-header nav a::after { position: absolute; right: 0; bottom: 15px; left: 0; height: 1px; content: ""; transform: scaleX(0); transform-origin: right; background: var(--clay); transition: transform .28s ease; }

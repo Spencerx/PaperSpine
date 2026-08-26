@@ -20,9 +20,9 @@
   .hero-index { grid-column: 1; max-width: 620px; }
   .hero-grid { background-size: calc((100vw - 2 * var(--page-pad)) / 6) 82px; }
 
-  .install-section { grid-template-columns: 1fr; }
-  .install-section-copy { position: static; grid-column: 1; max-width: 720px; }
-  .install-card { grid-column: 1; }
+  .install-section { grid-template-columns: minmax(0, 1fr); }
+  .install-section-copy { position: static; grid-column: 1; min-width: 0; max-width: 720px; }
+  .install-card { grid-column: 1; min-width: 0; }
 
   .premise, .release, .github, .community { grid-template-columns: 1fr; }
   .premise { gap: 42px; }
@@ -54,7 +54,8 @@
 
   body { font-size: 16px; }
   .site-header { padding: 0 var(--page-pad); }
-  .wordmark { font-size: 17px; }
+  .wordmark { gap: 7px; font-size: 17px; }
+  .wordmark img { width: 24px; height: 24px; }
   .release-chip { font-size: 8px; }
   .paper-section, .install-section, .workflow, .evidence, .github, .closing { padding: 84px var(--page-pad); }
 
