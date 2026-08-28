@@ -97,6 +97,65 @@
     });
   });
 
+  const supportDialog = document.getElementById("support-dialog");
+  const supportThanks = document.getElementById("support-thanks");
+  const supportOpeners = [...document.querySelectorAll("[data-support-open]")];
+  const supportClosers = [...document.querySelectorAll("[data-support-close]")];
+  const supportConfirm = document.querySelector("[data-support-confirm]");
+  let supportReturnFocus = null;
+  let supportThanksTimer = 0;
+
+  const closeSupportDialog = () => {
+    if (!supportDialog) return;
+    if (typeof supportDialog.close === "function" && supportDialog.open) supportDialog.close();
+    else supportDialog.removeAttribute("open");
+  };
+
+  const openSupportDialog = (trigger) => {
+    if (!supportDialog) return;
+    supportReturnFocus = trigger;
+    if (typeof supportDialog.showModal === "function") supportDialog.showModal();
+    else supportDialog.setAttribute("open", "");
+  };
+
+  supportOpeners.forEach((button) => button.addEventListener("click", () => openSupportDialog(button)));
+  supportClosers.forEach((button) => button.addEventListener("click", closeSupportDialog));
+
+  if (supportDialog) {
+    supportDialog.addEventListener("click", (event) => {
+      if (event.target === supportDialog) closeSupportDialog();
+    });
+    supportDialog.addEventListener("close", () => {
+      if (supportReturnFocus instanceof HTMLElement) supportReturnFocus.focus();
+    });
+  }
+
+  const hideSupportThanks = () => {
+    if (!supportThanks) return;
+    supportThanks.classList.remove("is-active");
+    supportThanks.hidden = true;
+  };
+
+  if (supportThanks) {
+    supportThanks.addEventListener("animationend", (event) => {
+      if (event.target === supportThanks && event.animationName === "support-overlay") hideSupportThanks();
+    });
+  }
+
+  if (supportConfirm) {
+    supportConfirm.addEventListener("click", () => {
+      closeSupportDialog();
+      if (!supportThanks) return;
+      window.clearTimeout(supportThanksTimer);
+      supportThanks.hidden = false;
+      supportThanks.classList.remove("is-active");
+      window.requestAnimationFrame(() => {
+        supportThanks.classList.add("is-active");
+        supportThanksTimer = window.setTimeout(hideSupportThanks, reduceMotion ? 1800 : 3600);
+      });
+    });
+  }
+
   if (!reduceMotion && hoverCapable) {
     document.querySelectorAll("[data-tilt]").forEach((card) => {
       card.addEventListener("pointermove", (event) => {

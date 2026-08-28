@@ -57,12 +57,15 @@ jobs:
       - name: Refuse empty atlas data
         run: python atlas/validate_data.py atlas/data.js
 
+      - name: Build and verify PaperSpine5 website
+        run: python paperspine5/release_tools/build_site.py
+
       - name: Assemble site (static files only)
         run: |
           mkdir _site
           cp atlas/index.html atlas/echarts.min.js atlas/worldgeo.js atlas/data.js _site/
           mkdir -p _site/v5
-          cp -R website/. _site/v5/
+          cp -R build/v5-site/. _site/v5/
 
       - uses: actions/configure-pages@v5
         with:

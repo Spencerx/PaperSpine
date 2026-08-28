@@ -24,7 +24,7 @@
   .install-section-copy { position: static; grid-column: 1; min-width: 0; max-width: 720px; }
   .install-card { grid-column: 1; min-width: 0; }
 
-  .premise, .release, .github, .community { grid-template-columns: 1fr; }
+  .premise, .release, .github, .community, .faq-section { grid-template-columns: 1fr; }
   .premise { gap: 42px; }
   .section-label { margin-bottom: 20px; }
   .premise-note { max-width: 620px; }
@@ -32,7 +32,9 @@
   .community .section-label, .community .premise-copy, .community .premise-note, .community-frame-wrap { grid-column: 1; }
   .community-frame-wrap { margin-top: 8px; }
 
-  .workflow-head, .proof-head, .evidence-head { grid-template-columns: 1fr; gap: 26px; }
+  .workflow-head, .proof-head, .evidence-head, .why-head, .deliverables-head { grid-template-columns: 1fr; gap: 26px; }
+  .why-head, .deliverables-head { margin-bottom: 48px; }
+  .why-head > p:last-child, .deliverables-head > p:last-child { max-width: 620px; }
   .workflow-head { margin-bottom: 48px; }
   .workflow-head > p:last-child { max-width: 620px; }
   .workflow-list li { grid-template-columns: 64px 1fr; }
@@ -40,6 +42,9 @@
 
   .metrics { grid-template-columns: repeat(2, 1fr); }
   .readiness { grid-template-columns: repeat(3, 1fr); }
+  .deliverable-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; }
+  .deliverable-primary { grid-column: 1 / -1; grid-row: auto; min-height: 360px; }
+  .figure-method { grid-template-columns: 1fr; gap: 18px; }
 
   .release-status { margin-top: 8px; }
   .github-mark { max-width: 118px; }
@@ -57,7 +62,7 @@
   .wordmark { gap: 7px; font-size: 17px; }
   .wordmark img { width: 24px; height: 24px; }
   .release-chip { font-size: 8px; }
-  .paper-section, .install-section, .workflow, .evidence, .github, .closing { padding: 84px var(--page-pad); }
+  .paper-section, .install-section, .why-section, .workflow, .evidence, .github, .closing, .faq-section { padding: 84px var(--page-pad); }
 
   .hero { gap: 26px; padding-bottom: 92px; }
   .hero-copy { padding-top: 12px; }
@@ -93,8 +98,13 @@
   .media-placeholder::before { inset: 16px; }
   .placeholder-copy b { font-size: clamp(28px, 9vw, 42px); }
 
-  .premise-copy h2, .proof-head h2, .release-copy h2, .evidence-head h2, .workflow-head h2, .github-copy h2 { font-size: clamp(42px, 12vw, 60px); }
+  .premise-copy h2, .proof-head h2, .release-copy h2, .evidence-head h2, .workflow-head h2, .github-copy h2, .why-head h2, .deliverables-head h2, .faq-head h2 { font-size: clamp(42px, 12vw, 60px); }
   .premise-copy > p, .release-copy > p { font-size: 16px; }
+
+  .principle-grid { grid-template-columns: 1fr; }
+  .principle-grid article, .principle-grid article + article { min-height: 250px; padding: 26px 0; border-right: 0; border-bottom: 1px solid var(--rule-strong); }
+  .principle-grid article:last-child { border-bottom: 0; }
+  .principle-grid h3 { margin-top: 54px; }
 
   .workflow-list li { grid-template-columns: 48px 1fr; gap: 18px; min-height: 132px; }
   .workflow-list li:hover, .workflow-list li.is-current { padding-right: 10px; padding-left: 10px; }
@@ -103,6 +113,11 @@
   .workflow-list h3 { font-size: 30px; }
 
   .figure-grid { grid-template-columns: 1fr; }
+  .deliverable-grid { grid-template-columns: 1fr; }
+  .deliverable-primary { grid-column: 1; min-height: 330px; }
+  .deliverable-grid article { min-height: 260px; }
+  .deliverable-grid article h3 { font-size: 34px; }
+  .deliverable-primary h3 { font-size: 48px !important; }
   .figure-card img, .figure-placeholder { min-height: 280px; aspect-ratio: auto; }
   .figure-card figcaption { min-height: auto; }
   .figure-credit a { min-height: 44px; }
@@ -125,6 +140,19 @@
   .closing h2 { margin: 54px 0; font-size: clamp(46px, 12.5vw, 66px); }
   .closing-actions { align-items: flex-start; flex-direction: column; }
   .button-light { width: 100%; }
+  .button-outline-light { width: 100%; }
+
+  .support-panel { padding: 24px 20px 22px; }
+  .support-panel h2 { font-size: clamp(40px, 11vw, 58px); }
+  .support-panel-head .eyebrow { max-width: 190px; }
+  .support-qr { padding: 18px 10px; }
+  .support-qr-object { width: min(100%, 236px); }
+  .support-qr-placeholder { min-height: 214px; padding: 18px; }
+  .support-thanks-card > small { max-width: 320px; margin-right: auto; margin-left: auto; }
+
+  .faq-section { gap: 40px; }
+  .faq-list summary { min-height: 72px; gap: 16px; }
+  .faq-list details p { margin-left: 34px; }
 
   footer { min-height: 88px; gap: 18px; }
 }
@@ -139,12 +167,24 @@
   .metric { min-height: 190px; }
   .metric b { margin-bottom: 32px; }
   .header-actions { gap: 6px; }
+  .support-trigger { min-width: 46px; padding: 0 8px; }
+  .support-label-full { display: none; }
+  .support-label-short { display: inline; }
   .language-link { min-width: 34px; }
   .community-frame-wrap iframe { min-height: 500px; }
+}
+
+@media (max-width: 350px) {
+  .release-chip { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
   [data-tilt] { transform: none !important; }
+  .support-thanks.is-active { animation: none !important; opacity: 1; }
+  .support-thanks.is-active .thanks-spine span { animation: none !important; transform: scaleX(1); }
+  .support-thanks.is-active .thanks-spine i { animation: none !important; transform: scale(1); background: var(--clay-dark); box-shadow: 0 0 0 1px var(--clay-dark); opacity: 1; }
+  .support-thanks.is-active .support-thanks-card h2,
+  .support-thanks.is-active .support-thanks-card > small { animation: none !important; transform: none; opacity: 1; }
 }
