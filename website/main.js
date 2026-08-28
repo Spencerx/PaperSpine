@@ -43,7 +43,9 @@
   }
 
   const sections = navLinks
-    .map((link) => document.querySelector(link.getAttribute("href")))
+    .map((link) => link.getAttribute("href"))
+    .filter((href) => href && href.startsWith("#"))
+    .map((href) => document.querySelector(href))
     .filter(Boolean);
   if ("IntersectionObserver" in window) {
     const sectionObserver = new IntersectionObserver((entries) => {
