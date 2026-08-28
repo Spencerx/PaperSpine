@@ -20,7 +20,6 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="motion.css">
   <link rel="stylesheet" href="responsive.css">
-  <link rel="stylesheet" href="figure-showcase.css">
   <script src="main.js" defer></script>
 </head>
 <body data-locale="zh-CN" data-manifest-path="downloads/manifest.json">
@@ -30,7 +29,7 @@
   <header class="site-header" aria-label="主导航">
     <a class="wordmark" href="#top" aria-label="PaperSpine5 首页"><img src="assets/brand/paperspine-mark.svg" width="28" height="28" alt=""><span>PaperSpine</span><b>5</b></a>
     <nav aria-label="页面章节">
-      <a href="#install">安装</a><a href="#figure-studies">科研图</a><a href="#official-reference">参考素材</a><a href="#why">为什么</a><a href="#workflow">五阶段</a><a href="#github">GitHub</a>
+      <a href="#install">安装</a><a href="materials/">官方素材库</a><a href="#why">为什么</a><a href="#workflow">五阶段</a><a href="#github">GitHub</a>
     </nav>
     <div class="header-actions"><button class="support-trigger" type="button" data-support-open aria-haspopup="dialog" aria-controls="support-dialog"><span class="support-label-full">支持我们</span><span class="support-label-short" aria-hidden="true">支持</span></button><a class="language-link" href="en/" hreflang="en" lang="en">EN</a><span class="release-chip">RC · 0.3.0-rc.1</span></div>
   </header>
@@ -110,36 +109,6 @@
         <figcaption><span>PACKAGED CANDIDATE / REAL UI</span><span>五阶段 · 空白演示任务 · 无论文数据</span></figcaption>
         <img src="assets/workspace-ui-public.png" alt="PaperSpine5 打包候选的科研图件工作区，显示五阶段导航和等待论文定锚的空白演示状态" width="1440" height="900">
       </figure>
-    </section>
-
-    <section class="figure-showcase" id="figure-studies" aria-labelledby="figure-showcase-title">
-      <div class="figure-showcase-head reveal">
-        <div><p class="eyebrow">Figure studies / 301–308</p><h2 id="figure-showcase-title">四幅示意图，四幅数据图。<br><em>只展示我们的图。</em></h2></div>
-        <div><p>官网发布版只保留八幅 PaperSpine5 产出，不展示对应参考图。四张双图长图按实际内容紧裁，两幅图首尾连续，不再用固定手机画布制造中缝和外围空白；八幅最终矢量图另合并为一个八页 PDF。</p><div class="figure-showcase-actions"><a class="button button-primary" href="figure-studies/"><span>打开完整图集</span><b>↗</b></a><a class="button button-secondary" href="assets/figure-showcase/01_pdf/paperspine5-figure-studies-publication.pdf"><span>下载 8 页 PDF</span><b>↓</b></a></div></div>
-      </div>
-      <div class="figure-overview-grid reveal">
-        <a href="figure-studies/#overview"><img loading="lazy" src="assets/figure-showcase/03_mobile/walls/01-301-302-paperspine-wall.png" width="1080" height="1262" alt="301 与 302 两幅 PaperSpine5 示意图紧凑长图"><span><b>301–302</b><i>2 SCHEMATICS</i></span></a>
-        <a href="figure-studies/#overview"><img loading="lazy" src="assets/figure-showcase/03_mobile/walls/02-303-304-paperspine-wall.png" width="1080" height="1315" alt="303 与 304 两幅 PaperSpine5 示意图紧凑长图"><span><b>303–304</b><i>2 SCHEMATICS</i></span></a>
-        <a href="figure-studies/#overview"><img loading="lazy" src="assets/figure-showcase/03_mobile/walls/03-305-306-paperspine-wall.png" width="1080" height="1383" alt="305 与 306 两幅 PaperSpine5 数据图紧凑长图"><span><b>305–306</b><i>2 DATA FIGURES</i></span></a>
-        <a href="figure-studies/#overview"><img loading="lazy" src="assets/figure-showcase/03_mobile/walls/04-307-308-paperspine-wall.png" width="1080" height="2769" alt="307 与 308 两幅 PaperSpine5 数据图紧凑长图"><span><b>307–308</b><i>2 DATA FIGURES</i></span></a>
-      </div>
-      <p class="figure-showcase-boundary reveal">公开目录、网页图墙、manifest 与 PDF 均不包含文献图、引用卡、DOI 或参考元数据。内部参考证据只留在任务目录用于溯源。图中的机制与数值均为 illustrative / synthetic demonstration，不是经验性证据。</p>
-    </section>
-
-    <section class="official-reference" id="official-reference" aria-labelledby="official-reference-title">
-      <div class="official-reference-head reveal">
-        <div><p class="eyebrow">Official reference / vector PDF</p><h2 id="official-reference-title">按发表尺度，<br><em>查看官方图件参考。</em></h2></div>
-        <div class="official-reference-copy"><p>这份八页 PDF 把 301–308 的四幅示意图与四幅数据图逐页保留。桌面端可在页面内缩放查看矢量细节，也可以独立打开或下载原文件。</p><div class="official-reference-actions"><a class="button button-primary" href="assets/figure-showcase/01_pdf/paperspine5-figure-studies-publication.pdf" target="_blank" rel="noopener noreferrer"><span>打开矢量 PDF</span><b>↗</b></a><a class="button button-reference-outline" href="assets/figure-showcase/01_pdf/paperspine5-figure-studies-publication.pdf" download><span>下载原文件</span><b>↓</b></a><a class="reference-text-link" href="figure-studies/"><span>查看完整图集</span><b>↗</b></a></div></div>
-      </div>
-      <div class="pdf-reference-shell reveal">
-        <div class="pdf-reference-toolbar"><div><span>PDF / 8 PAGES</span><b>paperspine5-figure-studies-publication.pdf</b></div><div><span>VECTOR-NATIVE</span><b>1,956,388 bytes · SHA-256 b34c0d92…938afe0e</b></div></div>
-        <object class="pdf-reference-object" data="assets/figure-showcase/01_pdf/paperspine5-figure-studies-publication.pdf#view=FitH&amp;toolbar=1&amp;navpanes=0" type="application/pdf" aria-label="PaperSpine5 Figure Studies 301 至 308 八页矢量 PDF">
-          <div class="pdf-reference-fallback"><img src="assets/figure-showcase/02_images/svg/301.svg" alt="CrossScale-Omics Transformer 官方示例图"><div><h3>当前浏览器没有内嵌 PDF 阅读器。</h3><p>图件本身仍可直接打开；原文件保留八页矢量内容与嵌入字体。</p><a href="assets/figure-showcase/01_pdf/paperspine5-figure-studies-publication.pdf" target="_blank" rel="noopener noreferrer">在新窗口打开 PDF ↗</a></div></div>
-        </object>
-        <div class="pdf-reference-mobile"><img src="assets/figure-showcase/02_images/svg/301.svg" alt="CrossScale-Omics Transformer 官方示例图"><div><span>MOBILE PREVIEW / PAGE 01</span><h3>移动端请使用原生 PDF 阅读器。</h3><p>这里展示真实 SVG 首图；打开 PDF 后可逐页缩放查看八幅矢量图。</p><a class="button button-primary" href="assets/figure-showcase/01_pdf/paperspine5-figure-studies-publication.pdf" target="_blank" rel="noopener noreferrer"><span>打开 8 页 PDF</span><b>↗</b></a></div></div>
-      </div>
-      <div class="pdf-reference-facts reveal"><p><span>01 / CONTENT</span><b>4 幅示意图 + 4 幅数据图</b></p><p><span>02 / CONSTRUCTION</span><b>八份最终矢量 PDF 直接拼接</b></p><p><span>03 / PUBLIC BOUNDARY</span><b>0 份文献参考图进入公开包</b></p></div>
-      <p class="pdf-reference-boundary reveal">“官方参考素材”指 PaperSpine5 官方示例输出参考，不是文献参考原图，也不是经验性研究证据。图中的机制和数值均为 illustrative / synthetic demonstration。</p>
     </section>
 
     <section class="why-section" id="why" aria-labelledby="why-title">

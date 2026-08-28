@@ -75,14 +75,42 @@ def verify_figure_showcase() -> dict[str, int | str]:
     main_surfaces = [SOURCE / "index.html", SOURCE / "en" / "index.html"]
     for page in main_surfaces:
         content = page.read_text(encoding="utf-8")
-        require(content.count('id="official-reference"') == 1, f"missing official reference section: {page}")
-        require(content.count('class="pdf-reference-object"') == 1, f"missing embedded PDF reader: {page}")
-        require("paperspine5-figure-studies-publication.pdf" in content, f"missing PDF download link: {page}")
+        require('href="materials/"' in content, f"missing material-library entry: {page}")
+        for forbidden in ('id="figure-studies"', 'id="official-reference"', 'class="pdf-reference-object"'):
+            require(forbidden not in content, f"homepage must not embed material-library content: {page}/{forbidden}")
 
-    gallery_surfaces = [SOURCE / "figure-studies" / "index.html", SOURCE / "en" / "figure-studies" / "index.html"]
-    require(all(page.is_file() for page in gallery_surfaces), "missing bilingual figure gallery")
+    catalog = json.loads((SOURCE / "materials" / "catalog.json").read_text(encoding="utf-8"))
+    require(catalog.get("schema") == "paperspine5.material-library/1.0", "invalid material-library catalog schema")
+    require(catalog.get("append_only") is True, "material-library catalog must be append-only")
+    releases = catalog.get("releases", [])
+    require(len(releases) == 1, "material-library must contain the 2026-08-28 release")
+    release = releases[0]
+    require(release.get("id") == "2026-08-28-figure-studies-301-308", "unexpected material release ID")
+    require(release.get("sequence") == 1 and release.get("published_on") == "2026-08-28", "unexpected material release order/date")
+    require(release.get("pdf_sha256") == combined["sha256"], "material catalog PDF checksum drift")
+    require(release.get("counts", {}).get("figures") == 8 and release.get("counts", {}).get("svg") == 8, "invalid material release counts")
+
+    library_surfaces = [SOURCE / "materials" / "index.html", SOURCE / "en" / "materials" / "index.html"]
+    record_surfaces = [SOURCE / "figure-studies" / "index.html", SOURCE / "en" / "figure-studies" / "index.html"]
+    require(all(page.is_file() for page in library_surfaces), "missing bilingual material library")
+    require(all(page.is_file() for page in record_surfaces), "missing bilingual dated material release")
+    for page in library_surfaces:
+        content = page.read_text(encoding="utf-8")
+        require("2026-08-28" in content, f"missing dated release record: {page}")
+        require("figure-studies/" in content and "paperspine5-figure-studies-publication.pdf" in content, f"missing release links: {page}")
+    for page in record_surfaces:
+        content = page.read_text(encoding="utf-8")
+        require(content.count('class="material-asset-card"') == 8, f"material release must expose eight asset cards: {page}")
+        for task_id in range(301, 309):
+            for relative in (
+                f"02_images/svg/{task_id}.svg\" download",
+                f"02_images/png/{task_id}.png\" download",
+                f"03_mobile/detail/{task_id}.png\" download",
+            ):
+                require(relative in content, f"missing direct material download: {page}/{relative}")
+        require("paperspine5-figure-studies-publication.pdf\" download" in content, f"missing vector-PDF download: {page}")
     require(len([path for path in showcase.rglob("*") if path.is_file()]) == 32, "public figure package must contain exactly 32 files")
-    return {"items": 8, "pdf_pages": 8, "files": 32, "pdf_sha256": combined["sha256"]}
+    return {"items": 8, "pdf_pages": 8, "files": 32, "material_releases": 1, "pdf_sha256": combined["sha256"]}
 
 
 def main() -> int:
