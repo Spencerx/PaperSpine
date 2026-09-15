@@ -3,7 +3,7 @@
   "product": "PaperSpine5",
   "version": "0.4.0-alpha.1-dev",
   "channel": "prerelease",
-  "build_id": "w7a-3042d27ecacbf40c58f1",
+  "build_id": "w7a-6298427f9e593fdc2bc2",
   "release_state": "published",
   "published": true,
   "repository": "https://github.com/WUBING2023/PaperSpine",
@@ -14,8 +14,8 @@
     {
       "kind": "suite",
       "file": "paperspine5-suite-0.4.0-alpha.1-dev.zip",
-      "bytes": 26416717,
-      "sha256": "45380d5c26b445297d55f123e65cfce67932b1804df504f05c81fc3f81ad835d",
+      "bytes": 26412900,
+      "sha256": "9b7160f1da0ae01212d0c7dcd85e7e74a4fec44740a8f6a95db6629bfec7cc49",
       "download_url": "https://github.com/WUBING2023/PaperSpine/releases/download/v0.4.0-alpha.1-dev/paperspine5-suite-0.4.0-alpha.1-dev.zip",
       "description": "完整 V5 工作区：内置 Windows x64 runtime、Web 工作区、profile 生命周期、更新与回滚。",
       "install_command": "powershell -ExecutionPolicy Bypass -File .\\install.ps1 -Target codex -CleanLegacy"
@@ -23,8 +23,8 @@
     {
       "kind": "standalone-skill",
       "file": "paperspine5-skill-0.4.0-alpha.1-dev.zip",
-      "bytes": 717793,
-      "sha256": "f22d8fd14e2721f7f36bd6f8030273dd330f412bd970948381b6d295c05b215b",
+      "bytes": 715883,
+      "sha256": "63b6e8568a608b6a7737dcedb63783dbb5180d5868c8515a62ab661c6c6ba00b",
       "download_url": "https://github.com/WUBING2023/PaperSpine/releases/download/v0.4.0-alpha.1-dev/paperspine5-skill-0.4.0-alpha.1-dev.zip",
       "description": "轻量 paper-spine Skill：适用于已有宿主和本地运行环境。",
       "install_command": "powershell -ExecutionPolicy Bypass -File .\\install.ps1 -Target codex -CleanLegacy"
@@ -32,7 +32,10 @@
   ],
   "release_assets": {
     "manifest_url": "https://github.com/WUBING2023/PaperSpine/releases/download/v0.4.0-alpha.1-dev/manifest.json",
-    "checksums_url": "https://github.com/WUBING2023/PaperSpine/releases/download/v0.4.0-alpha.1-dev/checksums.sha256"
+    "checksums_url": "https://github.com/WUBING2023/PaperSpine/releases/download/v0.4.0-alpha.1-dev/checksums.sha256",
+    "installer_url": "https://github.com/WUBING2023/PaperSpine/releases/download/v0.4.0-alpha.1-dev/install.ps1",
+    "installer_bytes": 5890,
+    "installer_sha256": "50082ae8d86f88109aa1fa308cb5cab591d53c46aaa92b3938fd3e7abc30c110"
   },
   "installation": {
     "canonical_skill": "paper-spine",
