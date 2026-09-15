@@ -115,8 +115,11 @@ def verify_figure_showcase() -> dict[str, int | str]:
 
 def main() -> int:
     manifest = json.loads((SOURCE / "downloads" / "manifest.json").read_text(encoding="utf-8"))
-    if manifest.get("product") != "PaperSpine5" or len(manifest.get("artifacts", [])) != 4:
+    if manifest.get("product") != "PaperSpine5" or len(manifest.get("artifacts", [])) < 2:
         raise RuntimeError("refusing to build from an invalid PaperSpine5 manifest")
+    kinds = {item.get("kind") for item in manifest.get("artifacts", [])}
+    if not {"suite", "standalone-skill"}.issubset(kinds):
+        raise RuntimeError("manifest must expose both suite and standalone-skill artifacts")
     figure_evidence = verify_figure_showcase()
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)

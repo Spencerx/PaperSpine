@@ -10,6 +10,13 @@
 
 [**🌍 Community Stargazer Atlas · a public GitHub community signal**](https://wubing2023.github.io/PaperSpine/)
 
+## PaperSpine5 V5 public installation
+
+Start at the [release page](https://wubing2023.github.io/PaperSpine/v5/). The V5 full suite is about 26.4 MB compressed for Windows x64 with an embedded runtime; the standalone `paper-spine` Skill is about 0.7 MB. The installer verifies the manifest and SHA-256 first. `-CleanLegacy` archives known V3/V4 Skill folders without deleting paper task data or host settings.
+
+- GitHub Release: [v0.4.0-alpha.1-dev](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.1-dev)
+- Windows: `powershell -ExecutionPolicy Bypass -File .\install.ps1 -Target codex -CleanLegacy`
+
 ## PaperSpine5 release candidate
 
 PaperSpine5 `0.3.0-rc.1` adds a five-stage, local-first research production workspace while preserving this repository's established V4 install and update identity. Start with the [English release page](https://wubing2023.github.io/PaperSpine/v5/en/): give the complete zero-to-install instruction to an AI, or choose the Codex, Claude Code, or DSH host package. The [GitHub prerelease](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.3.0-rc.1) carries four byte-immutable ZIPs, SHA-256 checksums, a manifest, and validation evidence.

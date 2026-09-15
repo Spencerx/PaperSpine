@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; font-src 'self'; object-src 'self'; base-uri 'self'; form-action 'none'">
-  <meta name="description" content="PaperSpine5 0.3.0-rc.1：本地优先、人工把关的论文写作、科研图审阅与投稿材料工作区。">
+  <meta name="description" content="PaperSpine5 0.4.0-alpha.1-dev：本地优先、人工把关的论文写作、科研图审阅与投稿材料工作区。">
   <meta name="theme-color" content="#e9ece7">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="PaperSpine5 · 0.3.0-rc.1">
+  <meta property="og:title" content="PaperSpine5 · 0.4.0-alpha.1-dev">
   <meta property="og:description" content="从论文定锚到科研图、规范主稿与投稿循环的本地研究生产工作区。">
   <meta property="og:image" content="https://wubing2023.github.io/PaperSpine/v5/assets/brand/paperspine-og.png">
   <link rel="canonical" href="https://wubing2023.github.io/PaperSpine/v5/">
@@ -16,7 +16,7 @@
   <link rel="alternate" hreflang="x-default" href="https://wubing2023.github.io/PaperSpine/v5/">
   <link rel="icon" href="assets/brand/paperspine-mark.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/brand/paperspine-plugin-icon-256.png">
-  <title>PaperSpine5 · 0.3.0-rc.1</title>
+  <title>PaperSpine5 · 0.4.0-alpha.1-dev</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="motion.css">
   <link rel="stylesheet" href="responsive.css">
@@ -31,7 +31,7 @@
     <nav aria-label="页面章节">
       <a href="#install">安装</a><a href="materials/">官方素材库</a><a href="#why">为什么</a><a href="#workflow">五阶段</a><a href="#github">GitHub</a>
     </nav>
-    <div class="header-actions"><button class="support-trigger" type="button" data-support-open aria-haspopup="dialog" aria-controls="support-dialog"><span class="support-label-full">支持我们</span><span class="support-label-short" aria-hidden="true">支持</span></button><a class="language-link" href="en/" hreflang="en" lang="en">EN</a><span class="release-chip">RC · 0.3.0-rc.1</span></div>
+    <div class="header-actions"><button class="support-trigger" type="button" data-support-open aria-haspopup="dialog" aria-controls="support-dialog"><span class="support-label-full">支持我们</span><span class="support-label-short" aria-hidden="true">支持</span></button><a class="language-link" href="en/" hreflang="en" lang="en">EN</a><span class="release-chip">RC · 0.4.0-alpha.1-dev</span></div>
   </header>
 
   <main id="main">
@@ -60,7 +60,7 @@
         <p class="eyebrow">01 / Install</p>
         <h2 id="install-section-title">首页之后，<br><em>先完成安装。</em></h2>
         <p>把从零下载、哈希校验、解压、宿主识别和健康检查交给 AI。所有按钮与可见版本都由同一份公开 manifest 驱动。</p>
-        <div class="release-placeholder-note release-live-note"><span>PRERELEASE · MANIFEST DRIVEN</span><p>0.3.0-rc.1；无独立密码学签名。先核对 SHA-256，再安装；更新仍是手动或明确 opt-in，默认关闭。</p></div>
+        <div class="release-placeholder-note release-live-note"><span>PRERELEASE · MANIFEST DRIVEN</span><p>0.4.0-alpha.1-dev；无独立密码学签名。先核对 SHA-256，再安装；更新仍是手动或明确 opt-in，默认关闭。</p></div>
       </div>
 
       <article class="install-card reveal" aria-labelledby="install-title">
@@ -68,36 +68,15 @@
           <div><p class="eyebrow">AI INSTALL / ZERO → WORKSPACE</p><h2 id="install-title">把这一段交给 AI。</h2></div>
           <span class="package-state"><i></i><span id="asset-state">读取 manifest</span></span>
         </div>
-        <p class="install-intro">产品是同一套 PaperSpine5 工作区；通用安装包以 Skill 方式接入，Codex、Claude Code 与 DSH 另有宿主原生包。它们不是四个不同产品。</p>
-        <div class="install-actions">
-          <button class="button button-primary copy-button" type="button" data-copy-target="ai-zero-prompt"><span>复制给 AI，从零安装</span><b>＋</b></button>
-          <a id="primary-download" class="button button-secondary" href="https://github.com/WUBING2023/PaperSpine/releases/download/v0.3.0-rc.1/paperspine5-skill-0.3.0-rc.1.zip"><span>直接下载通用包</span><b>↓</b></a>
+        <p class="install-intro">V5 提供两种清晰入口：完整套件包含内置 Windows x64 runtime、Web 工作区和 profile 更新/回滚；独立 Skill 只安装 canonical <code>paper-spine</code>。安装器先验证 manifest 与 SHA-256，再把已知 V3/V4 Skill 归档到备份目录，不删除论文任务数据。</p>
+        <div class="install-actions"><button class="button button-primary copy-button" type="button" data-copy-target="ai-zero-prompt"><span>复制给 AI，从零安装</span><b>＋</b></button><a id="primary-download" class="button button-secondary" href="#"><span>下载 V5 完整套件</span><b>↓</b></a></div>
+        <div class="install-meta"><span id="release-version">Version · 0.4.0-alpha.1-dev</span><span id="release-size">ZIP · 读取 manifest</span><span>Windows x64 suite</span><a id="manifest-link" href="#">Manifest</a><a id="checksum-link" href="#">SHA-256</a></div>
+        <div id="artifact-grid" class="artifact-grid" aria-label="V5 安装选项">
+          <a data-artifact-kind="suite" href="#"><span>V5 完整套件</span><small>内置 runtime · Web 工作区 · 更新/回滚</small></a>
+          <a data-artifact-kind="standalone-skill" href="#"><span>独立 paper-spine Skill</span><small>轻量宿主 Skill · Codex / Claude Code</small></a>
         </div>
-        <div class="install-meta">
-          <span id="release-version">Version · 0.3.0-rc.1</span><span id="release-size">ZIP · 577,038 bytes</span><span>Python 3</span>
-          <a id="manifest-link" href="https://github.com/WUBING2023/PaperSpine/releases/download/v0.3.0-rc.1/manifest.json">Manifest</a>
-          <a id="checksum-link" href="https://github.com/WUBING2023/PaperSpine/releases/download/v0.3.0-rc.1/checksums.sha256">SHA-256</a>
-        </div>
-        <div id="artifact-grid" class="artifact-grid" aria-label="宿主安装包">
-          <a data-artifact-kind="universal-skill" href="https://github.com/WUBING2023/PaperSpine/releases/download/v0.3.0-rc.1/paperspine5-skill-0.3.0-rc.1.zip"><span>通用安装包</span><small>Codex / Claude Code · Skill 安装</small></a>
-          <a data-artifact-kind="codex-plugin" href="https://github.com/WUBING2023/PaperSpine/releases/download/v0.3.0-rc.1/paperspine5-codex-plugin-0.3.0-rc.1.zip"><span>Codex 插件</span><small>个人 marketplace 包</small></a>
-          <a data-artifact-kind="claude-code-plugin" href="https://github.com/WUBING2023/PaperSpine/releases/download/v0.3.0-rc.1/paperspine5-claude-code-plugin-0.3.0-rc.1.zip"><span>Claude Code 插件</span><small>marketplace 包</small></a>
-          <a data-artifact-kind="dsh-plugin" href="https://github.com/WUBING2023/PaperSpine/releases/download/v0.3.0-rc.1/dsh-paperspine5-0.3.0-rc.1.zip"><span>DSH Bundle</span><small>Web profile 包</small></a>
-        </div>
-        <div class="command-shell">
-          <div class="command-shell-bar"><span>AI INSTRUCTION / VERIFIED DOWNLOAD</span><button class="copy-inline copy-button" type="button" data-copy-target="ai-zero-prompt">复制</button></div>
-          <pre id="ai-zero-prompt"><code>请从零开始下载并安装 PaperSpine5 0.3.0-rc.1：
-1. 读取 https://github.com/WUBING2023/PaperSpine/releases/download/v0.3.0-rc.1/manifest.json；
-2. 根据当前宿主选择其中一个包。普通 Codex / Claude Code 优先用 paperspine5-skill-0.3.0-rc.1.zip；需要宿主原生插件时再选对应插件包；
-3. 从 manifest 的 download_url 下载 ZIP，计算 SHA-256，并与 manifest 中同名制品逐字符比较；不一致立即停止；
-4. 解压到新的持久目录，先阅读 README.md、INSTALL.md、UPDATE.md 与 UNINSTALL.md；
-5. 运行包内安装方式。通用包在 Windows/Codex 运行 .\install.ps1 -Target codex；Claude Code 改为 -Target claude-code。macOS/Linux 运行 bash install.sh --host codex 或 --host claude-code；
-6. 不覆盖 settings.json、config.toml 或无关 Skill；如缺少 Python 3 或可选科研图依赖，先说明来源与改动范围，再征得许可；
-7. 必须确认 runtime health 返回 PASS，并在安装后开启新任务或重启宿主，确认 PaperSpine5 可被发现；
-8. 只有存在真实 integration_job.json 时才启动 127.0.0.1 本地网页；不生成假论文任务，不暴露到公网；
-9. 最后分别报告下载 URL、文件字节数、SHA-256、安装目标、备份、runtime health、宿主重新发现和网页 snapshot。未验证项写 NOT VERIFIED。</code></pre>
-        </div>
-        <details class="manual-install"><summary>我想看每种包的安装边界 <span>展开</span></summary><div class="manual-grid"><div><p>通用包</p><code>install.ps1 -Target codex</code></div><div><p>宿主插件</p><code>先解压，再按包内 INSTALL.md</code></div></div></details>
+        <div class="command-shell"><div class="command-shell-bar"><span>AI INSTALL / VERIFIED V5</span><button class="copy-inline copy-button" type="button" data-copy-target="ai-zero-prompt">复制</button></div><pre id="ai-zero-prompt"><code>从公开 manifest 下载并安装 PaperSpine5 V5。必须先比较 SHA-256；安装前将已知 V3/V4 Skill 归档到 ~/.paperspine5/backups，不删除任务数据或设置。Windows x64 完整套件运行：powershell -ExecutionPolicy Bypass -File .\install.ps1 -Target codex -CleanLegacy。安装后运行 first-start health，并重启宿主后确认发现 paper-spine。</code></pre></div>
+        <details class="manual-install"><summary>查看安装边界 <span>展开</span></summary><div class="manual-grid"><div><p>完整套件</p><code>约 26.4 MB · Windows x64</code></div><div><p>独立 Skill</p><code>约 0.7 MB · 已有 runtime</code></div></div></details>
       </article>
     </section>
 
@@ -151,7 +130,7 @@
         <p class="eyebrow">06 / One core · four host packages</p><h2 id="github-title">选择接入方式，<br>不改变产品核心。</h2>
         <p>通用 Skill、Codex 插件、Claude Code 插件与 DSH Bundle 共享同一 176 文件核心。PaperSpine5 继续使用既有公开仓库与更新身份，保留历史和社区入口。</p>
         <a class="github-link" href="https://github.com/WUBING2023/PaperSpine" target="_blank" rel="noopener noreferrer"><span>打开 WUBING2023 / PaperSpine</span><b>↗</b></a>
-        <a class="github-link github-link-secondary" href="https://github.com/WUBING2023/PaperSpine/releases/tag/v0.3.0-rc.1" target="_blank" rel="noopener noreferrer"><span>查看 v0.3.0-rc.1 prerelease</span><b>↗</b></a>
+        <a class="github-link github-link-secondary" href="https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.1-dev" target="_blank" rel="noopener noreferrer"><span>查看 v0.4.0-alpha.1-dev prerelease</span><b>↗</b></a>
       </div>
       <div class="github-boundary reveal"><span>HOST ADAPTERS / SAME CORE</span><p><b>Universal</b>：Codex / Claude Code Skill</p><p><b>Codex</b>：personal marketplace</p><p><b>Claude Code</b>：marketplace bundle</p><p><b>DSH</b>：Web profile bundle</p></div>
     </section>
@@ -182,8 +161,8 @@
     </section>
 
     <section class="closing" id="closing">
-      <p class="eyebrow reveal">PaperSpine5 · 0.3.0-rc.1</p><h2 class="reveal">不是让 Agent 替你相信一篇论文。<br><em>是让每一步，都有证据可回去。</em></h2>
-      <div class="closing-actions reveal"><a class="button button-light" href="#install"><span>交给 AI 安装</span><b>↑</b></a><a class="button button-outline-light" href="https://github.com/WUBING2023/PaperSpine/releases/tag/v0.3.0-rc.1" target="_blank" rel="noopener noreferrer"><span>核验 GitHub Release</span><b>↗</b></a></div>
+      <p class="eyebrow reveal">PaperSpine5 · 0.4.0-alpha.1-dev</p><h2 class="reveal">不是让 Agent 替你相信一篇论文。<br><em>是让每一步，都有证据可回去。</em></h2>
+      <div class="closing-actions reveal"><a class="button button-light" href="#install"><span>交给 AI 安装</span><b>↑</b></a><a class="button button-outline-light" href="https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.1-dev" target="_blank" rel="noopener noreferrer"><span>核验 GitHub Release</span><b>↗</b></a></div>
     </section>
 
     <section class="faq-section" id="faq" aria-labelledby="faq-title">
@@ -197,21 +176,7 @@
     </section>
   </main>
   <footer><span>PaperSpine5 / 2026</span><span>MIT · Local-first research production system</span><a href="#top">Back to top ↑</a></footer>
-  <dialog class="support-dialog" id="support-dialog" aria-labelledby="support-title" aria-describedby="support-description">
-    <div class="support-panel">
-      <header class="support-panel-head"><p class="eyebrow">Support independent research tooling</p><button class="support-close" type="button" data-support-close aria-label="关闭支持窗口"><span>关闭</span><b aria-hidden="true">×</b></button></header>
-      <h2 id="support-title">如果它帮到了你，<br><em>欢迎支持我们。</em></h2>
-      <p id="support-description" class="support-intro">你的自愿支持会用于 PaperSpine5 的持续维护；它不会解锁额外功能，也不影响任何人获取产品。</p>
-      <figure class="support-qr">
-        <object class="support-qr-object" data="assets/wechat-support-qr.png" type="image/png" aria-label="微信收款码">
-          <div class="support-qr-placeholder"><span>WECHAT PAY</span><b>微信收款码待添加</b><small>资产位 · assets/wechat-support-qr.png</small></div>
-        </object>
-        <figcaption>请使用微信扫码，自愿支持 PaperSpine5 的持续维护。</figcaption>
-      </figure>
-      <button class="button button-primary support-confirm" type="button" data-support-confirm><span>我已完成支持</span><b aria-hidden="true">→</b></button>
-      <p class="support-privacy">说明：本页面不读取或验证支付结果，也不收集支付信息。点击上方按钮只用于播放感谢动画。</p>
-    </div>
-  </dialog>
+  <dialog class="support-dialog" id="support-dialog" aria-labelledby="support-title" aria-describedby="support-description"><div class="support-panel"><header class="support-panel-head"><p class="eyebrow">Support independent research tooling</p><button class="support-close" type="button" data-support-close aria-label="关闭支持窗口"><span>关闭</span><b aria-hidden="true">×</b></button></header><h2 id="support-title">如果它帮到了你，<br><em>欢迎支持我们。</em></h2><p id="support-description" class="support-intro">自愿支持会用于 PaperSpine5 的维护、文档和公开发布成本；它不会解锁额外功能，也不影响任何人获取产品。</p><div class="support-methods" role="tablist" aria-label="选择支持方式"><button type="button" class="support-method is-active" data-support-method="alipay" role="tab" aria-selected="true">支付宝</button><button type="button" class="support-method" data-support-method="wechat" role="tab" aria-selected="false">微信</button></div><div class="support-qr-grid"><figure class="support-qr-card is-active" data-support-card="alipay"><img src="assets/support/alipay.jpg" alt="支付宝支持二维码"><figcaption><b>支付宝</b><span>打开支付宝扫一扫</span></figcaption></figure><figure class="support-qr-card" data-support-card="wechat" hidden><img src="assets/support/wechat.jpg" alt="微信支持二维码"><figcaption><b>微信</b><span>打开微信扫一扫</span></figcaption></figure></div><details class="support-disclosure"><summary>支持说明</summary><p>这不是捐款、投资、购买服务或慈善募款，也不产生任何产品特权。付款由第三方平台处理；本页面不读取、验证或收集支付信息。</p></details><button class="button button-primary support-confirm" type="button" data-support-confirm><span>完成后关闭</span><b aria-hidden="true">→</b></button></div></dialog>
   <div class="support-thanks" id="support-thanks" hidden role="status" aria-live="polite" aria-atomic="true">
     <div class="support-thanks-card">
       <p>THANK YOU / PAPERSPINE5</p>

@@ -104,6 +104,8 @@
   const supportOpeners = [...document.querySelectorAll("[data-support-open]")];
   const supportClosers = [...document.querySelectorAll("[data-support-close]")];
   const supportConfirm = document.querySelector("[data-support-confirm]");
+  const supportMethods = [...document.querySelectorAll("[data-support-method]")];
+  const supportCards = [...document.querySelectorAll("[data-support-card]")];
   let supportReturnFocus = null;
   let supportThanksTimer = 0;
 
@@ -143,6 +145,20 @@
       if (event.target === supportThanks && event.animationName === "support-overlay") hideSupportThanks();
     });
   }
+
+  supportMethods.forEach((method) => method.addEventListener("click", () => {
+    const selected = method.dataset.supportMethod;
+    supportMethods.forEach((item) => {
+      const active = item === method;
+      item.classList.toggle("is-active", active);
+      item.setAttribute("aria-selected", String(active));
+    });
+    supportCards.forEach((card) => {
+      const active = card.dataset.supportCard === selected;
+      card.classList.toggle("is-active", active);
+      card.hidden = !active;
+    });
+  }));
 
   if (supportConfirm) {
     supportConfirm.addEventListener("click", () => {
@@ -216,7 +232,7 @@
   const buildInstallPrompt = (manifest, primary) => {
     const manifestUrl = manifest.release_assets?.manifest_url || new URL(manifestPath, window.location.href).href;
     if (locale.startsWith("en")) {
-      return `Install PaperSpine5 ${manifest.version} from zero:\n1. Read ${manifestUrl}.\n2. Choose exactly one package for the current host. Prefer ${primary.file} for ordinary Codex or Claude Code Skill installation; use a native host package only when that host integration is required.\n3. Download the selected artifact from its download_url, compute SHA-256, and compare it character-for-character with the manifest. Stop on any mismatch.\n4. Extract into a new persistent directory. Read README.md, INSTALL.md, UPDATE.md, and UNINSTALL.md before changing the host.\n5. For the universal package on Windows/Codex run .\\install.ps1 -Target codex; use -Target claude-code for Claude Code. On macOS/Linux run bash install.sh --host codex or --host claude-code.\n6. Do not overwrite settings.json, config.toml, or unrelated Skills. Ask before installing Python 3 or optional scientific-figure dependencies.\n7. Require runtime health PASS, then open a new task or restart the host and verify PaperSpine5 is discovered.\n8. Launch the 127.0.0.1 workspace only for a real integration_job.json. Never invent a paper job or expose the local server publicly.\n9. Report the URL, bytes, SHA-256, install target, backup, runtime health, host rediscovery, and workspace snapshot separately. Mark every untested layer NOT VERIFIED.`;
+      return `Install PaperSpine5 ${manifest.version} from zero:\n1. Read ${manifestUrl}.\n2. Choose either the verified V5 suite or the standalone Skill. The suite is the primary Windows x64 option; the standalone package is for an existing host runtime.\n3. Download the selected artifact from its download_url, compute SHA-256, and compare it character-for-character with the manifest. Stop on any mismatch.\n4. Extract into a new persistent directory. Read README.md, INSTALL.md, UPDATE.md, and UNINSTALL.md before changing the host.\n5. For the universal package on Windows/Codex run .\\install.ps1 -Target codex; use -Target claude-code for Claude Code. On macOS/Linux run bash install.sh --host codex or --host claude-code.\n6. Do not overwrite settings.json, config.toml, or unrelated Skills. Ask before installing Python 3 or optional scientific-figure dependencies.\n7. Require runtime health PASS, then open a new task or restart the host and verify PaperSpine5 is discovered.\n8. Launch the 127.0.0.1 workspace only for a real integration_job.json. Never invent a paper job or expose the local server publicly.\n9. Report the URL, bytes, SHA-256, install target, backup, runtime health, host rediscovery, and workspace snapshot separately. Mark every untested layer NOT VERIFIED.`;
     }
     return `请从零开始下载并安装 PaperSpine5 ${manifest.version}：\n1. 读取 ${manifestUrl}；\n2. 根据当前宿主只选择一个包。普通 Codex / Claude Code 优先用 ${primary.file}；需要宿主原生插件时再选对应插件包；\n3. 从 manifest 的 download_url 下载 ZIP，计算 SHA-256，并与 manifest 中同名制品逐字符比较；不一致立即停止；\n4. 解压到新的持久目录，先阅读 README.md、INSTALL.md、UPDATE.md 与 UNINSTALL.md；\n5. 通用包在 Windows/Codex 运行 .\\install.ps1 -Target codex；Claude Code 改为 -Target claude-code。macOS/Linux 运行 bash install.sh --host codex 或 --host claude-code；\n6. 不覆盖 settings.json、config.toml 或无关 Skill；如缺少 Python 3 或可选科研图依赖，先说明来源与改动范围，再征得许可；\n7. 必须确认 runtime health 返回 PASS，并在安装后开启新任务或重启宿主，确认 PaperSpine5 可被发现；\n8. 只有存在真实 integration_job.json 时才启动 127.0.0.1 本地网页；不生成假论文任务，不暴露到公网；\n9. 最后分别报告下载 URL、文件字节数、SHA-256、安装目标、备份、runtime health、宿主重新发现和网页 snapshot。未验证项写 NOT VERIFIED。`;
   };
@@ -231,10 +247,10 @@
   };
 
   const applyReleaseManifest = (manifest) => {
-    if (manifest.product !== "PaperSpine5" || manifest.version !== "0.3.0-rc.1" || !Array.isArray(manifest.artifacts) || manifest.artifacts.length !== 4) {
+    if (manifest.product !== "PaperSpine5" || !manifest.version || !Array.isArray(manifest.artifacts) || manifest.artifacts.length < 2) {
       throw new Error("unexpected release manifest");
     }
-    const primary = manifest.artifacts.find((item) => item.kind === "universal-skill");
+    const primary = manifest.artifacts.find((item) => item.kind === "suite") || manifest.artifacts.find((item) => item.kind === "standalone-skill");
     if (!primary?.download_url || !primary.sha256 || !Number.isInteger(primary.bytes)) throw new Error("primary artifact is incomplete");
     const primaryLink = document.getElementById("primary-download");
     if (primaryLink) primaryLink.href = primary.download_url;
@@ -242,7 +258,7 @@
       const artifact = manifest.artifacts.find((item) => item.kind === link.dataset.artifactKind);
       if (!artifact?.download_url) return;
       link.href = artifact.download_url;
-      link.classList.toggle("is-primary", artifact.kind === "universal-skill");
+      link.classList.toggle("is-primary", artifact.kind === "suite");
       link.dataset.sha256 = artifact.sha256;
       link.title = `${artifact.file} · ${formatReleaseBytes(artifact.bytes)} bytes · SHA-256 ${artifact.sha256}`;
     });

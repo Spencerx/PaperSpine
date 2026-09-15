@@ -12,6 +12,13 @@
 
 [**🌍 社区 Stargazer 星图 · 公开 GitHub 社区信号**](https://wubing2023.github.io/PaperSpine/)
 
+## PaperSpine5 V5 公开安装入口
+
+请从[发布页](https://wubing2023.github.io/PaperSpine/v5/)开始；V5 完整套件约 26.4 MB（Windows x64，内置 runtime），独立 `paper-spine` Skill 约 0.7 MB。安装器会先验证 manifest 与 SHA-256；使用 `-CleanLegacy` 时只归档已知 V3/V4 Skill 目录，不删除论文任务数据或宿主设置。
+
+- GitHub Release：[v0.4.0-alpha.1-dev](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.1-dev)
+- Windows：`powershell -ExecutionPolicy Bypass -File .\install.ps1 -Target codex -CleanLegacy`
+
 ## PaperSpine5 发布候选版
 
 PaperSpine5 `0.3.0-rc.1` 在保留本仓库 V4 安装与更新身份的基础上，增加五阶段本地科研生产工作区。请从[中文发布页](https://wubing2023.github.io/PaperSpine/v5/)开始：先把完整的零起点安装指令交给 AI，也可以按宿主选择 Codex、Claude Code 或 DSH 插件包。[GitHub prerelease](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.3.0-rc.1)提供四个原样 ZIP、SHA-256、manifest 与验证证据。

@@ -199,15 +199,40 @@ def describe_update_policy(policy: dict[str, Any]) -> str:
     )
 
 
-def version_key(version: str) -> tuple[int, int, int, int, int]:
-    match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:-rc\.(\d+))?", version.strip())
+def version_key(
+    version: str,
+) -> tuple[int, int, int, int, tuple[tuple[int, int | str], ...]]:
+    """Return a SemVer precedence key while ignoring build metadata.
+
+    PaperSpine prereleases are used for shadow migrations (for example
+    ``0.4.0-alpha.1``), so restricting the updater to ``rc.N`` makes a safe
+    staged release impossible.  The token shape keeps numeric identifiers
+    below non-numeric identifiers exactly as SemVer 2.0.0 requires.
+    """
+    match = re.fullmatch(
+        r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+        r"(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?"
+        r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?",
+        version.strip(),
+    )
     if not match:
         raise UpdateError(f"Unsupported PaperSpine version: {version}")
     major, minor, patch = (int(match.group(i)) for i in range(1, 4))
-    rc = match.group(4)
-    if rc is None:
-        return (major, minor, patch, 1, 0)
-    return (major, minor, patch, 0, int(rc))
+    prerelease = match.group(4)
+    if prerelease is None:
+        return (major, minor, patch, 1, ())
+
+    identifiers: list[tuple[int, int | str]] = []
+    for identifier in prerelease.split("."):
+        if identifier.isdigit():
+            if len(identifier) > 1 and identifier.startswith("0"):
+                raise UpdateError(
+                    f"Numeric SemVer prerelease identifiers must not have leading zeros: {version}"
+                )
+            identifiers.append((0, int(identifier)))
+        else:
+            identifiers.append((1, identifier))
+    return (major, minor, patch, 0, tuple(identifiers))
 
 
 def compare_versions(left: str, right: str) -> int:

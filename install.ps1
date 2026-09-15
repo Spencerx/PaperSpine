@@ -1,37 +1,71 @@
 param(
-    [switch]$CleanLegacy
+  [ValidateSet("codex", "claude-code", "both")]
+  [string]$Target = "codex",
+  [switch]$CleanLegacy,
+  [string]$ProfileRoot = (Join-Path $env:USERPROFILE ".paperspine5\profiles\default"),
+  [string]$ManifestPath = "",
+  [string]$BundlePath = "",
+  [string]$CodexSkillsRoot = "",
+  [string]$ClaudeSkillsRoot = "",
+  [string]$LegacyArchiveRoot = (Join-Path $env:USERPROFILE ".paperspine5\legacy-migrations")
 )
-
-# PaperSpine V4 installer (Windows). Thin wrapper that delegates all file work to
-# the Python sync, which generates dist/ from src/ and installs the single
-# `paper-spine` skill into Claude Code, Codex, OpenClaw, and Hermes.
-#
-# PowerShell 5.1-safe by design: no PS7-only operators, and it NEVER writes
-# settings.json (fixes issue #3 — old installers could wipe settings.json).
-
 $ErrorActionPreference = "Stop"
-$Root = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Sync = Join-Path $Root "src\scripts\sync_local_installs.py"
-
-if (-not (Test-Path -LiteralPath $Sync)) {
-    throw "PaperSpine sync script not found: $Sync"
+$Version = "0.4.0-alpha.1-dev"
+$ManifestUrl = "https://github.com/WUBING2023/PaperSpine/releases/download/v$Version/manifest.json"
+$manifest = if ($ManifestPath) { Get-Content -LiteralPath $ManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json } else { Invoke-RestMethod -Uri $ManifestUrl -UseBasicParsing }
+$artifact = @($manifest.artifacts | Where-Object { $_.kind -eq "suite" }) | Select-Object -First 1
+if ($null -eq $artifact) { throw "V5 suite artifact is missing from the release manifest." }
+$downloadRoot = Join-Path ([IO.Path]::GetTempPath()) ("paperspine5-v5-" + [guid]::NewGuid().ToString("N"))
+$extractRoot = Join-Path $downloadRoot "suite"
+New-Item -ItemType Directory -Path $extractRoot -Force | Out-Null
+$zipPath = Join-Path $downloadRoot $artifact.file
+try {
+  if ($BundlePath) { Copy-Item -LiteralPath $BundlePath -Destination $zipPath -Force } else { Invoke-WebRequest -Uri $artifact.download_url -OutFile $zipPath -UseBasicParsing }
+  $actualHash = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+  if ($actualHash -ne $artifact.sha256.ToLowerInvariant()) { throw "SHA-256 mismatch for $($artifact.file)." }
+  if ((Get-Item -LiteralPath $zipPath).Length -ne [int64]$artifact.bytes) { throw "Byte-size mismatch for $($artifact.file)." }
+  Expand-Archive -LiteralPath $zipPath -DestinationPath $extractRoot -Force
+  $launcher = Join-Path $extractRoot "paperspine.cmd"
+  $runtime = Join-Path $extractRoot "runtime_vendor\windows-py312\python.exe"
+  $migrator = Join-Path $extractRoot "standalone\paper-spine\scripts\skill_discovery_migration.py"
+  if (-not (Test-Path -LiteralPath $launcher) -or -not (Test-Path -LiteralPath $runtime)) { throw "The downloaded V5 suite is incomplete." }
+  & $launcher verify-bundle --bundle $zipPath | Out-Host
+  if ($LASTEXITCODE -ne 0) { throw "The downloaded V5 suite failed its internal verification." }
+  $targets = if ($Target -eq "both") { @("codex", "claude-code") } else { @($Target) }
+  $roots = @{}
+  foreach ($name in $targets) {
+    $roots[$name] = if ($name -eq "codex") { if ($CodexSkillsRoot) { $CodexSkillsRoot } else { Join-Path $env:USERPROFILE ".codex\skills" } } else { if ($ClaudeSkillsRoot) { $ClaudeSkillsRoot } else { Join-Path $env:USERPROFILE ".claude\skills" } }
+  }
+  $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+  $backupRoot = Join-Path $env:USERPROFILE ".paperspine5\backups\v5-install\$stamp"
+  $operationId = "v5-install-$stamp"
+  if ($CleanLegacy) {
+    $migrationArgs = @("-I", "-B", $migrator, "migrate", "--archive-root", $LegacyArchiveRoot, "--operation-id", $operationId)
+    foreach ($entry in $roots.GetEnumerator()) { $migrationArgs += @("--skills-root", "$($entry.Key)=$($entry.Value)") }
+    & $runtime @migrationArgs | Out-Host
+    if ($LASTEXITCODE -ne 0) { throw "Known legacy Skill migration did not complete; no V5 Skill was activated." }
+  }
+  $skillSource = Join-Path $extractRoot "standalone\paper-spine"
+  foreach ($entry in $roots.GetEnumerator()) {
+    $hostRoot = $entry.Value; $destination = Join-Path $hostRoot "paper-spine"
+    New-Item -ItemType Directory -Path $hostRoot -Force | Out-Null
+    if (Test-Path -LiteralPath $destination) {
+      $targetBackup = Join-Path $backupRoot (Join-Path $entry.Key "paper-spine")
+      New-Item -ItemType Directory -Path (Split-Path $targetBackup) -Force | Out-Null
+      Move-Item -LiteralPath $destination -Destination $targetBackup
+    }
+    Copy-Item -LiteralPath $skillSource -Destination $destination -Recurse -Force
+    Write-Output "Installed V5 paper-spine Skill for $($entry.Key): $destination"
+  }
+  New-Item -ItemType Directory -Path $ProfileRoot -Force | Out-Null
+  & $launcher install --profile-root $ProfileRoot --bundle $zipPath --operation-id $operationId | Out-Host
+  if ($LASTEXITCODE -ne 0) { throw "V5 profile installation failed." }
+  & $launcher first-start --profile-root $ProfileRoot | Out-Host
+  if ($LASTEXITCODE -ne 0) { throw "V5 first-start health check failed." }
+  Write-Output "PaperSpine5 V5 installed. Start a new host session before invoking paper-spine."
+  Write-Output "Profile: $ProfileRoot"
+  if ($CleanLegacy) { Write-Output "Known V3/V4 discovery folders were archived; user task data was retained." }
+  Write-Output "Backup root: $backupRoot"
+} finally {
+  if (Test-Path -LiteralPath $downloadRoot) { Remove-Item -LiteralPath $downloadRoot -Recurse -Force }
 }
-
-$python = $null
-foreach ($candidate in @("python", "python3", "py")) {
-    $cmd = Get-Command $candidate -ErrorAction SilentlyContinue
-    if ($cmd) { $python = $cmd.Source; break }
-}
-if (-not $python) {
-    throw "Python 3 not found on PATH. Install Python and retry."
-}
-
-$args = @($Sync)
-if ($CleanLegacy) { $args += "--clean-legacy" }
-
-Write-Output "Installing PaperSpine V4 (single skill, 4 hosts) via $python ..."
-& $python @args
-if ($LASTEXITCODE -ne 0) {
-    throw "PaperSpine install failed (exit $LASTEXITCODE)."
-}
-Write-Output "PaperSpine V4 installed. In Claude Code or Codex, run /paperspine to start."
