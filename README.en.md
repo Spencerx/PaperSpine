@@ -8,31 +8,50 @@ PaperSpine5 is a local-first, evidence-bound workspace for paper research, writi
 
 ## Downloads
 
-- Full V5 suite: Windows x64, embedded runtime and Web workspace, about 26.42 MB.
+- Windows x64 suite: about 26.4 MB.
+- Linux glibc x86_64 suite: about 56.2 MB.
+- macOS Apple Silicon suite: about 40.5 MB.
+- macOS Intel x86_64 suite: about 40.5 MB.
 - Standalone `paper-spine` Skill: for an existing host runtime, about 0.72 MB.
 
 Downloads are bound to the public manifest and SHA-256. Current version: `v0.4.0-alpha.1-dev` prerelease.
 
 ## Install and archive V3/V4 discovery conflicts
 
+Windows x64:
+
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install.ps1 -Target codex -CleanLegacy
 ```
 
-`-CleanLegacy` archives only known V3/V4 Skill discovery folders. It does not delete paper tasks, host settings, or unknown files. The installer verifies the manifest, byte count, SHA-256, suite integrity, and first-start health.
+macOS / Linux:
+
+```sh
+sh ./install.sh --target codex --clean-legacy
+```
+
+`-CleanLegacy` archives only known V3/V4 Skill discovery folders. It does not delete paper tasks, host settings, or unknown files. Both platform installers verify byte count, SHA-256, suite integrity, and first-start health.
 
 ## Check and apply updates
 
 ```powershell
+# Windows
 powershell -ExecutionPolicy Bypass -File .\install.ps1 -CheckOnly
 powershell -ExecutionPolicy Bypass -File .\install.ps1 -Target codex
+```
+
+```sh
+# macOS / Linux
+sh ./install.sh --check-only
+sh ./install.sh --target codex
 ```
 
 When a profile exists, the second command uses transactional `update`, retains task data, and runs first-start. Automatic update is disabled by default.
 
 ## Boundaries
 
-- The self-contained full suite is currently verified only on Windows x64.
+- Self-contained suites are verified on Windows x64, Linux glibc x86_64, macOS arm64, and macOS x86_64. Linux arm64 and musl/Alpine are not claimed.
+- macOS packages are not signed or notarized; first launch may require explicit user approval.
 - This is an alpha prerelease without an independent cryptographic signature.
 - Publishing the product never authorizes manuscript submission, private-data upload, payment, or external contact.
 - The support surface is voluntary, unlocks no feature, and reads no payment state.

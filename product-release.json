@@ -13,7 +13,7 @@
     "communityRepository": null
   },
   "build": {
-    "installCommand": "powershell -ExecutionPolicy Bypass -File <extracted-package>/install.ps1 -Target codex",
+    "installCommand": "Windows: install.ps1 -Target codex; macOS/Linux: install.sh --target codex",
     "verifyCommands": [
       "python paperspine5/release_tools/verify_release.py",
       "python -m unittest discover -s tests -p test_atlas_pipeline.py"
