@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Section-economy guidance for PaperSpine manuscripts.
+"""Section-economy guard for PaperSpine manuscripts.
 
 Applied journal/conference papers run roughly 4-6 top-level sections. Emitting
-one section per idea can make a paper feel fragmented, but section count is not
-editorial quality. The default run therefore reports an advisory and leaves the
-architecture to the Agent. Explicit strict review may opt into enforcement.
+one section per idea — a 2-paragraph "Experimental Setup", a "Discussion" split
+out from "Conclusion" — is structural bloat. The exemplar-learning step observes
+a real section economy but nothing enforced it, so this guard converts that
+budget into a hard gate: it fails when the top-level section count exceeds the
+budget and flags the thinnest sections as merge candidates.
 
-Standard library only. Exit code 1 is used only with ``--enforce``.
+Standard library only. Exit code 0 = within budget, 1 = over budget.
 """
 
 from __future__ import annotations
@@ -78,7 +80,7 @@ def content_units(body: str) -> int:
     return cjk + words
 
 
-def check(text: str, max_sections: int, enforce: bool = False) -> tuple[int, list[SectionFinding]]:
+def check(text: str, max_sections: int) -> tuple[int, list[SectionFinding]]:
     sections = numbered_sections(text)
     count = len(sections)
     findings: list[SectionFinding] = []
@@ -86,11 +88,11 @@ def check(text: str, max_sections: int, enforce: bool = False) -> tuple[int, lis
     if count > max_sections:
         titles = ", ".join(title or "(untitled)" for title, _ in sections)
         findings.append(SectionFinding(
-            "error" if enforce else "advisory",
-            f"{count} top-level sections exceeds the orientation value of {max_sections}. "
-            "Review whether the architecture is fragmented, but keep additional sections when "
-            "they perform distinct venue-appropriate intellectual jobs. "
-            f"Sections: {titles}.",
+            "error",
+            f"{count} top-level sections exceeds the applied-paper budget of {max_sections}. "
+            "Real journal/conference papers run 4-6 sections; merge thin or overlapping ones "
+            "(e.g. fold 'Experimental Setup' into the Results opening, merge 'Discussion' into "
+            f"'Conclusion'). Sections: {titles}.",
         ))
 
     sized = [(content_units(body), title) for title, body in sections]
@@ -105,18 +107,15 @@ def check(text: str, max_sections: int, enforce: bool = False) -> tuple[int, lis
     return count, findings
 
 
-def render_markdown(
-    path: Path, count: int, max_sections: int, findings: list[SectionFinding], enforce: bool = False
-) -> str:
+def render_markdown(path: Path, count: int, max_sections: int, findings: list[SectionFinding]) -> str:
     errors = [f for f in findings if f.severity == "error"]
     lines = [
         "# Section Economy Check",
         "",
         f"- Manuscript: `{path}`",
         f"- Top-level sections: {count}",
-        f"- Orientation value (max): {max_sections}",
-        f"- Enforcement: {'strict' if enforce else 'advisory'}",
-        f"- Status: {'FAIL' if errors else 'PASS_WITH_ADVISORIES' if findings else 'PASS'}",
+        f"- Budget (max): {max_sections}",
+        f"- Status: {'FAIL' if errors else 'PASS'}",
         "",
     ]
     if findings:
@@ -125,7 +124,7 @@ def render_markdown(
         for item in findings:
             lines.append(f"| {item.severity} | {item.message.replace('|', chr(92) + '|')} |")
     else:
-        lines.append("No section-economy advisory.")
+        lines.append("Section economy within budget.")
     lines.append("")
     return "\n".join(lines)
 
@@ -134,7 +133,6 @@ def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description="Check top-level section economy of a manuscript.")
     parser.add_argument("target", type=Path, help="main.tex or an output directory containing final_paper/main.tex")
     parser.add_argument("--max-sections", type=int, default=DEFAULT_MAX_SECTIONS)
-    parser.add_argument("--enforce", action="store_true", help="Fail when the orientation value is exceeded.")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--markdown", action="store_true")
     args = parser.parse_args(argv)
@@ -145,7 +143,7 @@ def main(argv: list[str]) -> int:
         return 2
 
     text = read_text(tex_path)
-    count, findings = check(text, args.max_sections, enforce=args.enforce)
+    count, findings = check(text, args.max_sections)
 
     if args.json:
         print(json.dumps(
@@ -160,7 +158,7 @@ def main(argv: list[str]) -> int:
             indent=2,
         ))
     if args.markdown or not args.json:
-        print(render_markdown(tex_path, count, args.max_sections, findings, enforce=args.enforce))
+        print(render_markdown(tex_path, count, args.max_sections, findings))
 
     return 1 if any(f.severity == "error" for f in findings) else 0
 

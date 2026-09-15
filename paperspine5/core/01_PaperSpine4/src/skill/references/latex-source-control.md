@@ -22,7 +22,7 @@ If a TeX engine is available, also compile the original project. Record whether 
 
 ## Step 1: Identify Protected Regions
 
-Protect these regions during ordinary prose editing. Change them when the authorized task requires template adaptation, citation or cross-reference correction, figure layout repair, or another supported structural change, then verify the affected source and renders:
+Do not edit these unless the task is specifically about LaTeX repair:
 
 - preamble,
 - document class and packages,

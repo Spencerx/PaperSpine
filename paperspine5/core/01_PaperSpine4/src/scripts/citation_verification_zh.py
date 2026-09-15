@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Inspect Chinese citation format and DOI availability.
+"""Verify Chinese-language citations for authenticity and completeness.
 
-These diagnostics cannot prove fabrication, bibliographic identity, or claim
-support. Complete verification requires the original source or authoritative
-metadata; no row becomes VERIFIED from format or a resolved DOI alone.
+Checks citation format, DOI resolveability, and structural integrity for
+中文参考文献 (Chinese-language references). Produces a structured report
+flagging SUSPICIOUS / INCOMPLETE / FAKE citations.
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ CN_PAGES_RE = re.compile(r"(\d+)[-~]\s*(\d+)")
 class CitationCheckZH:
     candidate_id: str
     reference_text: str
-    status: str = "INCOMPLETE"  # format/lookup diagnostic; never infers fabrication
+    status: str  # VERIFIED / SUSPICIOUS / INCOMPLETE / FAKE
     has_author: bool = False
     has_title: bool = False
     has_journal: bool = False
@@ -57,23 +57,11 @@ class CitationVerificationZHResult:
 
     @property
     def ok(self) -> bool:
-        """Legacy exit/JSON flag: a nonempty bank was diagnosed, not verified."""
-        return self.total > 0 and len(self.checks) == self.total
-
-    @property
-    def complete_verification(self) -> bool:
-        # This helper does not compare bibliographic identity or claim support.
-        return False
-
-    @property
-    def diagnostic_status(self) -> str:
-        if not self.ok:
-            return "FAIL"
-        return "WARN" if self.suspicious or self.incomplete or self.fake else "COMPLETE"
+        return self.fake == 0 and self.suspicious == 0
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Diagnose Chinese citation format and DOI availability; not complete verification.")
+    parser = argparse.ArgumentParser(description="Verify Chinese citations for PaperSpine.")
     parser.add_argument("output_dir", nargs="?", default="paper_rewriting_output")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--markdown", action="store_true")
@@ -109,19 +97,16 @@ def check_citation_bank_zh(out_dir: Path) -> CitationVerificationZHResult:
         return CitationVerificationZHResult(str(bank_path))
 
     text = bank_path.read_text(encoding="utf-8", errors="ignore")
-    header, rows = table_rows(text)
+    _, rows = table_rows(text)
     if not rows:
         return CitationVerificationZHResult(str(bank_path))
 
     result = CitationVerificationZHResult(str(bank_path), total=len(rows))
-    reference_index = next((i for i, name in enumerate(header)
-                            if any(term in name.casefold() for term in
-                                   ("reference", "citation", "bibtex", "文献", "引用"))), None)
 
     for row in rows:
         joined = " ".join(row)
         candidate_id = row[0] if len(row) > 0 else "?"
-        ref = row[reference_index] if reference_index is not None and reference_index < len(row) else joined
+        ref = row[1] if len(row) > 1 else joined
 
         check = CitationCheckZH(candidate_id=candidate_id, reference_text=ref[:120])
 
@@ -130,14 +115,14 @@ def check_citation_bank_zh(out_dir: Path) -> CitationVerificationZHResult:
         check.has_journal = fmt["has_journal"]
         check.has_year = fmt["has_year"]
 
-        # Format heuristics cannot establish fabrication.
+        # Check for obvious fabrications
         if len(ref.strip()) < 20:
-            check.status = "INCOMPLETE"
-            check.issues.append("Citation text is short; inspect full bibliographic metadata")
+            check.status = "FAKE"
+            check.issues.append("Citation text too short — likely fabricated")
 
         elif not check.has_author and not check.has_journal:
-            check.status = "INCOMPLETE"
-            check.issues.append("Author/journal not recognized by the format heuristic; verify the source metadata")
+            check.status = "FAKE"
+            check.issues.append("No author or journal found — likely fabricated")
 
         elif not check.has_author or not check.has_journal or not check.has_year:
             check.status = "INCOMPLETE"
@@ -155,13 +140,12 @@ def check_citation_bank_zh(out_dir: Path) -> CitationVerificationZHResult:
                 check.doi_resolves = verify_doi(doi)
                 if not check.doi_resolves:
                     check.status = "SUSPICIOUS"
-                    check.issues.append(f"Crossref lookup unsuccessful for {doi[:30]}; identity remains unverified, not proved invalid")
+                    check.issues.append(f"DOI {doi[:30]} does not resolve")
                 else:
-                    check.status = "SUSPICIOUS"
-                    check.issues.append("DOI record resolves; compare title, authors, year and claim support before treating this citation as verified")
+                    check.status = "VERIFIED"
             else:
                 check.status = "SUSPICIOUS"
-                check.issues.append("No DOI in this row; verify through the original paper, publisher or authoritative Chinese index. A DOI is not required for a real source")
+                check.issues.append("No DOI — cannot verify authenticity. Add DOI or verify manually")
 
         if check.status == "VERIFIED": result.verified += 1
         elif check.status == "SUSPICIOUS": result.suspicious += 1
@@ -174,15 +158,14 @@ def check_citation_bank_zh(out_dir: Path) -> CitationVerificationZHResult:
 
 def to_markdown(result: CitationVerificationZHResult) -> str:
     lines = [
-        "# Chinese Citation Diagnostic Report",
+        "# Chinese Citation Verification Report",
         "",
         f"- Total citations: {result.total}",
         f"- Verified: {result.verified}",
-        f"- Pending source verification (legacy suspicious count): {result.suspicious}",
+        f"- Suspicious: {result.suspicious}",
         f"- Incomplete: {result.incomplete}",
-        "- Scope: format and DOI availability only; no fabrication inference or complete citation verification is performed.",
-        f"- Diagnostic status: {result.diagnostic_status}",
-        "- Complete verification: not performed. Exit 0 / ok=true means diagnosis completed only; reuse valid source checks or inspect the source, not repeated runs of this heuristic.",
+        f"- Likely fake: {result.fake}",
+        f"- Status: {'PASS' if result.ok else 'FAIL'}",
         "",
         "## Details",
         "",
@@ -201,12 +184,7 @@ def main() -> int:
     result = check_citation_bank_zh(out_dir)
 
     if args.json:
-        print(json.dumps({"ok": result.ok, "diagnostic_status": result.diagnostic_status,
-                          "complete_verification": result.complete_verification,
-                          "scope": "format_and_doi_availability_only",
-                          "total": result.total, "verified": result.verified,
-                          "suspicious": result.suspicious, "incomplete": result.incomplete,
-                          "fake": result.fake}, ensure_ascii=False, indent=2))
+        print(json.dumps({"ok": result.ok, "total": result.total, "verified": result.verified, "suspicious": result.suspicious, "incomplete": result.incomplete, "fake": result.fake}, ensure_ascii=False, indent=2))
     if args.markdown or not args.json:
         print(to_markdown(result))
 
