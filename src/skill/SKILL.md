@@ -1,16 +1,21 @@
 ---
 name: paper-spine
 description: Research, write, review and deliver evidence-bound papers in one task, with user choices, real files, editable outputs and same-task revision.
-# Suite Update Authority is separate; Blocks unsupported readiness claims.
+# Suite Update Authority; Blocks unsupported readiness claims.
 ---
 
-# PaperSpine — the single paper skill
+# PaperSpine Orchestrator
 
 Before paper production or resume, read [paper-spine-production-protocol.md](references/paper-spine-production-protocol.md). It is the operational 17-step handoff for the methods below.
 
 The current host Agent performs research, citation checking, interpretation,
 writing, figures and revision, and arranges independent review. Web, local files
 and small scripts support interaction, persistence, rendering and delivery.
+
+When configuration is missing, launch the intake UI automatically before inspecting
+materials; do not hand-write configuration or silently choose a paper root.
+For a visible launcher action, use `require_escalated` as required by the host.
+When configuration is missing, this launch must be the first tool action.
 
 **Product outcome:** an evidence-bound, coherent paper with informative figures,
 applicable venue format and editable sources. Learn from strong same-field and
@@ -148,7 +153,7 @@ Read [intake.md](references/intake.md), [intent-configuration.md](references/int
 
 Read [research.md](references/research.md), [local-reference-ingestion.md](references/local-reference-ingestion.md), [citation.md](references/citation.md), [journal-learning.md](references/journal-learning.md), [target-journal-research.md](references/target-journal-research.md) and the applicable venue playbook. Read public literature unless explicitly limited. Use the saved learning-set sizes; inspect actual target-venue PDFs, current official instructions and any applicable official template. Abstracts can support bounded claims but cannot prove full-text, figure or page-design learning. Verify citation identity and use; build useful references without padding.
 
-Resolve target identity before claiming target-format learning. An Agent-selected comparator is not the saved target. If the target is unknown, use existing delegated authority and save the choice, request one concise decision, or keep the draft explicitly venue-neutral. Learning is applied only when the source uses the verified template/style or stated fallback and representative rendered pages have been compared with actual exemplars.
+Resolve target identity before claiming target-format learning. An Agent-selected comparator is not the saved target. If unknown, save a delegated choice, ask once, or keep the draft venue-neutral. Format learning counts only when the source uses a verified template/style or stated fallback and representative pages match actual exemplars.
 
 Apply the saved analysis scope to actual tool work:
 
@@ -176,9 +181,9 @@ Read [contribution.md](references/contribution.md), [semantic-confirmation.md](r
 
 For `build_from_materials`, read [build.md](references/build.md); for rewriting, read [rewrite.md](references/rewrite.md). Apply [editorial-completeness.md](references/editorial-completeness.md) and [assertive-scientific-writing.md](references/assertive-scientific-writing.md). Write a complete evidence-bound argument, not a summary or template shell.
 
-Before figures, read [scientific-figure-workflow.md](references/scientific-figure-workflow.md), [figure-story.md](references/figure-story.md) and [figure-reference-mapping.md](references/figure-reference-mapping.md). Map the actual result inventory to scientific questions and assign each useful evidence job—cohort/availability, primary finding, comparison/discrimination, uncertainty/validation, robustness/subgroup and explanation—to a figure, table, prose, supplement or justified omission. There is no figure quota: merge duplicates, but do not let the current figure folder or one overloaded omnibus plot define the complete story. View structurally matched references before design.
+Before figures, read [scientific-figure-workflow.md](references/scientific-figure-workflow.md), [figure-story.md](references/figure-story.md) and [figure-reference-mapping.md](references/figure-reference-mapping.md). Map actual results to questions and assign each useful job—cohort, primary finding, comparison, uncertainty/validation, robustness/subgroup and explanation—to a figure, table, prose, supplement or justified omission. No quota: merge duplicates, but do not let the current folder or one omnibus plot define the story. View matched references before design.
 
-For `mechanism_figure: auto` or `prefer`, make an explicit suitability decision. When explanation is central and adequately sourced, create a complete mechanism/conceptual/architecture candidate in addition to necessary data figures, distinguishing observed links, established knowledge and hypotheses. Under `auto`, omit only for a concrete scientific reason. A cohort flowchart, ROC panel or statistical summary is not a mechanism figure.
+For `mechanism_figure: auto` or `prefer`, make an explicit decision. If explanation is central and sourced, create a complete mechanism/conceptual/architecture candidate in addition to necessary data figures, distinguishing observations, established knowledge and hypotheses. Under `auto`, omit only for a concrete reason. A flowchart, ROC panel or statistical summary is not a mechanism figure.
 
 Expose current, reference and candidate files for each selectable figure and read every saved choice/comment before assembly. Preserve data truth, editable sources, panel identity, caption/body alignment, units, claim boundaries and prior figure bytes; keep references/comparisons separate from final candidates.
 
