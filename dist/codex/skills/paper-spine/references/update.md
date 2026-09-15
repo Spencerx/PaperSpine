@@ -44,3 +44,8 @@ folders archived. Never delete unknown folders, settings, or paper data.
 The self-contained full-suite update is currently Windows x64 only. For another
 platform, update only the standalone Skill using its verified release archive and
 package installer; do not claim full-suite runtime validation.
+
+Compatibility note: the installed legacy component helper remains at
+`paper-spine\scripts\paperspine_update.py` on Windows and
+`paper-spine/scripts/paperspine_update.py` on POSIX. Do not use it as the V5
+release authority; the verified manifest/installer route above supersedes it.

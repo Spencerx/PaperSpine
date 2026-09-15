@@ -3,7 +3,7 @@
   "product": "PaperSpine5",
   "version": "0.4.0-alpha.1-dev",
   "channel": "prerelease",
-  "build_id": "w7a-6298427f9e593fdc2bc2",
+  "build_id": "w7a-16e6c32f1eb32a463e7f",
   "release_state": "published",
   "published": true,
   "repository": "https://github.com/WUBING2023/PaperSpine",
@@ -14,8 +14,8 @@
     {
       "kind": "suite",
       "file": "paperspine5-suite-0.4.0-alpha.1-dev.zip",
-      "bytes": 26412900,
-      "sha256": "9b7160f1da0ae01212d0c7dcd85e7e74a4fec44740a8f6a95db6629bfec7cc49",
+      "bytes": 26413122,
+      "sha256": "5fd48b5baba22483bcffdc6078e6ab9aac2ab0d03a0a9214dc17df801ad544d5",
       "download_url": "https://github.com/WUBING2023/PaperSpine/releases/download/v0.4.0-alpha.1-dev/paperspine5-suite-0.4.0-alpha.1-dev.zip",
       "description": "完整 V5 工作区：内置 Windows x64 runtime、Web 工作区、profile 生命周期、更新与回滚。",
       "install_command": "powershell -ExecutionPolicy Bypass -File .\\install.ps1 -Target codex -CleanLegacy"
@@ -23,8 +23,8 @@
     {
       "kind": "standalone-skill",
       "file": "paperspine5-skill-0.4.0-alpha.1-dev.zip",
-      "bytes": 715883,
-      "sha256": "63b6e8568a608b6a7737dcedb63783dbb5180d5868c8515a62ab661c6c6ba00b",
+      "bytes": 715991,
+      "sha256": "3fe8f600919714c817d2c2becf096fa9b9a5e43640fa59f505b3055a8e1956f9",
       "download_url": "https://github.com/WUBING2023/PaperSpine/releases/download/v0.4.0-alpha.1-dev/paperspine5-skill-0.4.0-alpha.1-dev.zip",
       "description": "轻量 paper-spine Skill：适用于已有宿主和本地运行环境。",
       "install_command": "powershell -ExecutionPolicy Bypass -File .\\install.ps1 -Target codex -CleanLegacy"

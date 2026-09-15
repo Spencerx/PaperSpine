@@ -2,13 +2,13 @@
   "schema_version": "1.1",
   "product": "PaperSpine5",
   "version": "0.4.0-alpha.1-dev",
-  "build_id": "w7a-6298427f9e593fdc2bc2",
+  "build_id": "w7a-16e6c32f1eb32a463e7f",
   "release_state": "published-prerelease",
   "public_release": true,
   "release_url": "https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.1-dev",
   "artifacts": {
-    "suite_bytes": 26412900,
-    "standalone_skill_bytes": 715883
+    "suite_bytes": 26413122,
+    "standalone_skill_bytes": 715991
   },
   "update_policy": {
     "check": "root install.ps1 -CheckOnly",
