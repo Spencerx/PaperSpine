@@ -2,6 +2,7 @@ param(
   [ValidateSet("codex", "claude-code", "both")]
   [string]$Target = "codex",
   [switch]$CleanLegacy,
+  [switch]$CheckOnly,
   [string]$ProfileRoot = (Join-Path $env:USERPROFILE ".paperspine5\profiles\default"),
   [string]$ManifestPath = "",
   [string]$BundlePath = "",
@@ -15,6 +16,17 @@ $ManifestUrl = "https://github.com/WUBING2023/PaperSpine/releases/download/v$Ver
 $manifest = if ($ManifestPath) { Get-Content -LiteralPath $ManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json } else { Invoke-RestMethod -Uri $ManifestUrl -UseBasicParsing }
 $artifact = @($manifest.artifacts | Where-Object { $_.kind -eq "suite" }) | Select-Object -First 1
 if ($null -eq $artifact) { throw "V5 suite artifact is missing from the release manifest." }
+$profileStatePath = Join-Path $ProfileRoot ".paperspine5-lifecycle\profile-state.json"
+if ($CheckOnly) {
+  $currentBuild = $null
+  if (Test-Path -LiteralPath $profileStatePath) {
+    $profileState = Get-Content -LiteralPath $profileStatePath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $currentBuild = $profileState.active_build_id
+  }
+  $status = if (-not $currentBuild) { "not_installed" } elseif ($currentBuild -eq $manifest.build_id) { "up_to_date" } else { "update_available" }
+  [ordered]@{ status = $status; current_build_id = $currentBuild; available_build_id = $manifest.build_id; version = $manifest.version; release_url = $manifest.release_url } | ConvertTo-Json
+  return
+}
 $downloadRoot = Join-Path ([IO.Path]::GetTempPath()) ("paperspine5-v5-" + [guid]::NewGuid().ToString("N"))
 $extractRoot = Join-Path $downloadRoot "suite"
 New-Item -ItemType Directory -Path $extractRoot -Force | Out-Null
@@ -38,7 +50,7 @@ try {
   }
   $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
   $backupRoot = Join-Path $env:USERPROFILE ".paperspine5\backups\v5-install\$stamp"
-  $operationId = "v5-install-$stamp"
+  $operationId = if (Test-Path -LiteralPath $profileStatePath) { "v5-update-$stamp" } else { "v5-install-$stamp" }
   if ($CleanLegacy) {
     $migrationArgs = @("-I", "-B", $migrator, "migrate", "--archive-root", $LegacyArchiveRoot, "--operation-id", $operationId)
     foreach ($entry in $roots.GetEnumerator()) { $migrationArgs += @("--skills-root", "$($entry.Key)=$($entry.Value)") }
@@ -58,8 +70,12 @@ try {
     Write-Output "Installed V5 paper-spine Skill for $($entry.Key): $destination"
   }
   New-Item -ItemType Directory -Path $ProfileRoot -Force | Out-Null
-  & $launcher install --profile-root $ProfileRoot --bundle $zipPath --operation-id $operationId | Out-Host
-  if ($LASTEXITCODE -ne 0) { throw "V5 profile installation failed." }
+  if (Test-Path -LiteralPath $profileStatePath) {
+    & $launcher update --profile-root $ProfileRoot --bundle $zipPath --operation-id $operationId --confirm | Out-Host
+  } else {
+    & $launcher install --profile-root $ProfileRoot --bundle $zipPath --operation-id $operationId | Out-Host
+  }
+  if ($LASTEXITCODE -ne 0) { throw "V5 profile installation/update failed." }
   & $launcher first-start --profile-root $ProfileRoot | Out-Host
   if ($LASTEXITCODE -ne 0) { throw "V5 first-start health check failed." }
   Write-Output "PaperSpine5 V5 installed. Start a new host session before invoking paper-spine."

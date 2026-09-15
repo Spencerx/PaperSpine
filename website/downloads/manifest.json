@@ -3,7 +3,7 @@
   "product": "PaperSpine5",
   "version": "0.4.0-alpha.1-dev",
   "channel": "prerelease",
-  "build_id": "paperspine5-0.4.0-alpha.1-dev-build.20260915",
+  "build_id": "w7a-3042d27ecacbf40c58f1",
   "release_state": "published",
   "published": true,
   "repository": "https://github.com/WUBING2023/PaperSpine",
@@ -59,7 +59,7 @@
     "suite_build": "PASS",
     "suite_verify": "PASS",
     "standalone_archive": "PASS",
-    "public_release_status": "prerelease_pending_upload",
+    "public_release_status": "published",
     "external_submission_authorized": false
   },
   "limitations": [
@@ -67,5 +67,10 @@
     "No independent cryptographic signature.",
     "Known legacy Skill folders are archived only when -CleanLegacy is explicitly supplied.",
     "Public release does not authorize external manuscript submission."
-  ]
+  ],
+  "update": {
+    "check_command": "powershell -ExecutionPolicy Bypass -File .\\install.ps1 -CheckOnly",
+    "apply_command": "powershell -ExecutionPolicy Bypass -File .\\install.ps1 -Target codex",
+    "policy": "manual-explicit; existing profile uses transactional update; task data retained"
+  }
 }

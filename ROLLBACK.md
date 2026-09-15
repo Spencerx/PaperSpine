@@ -1,14 +1,5 @@
-# PaperSpine5 release rollback
+# PaperSpine5 rollback
 
-The immutable rollback point for this candidate is the commit referenced by tag
-`v0.3.0-rc.1`.  Release ZIP files must never be replaced in place.
+Current prerelease: `v0.4.0-alpha.1-dev`. The installer stores prior canonical Skill bytes and profile installations under `.paperspine5`; task data stays separate. Use the suite `paperspine.cmd rollback` command with an installed build ID, or restore an intentional timestamped Skill backup after closing the host.
 
-If the website is faulty, redeploy the preceding successful GitHub Pages artifact
-or revert only the website commit and rerun the Pages workflow.  If an artifact is
-faulty, mark this prerelease as withdrawn and publish a new version with new
-filenames and checksums.  Do not delete or overwrite evidence needed to explain
-the withdrawal.
-
-PaperSpine V4 remains available from the repository root and its established
-`dist/paperspine_version.json` update source.  V5 is opt-in, so rolling back the V5
-page or prerelease does not require changing the V4 user-data identity.
+Never overwrite a published ZIP without updating its manifest and SHA-256. If a release is defective, withdraw it and publish a new version. Git history retains older tags; old build reports are not kept in current `main`.

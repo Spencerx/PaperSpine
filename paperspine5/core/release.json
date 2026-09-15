@@ -1,35 +1,24 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "product": "PaperSpine5",
-  "version": "0.3.0-rc.1",
-  "build_id": "paperspine5-0.3.0-rc.1-build.20260823.1",
-  "release_state": "release-candidate-local-staging",
-  "paper_spine": {
-    "component_version": "4.0.0",
-    "verified_checkpoint": "2026-08-23-manual-opt-in-update",
-    "tests": 267,
-    "scope_note": "Open Release Beta is intentionally excluded because the delegated release authority freezes the independently accepted 267-test checkpoint."
-  },
-  "paper_figure": {
-    "tests": 60
-  },
-  "integration": {
-    "tests": 19,
-    "state_schema": "1.2",
-    "workflow_schema": "1.1",
-    "publication_cycle_interface": "1.0",
-    "visible_stages": [
-      "工作配置",
-      "论文定锚",
-      "科研图件",
-      "规范主稿",
-      "投稿循环"
-    ]
+  "version": "0.4.0-alpha.1-dev",
+  "build_id": "w7a-3042d27ecacbf40c58f1",
+  "release_state": "published-prerelease",
+  "public_release": true,
+  "release_url": "https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.1-dev",
+  "artifacts": {
+    "suite_bytes": 26416717,
+    "standalone_skill_bytes": 717793
   },
   "update_policy": {
-    "manual": true,
-    "automatic": "opt-in-launch-preflight",
-    "default_enabled": false
+    "check": "root install.ps1 -CheckOnly",
+    "apply": "rerun root install.ps1; existing profile uses transactional update",
+    "automatic": false,
+    "task_data_retained": true
   },
-  "public_release": false
+  "claim_boundary": {
+    "stable": false,
+    "windows_x64_full_suite": true,
+    "external_submission_authorized": false
+  }
 }
