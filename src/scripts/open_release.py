@@ -969,7 +969,7 @@ def record(ticket_path: Path, receipts_path: Path, output_dir: Path, *, invocati
         manifest_hash = (ticket.get("manifest") or {}).get("sha256")
         release_id = ticket.get("release_id")
         key = action.get("idempotency_key")
-        expected_key = sha256_bytes(f"{release_id}:{manifest_hash}:{platform}:{scope}".encode("utf-8"))
+        expected_key = sha256_bytes(f"{release_id}:{manifest_hash}:{platform}:{scope}".encode())
         if (platform not in authorized or platform in actions
                 or not isinstance(scope, str) or not scope.strip()
                 or not isinstance(release_id, str) or not release_id.strip()

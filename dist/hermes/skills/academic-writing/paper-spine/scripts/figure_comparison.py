@@ -11,10 +11,10 @@ Clips and exported views are keyed by one-based --view order, not page number.
 from __future__ import annotations
 
 import argparse
-from contextlib import ExitStack
 import json
 import math
 import os
+from contextlib import ExitStack
 from pathlib import Path
 
 

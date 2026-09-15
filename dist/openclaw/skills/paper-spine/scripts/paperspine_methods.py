@@ -8,11 +8,10 @@ from __future__ import annotations
 
 import hashlib
 import json
-from pathlib import Path, PureWindowsPath
 import stat
 import textwrap
+from pathlib import Path, PureWindowsPath
 from typing import Any
-
 
 REGISTRY_PATH = "references/current-method-routing.json"
 AXES = ("stages", "workflows", "scenes", "focuses")

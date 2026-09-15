@@ -5,10 +5,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from pathlib import Path
 import re
 import shutil
 import tempfile
+from pathlib import Path
 
 
 def preserve(paper_root: Path, revision: str, files: list[str]) -> dict:
@@ -57,7 +57,7 @@ def preserve(paper_root: Path, revision: str, files: list[str]) -> dict:
                             "bytes": len(content), "sha256": digest})
         # Check the whole input set again, not just each file immediately after
         # copying it. Callers still need stable inputs; this is not a writer lock.
-        for (source, rel), record in zip(inputs, records):
+        for (source, rel), record in zip(inputs, records, strict=True):
             if hashlib.sha256(source.read_bytes()).hexdigest() != record["sha256"]:
                 raise RuntimeError(f"Input set changed during preservation: {rel}")
         manifest = {"revision": revision, "files": records}

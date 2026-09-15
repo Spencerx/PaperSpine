@@ -31,11 +31,15 @@ _SCRIPT_DIR = str(Path(__file__).resolve().parent)
 if _SCRIPT_DIR not in sys.path:
     sys.path.insert(0, _SCRIPT_DIR)
 
-from latex_guard import check_internal_destinations, check_labels_and_refs
-from publication_surface_check import to_markdown as surface_markdown
-from publication_surface_check import validate as validate_surface
-from word_guard import (W_NS, internal_reference_findings,
-                        duplicate_figure_reference_findings, inspect_word_figure_geometry)
+from latex_guard import check_internal_destinations, check_labels_and_refs  # noqa: E402
+from publication_surface_check import to_markdown as surface_markdown  # noqa: E402
+from publication_surface_check import validate as validate_surface  # noqa: E402
+from word_guard import (  # noqa: E402
+    W_NS,
+    duplicate_figure_reference_findings,
+    inspect_word_figure_geometry,
+    internal_reference_findings,
+)
 
 
 def run(command: list[str], cwd: Path, *, input_text: str | None = None) -> str:

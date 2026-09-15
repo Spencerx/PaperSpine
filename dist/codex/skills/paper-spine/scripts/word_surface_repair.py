@@ -25,7 +25,6 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches
 
-
 RAW_DISPLAY_MATH = re.compile(r"^\s*\$\$(?P<body>.+)\$\$\s*$", re.DOTALL)
 RAW_TEX_MARKUP = re.compile(
     r"\\(?:begin|end)\s*\{(?:equation|align|aligned|gather|multline)\*?\}|\$\$",
@@ -270,7 +269,7 @@ def repair_word_surface(
                 "cannot bind Office display math to canonical LaTeX equations "
                 f"({len(display_paragraphs)}/{len(source_blocks)})"
             )
-        repair_targets = list(zip(display_paragraphs, source_blocks))
+        repair_targets = list(zip(display_paragraphs, source_blocks, strict=True))
 
     for index, (paragraph, body) in enumerate(repair_targets, start=1):
         image_path = render_dir / f"equation-{index:03d}.png"

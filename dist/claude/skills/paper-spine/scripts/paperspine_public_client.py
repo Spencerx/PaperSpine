@@ -12,7 +12,6 @@ import hashlib
 import importlib.util
 import json
 import os
-from pathlib import Path
 import runpy
 import subprocess
 import sys
@@ -20,8 +19,9 @@ import time
 import traceback
 import uuid
 import webbrowser
-from urllib.request import urlopen
+from pathlib import Path
 from typing import Any
+from urllib.request import urlopen
 
 sys.dont_write_bytecode = True
 
@@ -441,8 +441,7 @@ def _method_guidance(payload: dict[str, Any], args: argparse.Namespace,
 
 def local_methods(args: argparse.Namespace) -> int:
     """Read explicit installed method data; do not claim a current task observation."""
-    from paperspine_methods import (DEFAULT_TEXT_MAX_CHARS, format_method_text,
-                                    method_guidance, skill_root_for_script)
+    from paperspine_methods import DEFAULT_TEXT_MAX_CHARS, format_method_text, method_guidance, skill_root_for_script
     if not args.resource:
         raise ValueError("Local reading requires an explicit registered resource")
     text_mode = getattr(args, "format", "json") == "text"
@@ -751,4 +750,4 @@ if __name__ == "__main__":
         traceback.print_exception(exc, file=sys.stderr)
         print(json.dumps({"error": {"code": "public_transport_failed", "message": str(exc)},
                           "automatic_retry": False}), file=sys.stderr if server_mode else sys.stdout)
-        raise SystemExit(1)
+        raise SystemExit(1) from exc

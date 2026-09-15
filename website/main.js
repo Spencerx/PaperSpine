@@ -123,6 +123,9 @@
   };
 
   supportOpeners.forEach((button) => button.addEventListener("click", () => openSupportDialog(button)));
+  if (new URLSearchParams(window.location.search).get("support") === "1") {
+    window.requestAnimationFrame(() => openSupportDialog(supportOpeners[0] || null));
+  }
   supportClosers.forEach((button) => button.addEventListener("click", closeSupportDialog));
 
   if (supportDialog) {

@@ -18,7 +18,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-
 CONTRACT = "paperspine.execution-receipt"
 SCHEMA_VERSION = "1.0"
 REUSABLE = 0

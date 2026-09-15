@@ -526,7 +526,7 @@ def _existing_prepare_is_reusable(output_dir: Path, dpi: int) -> bool:
     figures = data.get("figures")
     if not isinstance(figures, list) or len(figures) != len(inventory):
         return False
-    for prepared, current in zip(figures, inventory):
+    for prepared, current in zip(figures, inventory, strict=True):
         if not isinstance(prepared, dict) or prepared.get("figure_id") != current.get("figure_id"):
             return False
         asset = Path(str(current.get("asset_path") or ""))
