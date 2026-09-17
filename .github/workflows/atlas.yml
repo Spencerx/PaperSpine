@@ -57,6 +57,11 @@ jobs:
       - name: Refuse empty atlas data
         run: python atlas/validate_data.py atlas/data.js
 
+      - name: Verify the V5 community view uses the refreshed atlas
+        run: |
+          python atlas/validate_data.py website/community/data.js
+          cmp atlas/data.js website/community/data.js
+
       - name: Build and verify PaperSpine5 website
         run: python paperspine5/release_tools/build_site.py
 

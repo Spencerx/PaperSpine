@@ -1,4 +1,6 @@
-<p align="center"><img src="website/assets/brand/paperspine-mark.svg" width="112" alt="PaperSpine"></p>
+<p align="right"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-mark.svg" width="24" alt="PaperSpine"></a></p>
+
+<p align="center"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-banner.webp" alt="PaperSpine5 · von null zu einer vollständigen Arbeit mit Text und Abbildungen"></a></p>
 
 # PaperSpine5
 
