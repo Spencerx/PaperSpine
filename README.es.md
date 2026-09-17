@@ -20,7 +20,7 @@ El cuerpo del texto, las figuras de datos, los esquemas de mecanismo y los diagr
 - Suite para macOS Intel x86_64: unos 40.5 MB.
 - `paper-spine` Skill independiente: para entornos que ya tienen runtime, unos 0.72 MB.
 
-Todas las descargas quedan sujetas al manifest público y a SHA-256. La versión actual es la prerelese `v0.4.0-alpha.1-dev`.
+Todas las descargas figuran en la lista pública de lanzamientos y se verifican con SHA-256. La versión actual es la versión preliminar `v0.4.0-alpha.1-dev`.
 
 ## Instalación y migración desde versiones anteriores
 
@@ -36,7 +36,7 @@ macOS / Linux:
 sh ./install.sh --target codex --clean-legacy
 ```
 
-`-CleanLegacy` solo archiva las carpetas conocidas de descubrimiento de Skills V3/V4. No borra datos de tareas, ajustes del host ni archivos desconocidos. Ambos instaladores verifican el número de bytes, el SHA-256, la integridad interna de la suite y el estado en el primer arranque.
+`-CleanLegacy` solo archiva las carpetas conocidas de descubrimiento de Skills V3/V4. No borra datos de tareas, ajustes del host ni archivos desconocidos. Ambos instaladores verifican el número de bytes, el SHA-256, la integridad interna de la suite y una comprobación al arrancar.
 
 ## Comprobar y aplicar actualizaciones
 
@@ -52,13 +52,13 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-Si ya existe un perfil, el segundo comando ejecuta un `update` transaccional, conserva los datos de las tareas y hace la comprobación de primer arranque. La actualización automática está desactivada por defecto.
+Si ya hay una instalación, el segundo comando aplica una actualización reversible, conserva los datos de las tareas y hace una comprobación al arrancar. La actualización automática está desactivada por defecto.
 
 ## Límites
 
 - Las suites autocontenidas están verificadas en Windows x64, Linux glibc x86_64, macOS arm64 y macOS x86_64. Linux arm64 y musl/Alpine no se declaran compatibles.
 - Los paquetes de macOS no están firmados ni notarizados; el primer arranque puede requerir una autorización explícita del usuario.
-- Es una prerelese alpha sin firma criptográfica independiente.
+- Es una versión preliminar alpha sin firma criptográfica independiente.
 - Publicar el producto no autoriza el envío de manuscritos, la subida de material privado, pagos ni contacto externo.
 - El canal de apoyo es voluntario, no desbloquea funciones y no lee el estado de pago.
 

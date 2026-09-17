@@ -20,7 +20,7 @@ Do corpo do texto às figuras de dados, esquemas de mecanismo e diagramas de mé
 - Suíte para macOS Intel x86_64: cerca de 40,5 MB.
 - `paper-spine` Skill avulso: para ambientes que já tenham runtime, cerca de 0,72 MB.
 
-Todos os downloads estão vinculados ao manifest público e ao SHA-256. A versão atual é a pré-lançamento `v0.4.0-alpha.1-dev`.
+Todos os downloads estão na lista pública de lançamentos e são verificados por SHA-256. A versão atual é o pré-lançamento `v0.4.0-alpha.1-dev`.
 
 ## Instalação e migração de versões anteriores
 
@@ -52,7 +52,7 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-Se já existir um perfil, o segundo comando faz um `update` transacional, mantém os dados das tarefas e roda a verificação de primeira execução. A atualização automática fica desligada por padrão.
+Se já houver uma instalação, o segundo comando faz uma atualização reversível, mantém os dados das tarefas e roda uma verificação na inicialização. A atualização automática fica desligada por padrão.
 
 ## Limites
 

@@ -20,7 +20,7 @@ Le corps du texte, les figures de données, les schémas de mécanisme et les fi
 - Suite macOS Intel x86_64 : environ 40,5 Mo.
 - Skill `paper-spine` autonome : pour un environnement hôte déjà en place, environ 0,72 Mo.
 
-Tous les téléchargements sont encadrés par le manifest public et par SHA-256. La version actuelle est la préversion `v0.4.0-alpha.1-dev`.
+Tous les téléchargements figurent dans la liste publique des versions et sont vérifiés par SHA-256. La version actuelle est la préversion `v0.4.0-alpha.1-dev`.
 
 ## Installation et migration depuis les versions précédentes
 
@@ -36,7 +36,7 @@ macOS / Linux :
 sh ./install.sh --target codex --clean-legacy
 ```
 
-`-CleanLegacy` archive uniquement les dossiers de découverte V3/V4 connus. Il ne supprime ni les données de tâches, ni les réglages de l'hôte, ni les fichiers inconnus. Les deux programmes d'installation vérifient le nombre d'octets, le SHA-256, l'intégrité interne de la suite et l'état au premier démarrage.
+`-CleanLegacy` archive uniquement les dossiers de découverte V3/V4 connus. Il ne supprime ni les données de tâches, ni les réglages de l'hôte, ni les fichiers inconnus. Les deux programmes d'installation vérifient le nombre d'octets, le SHA-256, l'intégrité interne de la suite et une vérification au démarrage.
 
 ## Vérifier et appliquer les mises à jour
 
@@ -52,7 +52,7 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-Si un profil existe déjà, la seconde commande passe par un `update` transactionnel, conserve les données de tâches et exécute la vérification du premier démarrage. La mise à jour automatique est désactivée par défaut.
+Si une installation existe déjà, la seconde commande applique une mise à jour réversible, conserve les données de tâches et exécute une vérification au démarrage. La mise à jour automatique est désactivée par défaut.
 
 ## Limites
 

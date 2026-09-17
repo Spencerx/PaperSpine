@@ -20,7 +20,7 @@ Body text, data figures, mechanism diagrams, and method frameworks are all produ
 - macOS Intel x86_64 suite: about 40.5 MB.
 - Standalone `paper-spine` Skill: for an existing host runtime, about 0.72 MB.
 
-Downloads are bound to the public manifest and SHA-256. Current version: `v0.4.0-alpha.1-dev` prerelease.
+Every download is listed in the public release list and verified with SHA-256. Current version: `v0.4.0-alpha.1-dev` prerelease.
 
 ## Install and archive V3/V4 discovery conflicts
 
@@ -36,7 +36,7 @@ macOS / Linux:
 sh ./install.sh --target codex --clean-legacy
 ```
 
-`-CleanLegacy` archives only known V3/V4 Skill discovery folders. It does not delete paper tasks, host settings, or unknown files. Both platform installers verify byte count, SHA-256, suite integrity, and first-start health.
+`-CleanLegacy` archives only known V3/V4 Skill discovery folders. It does not delete paper tasks, host settings, or unknown files. Both platform installers check the byte count, SHA-256, suite integrity, and a startup self-check.
 
 ## Check and apply updates
 
@@ -52,7 +52,7 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-When a profile exists, the second command uses transactional `update`, retains task data, and runs first-start. Automatic update is disabled by default.
+If an install is already present, the second command performs a rollback-safe update, keeps your task data, and runs a startup self-check. Automatic update is disabled by default.
 
 ## Boundaries
 

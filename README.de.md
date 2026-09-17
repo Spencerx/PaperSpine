@@ -20,7 +20,7 @@ Vom Fließtext über Datenabbildungen und Mechanismus-Skizzen bis zu Methodenüb
 - Suite für macOS Intel x86_64: etwa 40,5 MB.
 - Eigenständiger `paper-spine` Skill: für vorhandene Host-Laufzeitumgebungen, etwa 0,72 MB.
 
-Alle Downloads sind an das öffentliche Manifest und an SHA-256 gebunden. Aktuelle Version: `v0.4.0-alpha.1-dev` (Vorabversion).
+Alle Downloads stehen in der öffentlichen Release-Liste und sind per SHA-256 abgesichert. Aktuelle Version: `v0.4.0-alpha.1-dev` (Vorabversion).
 
 ## Installation und Migration von älteren Versionen
 
@@ -36,7 +36,7 @@ macOS / Linux:
 sh ./install.sh --target codex --clean-legacy
 ```
 
-`-CleanLegacy` archiviert nur bekannte V3/V4-Skill-Verzeichnisse. Aufgaben­daten, Host-Einstellungen und unbekannte Dateien werden nicht gelöscht. Beide Installer prüfen Byteanzahl, SHA-256, die interne Integrität der Suite und den Zustand beim ersten Start.
+`-CleanLegacy` archiviert nur bekannte V3/V4-Skill-Verzeichnisse. Aufgaben­daten, Host-Einstellungen und unbekannte Dateien werden nicht gelöscht. Beide Installer prüfen Byteanzahl, SHA-256, die interne Integrität der Suite und einen Selbsttest beim Start.
 
 ## Updates prüfen und einspielen
 
@@ -52,7 +52,7 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-Existiert bereits ein Profil, läuft der zweite Befehl als transaktionales `update`, behält die Aufgabendaten und führt den Erststart aus. Automatische Updates sind standardmäßig aus.
+Ist bereits eine Installation vorhanden, führt der zweite Befehl ein rückgängigfähiges Update aus, behält die Aufgabendaten und macht einen Selbsttest beim Start. Automatische Updates sind standardmäßig aus.
 
 ## Grenzen
 
