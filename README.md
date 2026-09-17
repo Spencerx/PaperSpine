@@ -2,9 +2,15 @@
 
 # PaperSpine5
 
-[English](README.en.md) · [中文](README.md) · [发布页](https://wubing2023.github.io/PaperSpine/v5/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.1-dev)
+[中文](README.md) · [English](README.en.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Português](README.pt.md)
 
-PaperSpine5 是本地优先、证据约束的论文研究、写作、科研制图、审阅和交付工作区。唯一用户入口是 `paper-spine` Skill；Web 负责配置、选择、预览、下载和反馈，宿主 Agent 负责真实科研工作。
+[产品页](https://wubing2023.github.io/PaperSpine/v5/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.1-dev)
+
+**PaperSpine5：从零开始，快速完成一篇图文完整的论文。**
+
+PaperSpine5 是一个覆盖论文全流程的 AI Skill。你提供研究方向、已有资料或实验数据，它帮你查文献、梳理论点、搭建大纲、撰写全文、生成科研配图，并完成引用核验、审阅修改和排版，最终交付可编辑的 Word / LaTeX 源文件和 PDF。
+
+从正文到数据图、机制示意图和方法框架图，在同一个任务中完成。通过 `paper-spine` 启动，在网页中选择方案、预览图文、提出修改意见并下载成果。研究材料优先保存在本地，论点、引用和图表均以真实资料与证据为依据。
 
 ## 下载
 
@@ -65,6 +71,6 @@ sh ./install.sh --target codex
 
 ## 开发
 
-`src/` 是 Skill 真源，`dist/` 是各宿主公开投影。公开仓库保留源代码和测试，不保留本地任务、临床数据、缓存或开发运行日志。
+`src/` 存放 Skill 源代码，`dist/` 是各宿主的公开投影。公开仓库保留源代码和测试，不保留本地任务、临床数据、缓存或开发运行日志。
 
 MIT License。

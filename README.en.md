@@ -2,9 +2,15 @@
 
 # PaperSpine5
 
-[English](README.en.md) · [中文](README.md) · [Product page](https://wubing2023.github.io/PaperSpine/v5/en/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.1-dev)
+[中文](README.md) · [English](README.en.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Português](README.pt.md)
 
-PaperSpine5 is a local-first, evidence-bound workspace for paper research, writing, scientific figures, review, and delivery. The single user entry is the `paper-spine` Skill. Web handles configuration, choices, previews, downloads, and feedback; the host Agent performs the scholarly work.
+[Product page](https://wubing2023.github.io/PaperSpine/v5/en/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.1-dev)
+
+**PaperSpine5: from zero to a complete paper, text and figures together.**
+
+PaperSpine5 is an AI Skill that covers the whole paper workflow. You bring a research direction, existing materials, or experimental data; it searches the literature, organises the argument, builds the outline, writes the full text, produces the scientific figures, verifies citations, works through review and revision, and handles layout, then delivers editable Word / LaTeX sources and a PDF.
+
+Body text, data figures, mechanism diagrams, and method frameworks are all produced inside one task. Start it with `paper-spine`, choose a plan in the web workspace, preview the text and figures, leave revision notes, and download the results. Research materials stay local by default, and every claim, citation, and figure is grounded in real sources and evidence.
 
 ## Downloads
 
@@ -65,6 +71,6 @@ When a profile exists, the second command uses transactional `update`, retains t
 
 ## Development
 
-`src/` is the Skill source of truth and `dist/` contains public host projections. The public repository keeps source and tests, not local tasks, clinical data, caches, or development run logs.
+`src/` holds the Skill source code and `dist/` holds the public host projections. The public repository keeps source and tests, not local tasks, clinical data, caches, or development run logs.
 
 MIT License.
