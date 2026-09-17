@@ -1,6 +1,6 @@
 <p align="right"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-mark.svg" width="24" alt="PaperSpine"></a></p>
 
-<p align="center"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-banner.webp" alt="PaperSpine5 · 처음부터, 그림까지 갖춘 논문을 빠르게 완성합니다"></a></p>
+<p align="center"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-hero.webp" alt="PaperSpine5 · 처음부터, 그림까지 갖춘 논문을 빠르게 완성합니다"></a></p>
 
 # PaperSpine5
 
@@ -13,6 +13,10 @@
 PaperSpine5는 논문의 전 과정을 다루는 AI Skill입니다. 연구 주제나 이미 가진 자료, 실험 데이터를 주면 문헌 검색, 논점 정리, 개요 작성, 본문 집필, 과학 그림 생성, 인용 검증, 검토와 수정, 조판까지 처리하고 편집 가능한 Word / LaTeX 원본과 PDF를 넘겨줍니다.
 
 본문부터 데이터 그림, 메커니즘 도해, 방법 프레임워크 그림까지 한 작업 안에서 만들어집니다. `paper-spine`으로 실행하고, 웹 화면에서 방식을 고르고, 본문과 그림을 미리 보고, 수정 의견을 남기고 결과물을 내려받습니다. 연구 자료는 기본적으로 로컬에 보관하며, 주장과 인용과 그림은 모두 실제 자료와 근거에 기반합니다.
+
+<p align="center"><img src="website/assets/brand/paperspine-figure-editable.webp" alt="위: PaperSpine5가 전달하는 완성된 연구 메커니즘 그림. 아래: 같은 그림을 PowerPoint에서 Ctrl+A로 모두 선택한 상태로, 122개 요소가 모두 편집 가능한 기본 개체입니다."></p>
+
+**그림은 붙여 넣은 스크린샷이 아닙니다.** 전달되는 연구 그림은 편집 가능한 PPTX입니다. 이 예시를 PowerPoint에서 Ctrl+A로 선택하면 122개의 기본 개체가 잡히고, 글자·화살표·데이터 곡선을 그대로 고칠 수 있습니다.
 
 ## 다운로드
 

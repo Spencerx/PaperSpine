@@ -1,6 +1,6 @@
 <p align="right"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-mark.svg" width="24" alt="PaperSpine"></a></p>
 
-<p align="center"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-banner.webp" alt="PaperSpine5 · de cero a un artículo completo con texto y figuras"></a></p>
+<p align="center"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-hero.webp" alt="PaperSpine5 · de cero a un artículo completo con texto y figuras"></a></p>
 
 # PaperSpine5
 
@@ -13,6 +13,10 @@
 PaperSpine5 es un AI Skill que cubre todo el proceso de un artículo. Tú aportas la dirección de investigación, los materiales que ya tengas o los datos experimentales; él busca la bibliografía, ordena los argumentos, arma el esquema, redacta el texto completo, genera las figuras científicas, verifica las citas, pasa por revisión y corrección y se ocupa de la maquetación, y al final entrega fuentes editables de Word / LaTeX y un PDF.
 
 El cuerpo del texto, las figuras de datos, los esquemas de mecanismo y los diagramas de método se producen dentro de la misma tarea. Se inicia con `paper-spine`, eliges el enfoque en la página web, previsualizas texto y figuras, dejas comentarios de revisión y descargas los resultados. Los materiales de investigación se guardan por defecto en tu equipo, y cada afirmación, cita y figura se apoya en fuentes y evidencias reales.
+
+<p align="center"><img src="website/assets/brand/paperspine-figure-editable.webp" alt="Arriba: la figura de mecanismo completa que entrega PaperSpine5. Abajo: la misma figura con Ctrl+A en PowerPoint, donde los 122 elementos siguen siendo objetos nativos editables."></p>
+
+**Las figuras no son capturas pegadas.** Las figuras que recibes son PPTX editables: pulsa Ctrl+A sobre este ejemplo en PowerPoint y se seleccionan 122 objetos nativos; el texto, las flechas y las curvas de datos siguen siendo editables.
 
 ## Descargas
 

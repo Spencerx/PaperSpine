@@ -1,6 +1,6 @@
 <p align="right"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-mark.svg" width="24" alt="PaperSpine"></a></p>
 
-<p align="center"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-banner.webp" alt="PaperSpine5 · von null zu einer vollständigen Arbeit mit Text und Abbildungen"></a></p>
+<p align="center"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-hero.webp" alt="PaperSpine5 · von null zu einer vollständigen Arbeit mit Text und Abbildungen"></a></p>
 
 # PaperSpine5
 
@@ -13,6 +13,10 @@
 PaperSpine5 ist ein AI Skill, der den gesamten Ablauf einer wissenschaftlichen Arbeit abdeckt. Sie geben eine Forschungsrichtung, vorhandenes Material oder experimentelle Daten vor; er sucht die Literatur, ordnet die Argumente, baut die Gliederung, schreibt den Volltext, erstellt die wissenschaftlichen Abbildungen, prüft die Zitate, führt durch Review und Überarbeitung und übernimmt das Layout. Am Ende stehen bearbeitbare Word- / LaTeX-Quellen und ein PDF.
 
 Vom Fließtext über Datenabbildungen und Mechanismus-Skizzen bis zu Methodenübersichten entsteht alles in einer einzigen Aufgabe. Gestartet wird mit `paper-spine`; in der Weboberfläche wählen Sie den Ansatz, sehen Text und Abbildungen als Vorschau, hinterlassen Änderungswünsche und laden die Ergebnisse herunter. Forschungsmaterial bleibt standardmäßig lokal, und jede Aussage, jedes Zitat und jede Abbildung stützt sich auf echte Quellen und Belege.
+
+<p align="center"><img src="website/assets/brand/paperspine-figure-editable.webp" alt="Oben: die vollständige wissenschaftliche Mechanismen-Abbildung von PaperSpine5. Unten: dieselbe Abbildung mit Ctrl+A in PowerPoint, bei der alle 122 Elemente weiterhin bearbeitbare native Objekte sind."></p>
+
+**Abbildungen sind keine eingefügten Screenshots.** Die gelieferten Abbildungen sind bearbeitbare PPTX-Dateien: Mit Ctrl+A werden in diesem Beispiel in PowerPoint 122 native Objekte ausgewählt; Text, Pfeile und Datenkurven bleiben bearbeitbar.
 
 ## Downloads
 

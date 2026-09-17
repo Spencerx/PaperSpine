@@ -1,6 +1,6 @@
 <p align="right"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-mark.svg" width="24" alt="PaperSpine"></a></p>
 
-<p align="center"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-banner.webp" alt="PaperSpine5 · ゼロから、図表までそろった論文をすばやく仕上げる"></a></p>
+<p align="center"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-hero.webp" alt="PaperSpine5 · ゼロから、図表までそろった論文をすばやく仕上げる"></a></p>
 
 # PaperSpine5
 
@@ -13,6 +13,10 @@
 PaperSpine5 は、論文の全工程をカバーする AI Skill です。研究テーマ、手持ちの資料、実験データのいずれかを渡せば、文献調査、論点の整理、アウトライン作成、本文の執筆、科学図の作成、引用の検証、査読対応と修正、レイアウトまでを一通りこなし、編集可能な Word / LaTeX 原稿と PDF を納品します。
 
 本文からデータ図、メカニズム図、手法フレームワーク図までを同じタスクの中で作ります。`paper-spine` で起動し、Web 画面で方針を選び、本文と図をプレビューし、修正点を伝えて成果物をダウンロードします。研究資料は原則として手元の環境に保存し、主張・引用・図表はすべて実在の資料と根拠に基づきます。
+
+<p align="center"><img src="website/assets/brand/paperspine-figure-editable.webp" alt="上：PaperSpine5 が納品する完全な科研メカニズム図。下：同じ図を PowerPoint で Ctrl+A 全選択した状態。122 個の要素はすべて編集可能なネイティブオブジェクトです。"></p>
+
+**図は貼り付けたスクリーンショットではありません。** 納品される科研図は編集可能な PPTX です。この例を PowerPoint で Ctrl+A すると 122 個のネイティブオブジェクトが選択され、文字・矢印・データ曲線はそのまま編集できます。
 
 ## ダウンロード
 

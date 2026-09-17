@@ -294,6 +294,10 @@ p { text-wrap: pretty; }
 .figure-method p { margin: 12px 0 0; color: var(--muted); font-size: 13px; line-height: 1.78; }
 .figure-method > div p { color: var(--ink-2); font: 500 12px/1.7 var(--mono); }
 .figure-method a { color: var(--blue); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.figure-editable { margin: 40px 0 0; border: 1px solid var(--rule-strong); background: var(--paper-cool); }
+.figure-editable img { display: block; width: 100%; height: auto; }
+.figure-editable figcaption { padding: 22px 24px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 13px; line-height: 1.78; }
+.figure-editable figcaption b { color: var(--ink); }
 
 .proof { scroll-margin-top: var(--header-h); border-bottom: 1px solid var(--rule); }
 .proof-head { display: grid; grid-template-columns: 1fr 2fr; gap: 50px; margin-bottom: 74px; }

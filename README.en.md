@@ -1,6 +1,6 @@
 <p align="right"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-mark.svg" width="24" alt="PaperSpine"></a></p>
 
-<p align="center"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-banner.webp" alt="PaperSpine5 · from zero to a complete paper, text and figures together"></a></p>
+<p align="center"><a href="https://wubing2023.github.io/PaperSpine/v5/"><img src="website/assets/brand/paperspine-hero.webp" alt="PaperSpine5 · from zero to a complete paper, text and figures together"></a></p>
 
 # PaperSpine5
 
@@ -13,6 +13,10 @@
 PaperSpine5 is an AI Skill that covers the whole paper workflow. You bring a research direction, existing materials, or experimental data; it searches the literature, organises the argument, builds the outline, writes the full text, produces the scientific figures, verifies citations, works through review and revision, and handles layout, then delivers editable Word / LaTeX sources and a PDF.
 
 Body text, data figures, mechanism diagrams, and method frameworks are all produced inside one task. Start it with `paper-spine`, choose a plan in the web workspace, preview the text and figures, leave revision notes, and download the results. Research materials stay local by default, and every claim, citation, and figure is grounded in real sources and evidence.
+
+<p align="center"><img src="website/assets/brand/paperspine-figure-editable.webp" alt="Top: the complete scientific mechanism figure PaperSpine5 delivers. Bottom: the same figure with Ctrl+A in PowerPoint, where all 122 elements are still editable native objects."></p>
+
+**Figures are not pasted screenshots.** What you get are editable PPTX files: press Ctrl+A on this example in PowerPoint and 122 native objects are selected; text, arrows, and data curves all stay editable.
 
 ## Downloads
 
