@@ -14,10 +14,6 @@ O PaperSpine5 é um AI Skill que cobre todo o percurso de um artigo. Você traz 
 
 Do corpo do texto às figuras de dados, esquemas de mecanismo e diagramas de método, tudo é produzido dentro da mesma tarefa. Inicia-se com `paper-spine`, escolhe-se o caminho na página web, pré-visualiza-se texto e figuras, deixam-se pedidos de alteração e baixam-se os resultados. Os materiais de pesquisa ficam por padrão na sua máquina, e cada afirmação, citação e figura se apoia em fontes e evidências reais.
 
-<p align="center"><img src="website/assets/brand/paperspine-figure-editable.webp" alt="Acima: a figura de mecanismo completa entregue pelo PaperSpine5. Abaixo: a mesma figura com Ctrl+A no PowerPoint, em que os 122 elementos continuam sendo objetos nativos editáveis."></p>
-
-**Figuras não são capturas coladas.** As figuras entregues são arquivos PPTX editáveis: pressione Ctrl+A neste exemplo no PowerPoint; 122 objetos nativos são selecionados e texto, setas e curvas de dados continuam editáveis.
-
 ## Downloads
 
 - Suíte para Windows x64: cerca de 26,4 MB.

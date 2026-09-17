@@ -14,10 +14,6 @@ PaperSpine5 is an AI Skill that covers the whole paper workflow. You bring a res
 
 Body text, data figures, mechanism diagrams, and method frameworks are all produced inside one task. Start it with `paper-spine`, choose a plan in the web workspace, preview the text and figures, leave revision notes, and download the results. Research materials stay local by default, and every claim, citation, and figure is grounded in real sources and evidence.
 
-<p align="center"><img src="website/assets/brand/paperspine-figure-editable.webp" alt="Top: the complete scientific mechanism figure PaperSpine5 delivers. Bottom: the same figure with Ctrl+A in PowerPoint, where all 122 elements are still editable native objects."></p>
-
-**Figures are not pasted screenshots.** What you get are editable PPTX files: press Ctrl+A on this example in PowerPoint and 122 native objects are selected; text, arrows, and data curves all stay editable.
-
 ## Downloads
 
 - Windows x64 suite: about 26.4 MB.

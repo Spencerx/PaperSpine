@@ -14,10 +14,6 @@ PaperSpine5 是一个覆盖论文全流程的 AI Skill。你提供研究方向�
 
 从正文到数据图、机制示意图和方法框架图，在同一个任务中完成。通过 `paper-spine` 启动，在网页中选择方案、预览图文、提出修改意见并下载成果。研究材料优先保存在本地，论点、引用和图表均以真实资料与证据为依据。
 
-<p align="center"><img src="website/assets/brand/paperspine-figure-editable.webp" alt="上：PaperSpine5 交付的完整科研机制图。下：同一个图在 PowerPoint 里 Ctrl+A 全选，122 个元素都是可继续编辑的原生对象。"></p>
-
-**图不是贴上去的截图。** 交付的科研图是可编辑的 PPTX：把这张示例图在 PowerPoint 里 Ctrl+A，会选中 122 个原生对象，文字、箭头和数据曲线都还能继续改。
-
 ## 下载
 
 - Windows x64 套件：约 26.4 MB。

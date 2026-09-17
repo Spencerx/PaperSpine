@@ -14,10 +14,6 @@ PaperSpine5 ist ein AI Skill, der den gesamten Ablauf einer wissenschaftlichen A
 
 Vom Fließtext über Datenabbildungen und Mechanismus-Skizzen bis zu Methodenübersichten entsteht alles in einer einzigen Aufgabe. Gestartet wird mit `paper-spine`; in der Weboberfläche wählen Sie den Ansatz, sehen Text und Abbildungen als Vorschau, hinterlassen Änderungswünsche und laden die Ergebnisse herunter. Forschungsmaterial bleibt standardmäßig lokal, und jede Aussage, jedes Zitat und jede Abbildung stützt sich auf echte Quellen und Belege.
 
-<p align="center"><img src="website/assets/brand/paperspine-figure-editable.webp" alt="Oben: die vollständige wissenschaftliche Mechanismen-Abbildung von PaperSpine5. Unten: dieselbe Abbildung mit Ctrl+A in PowerPoint, bei der alle 122 Elemente weiterhin bearbeitbare native Objekte sind."></p>
-
-**Abbildungen sind keine eingefügten Screenshots.** Die gelieferten Abbildungen sind bearbeitbare PPTX-Dateien: Mit Ctrl+A werden in diesem Beispiel in PowerPoint 122 native Objekte ausgewählt; Text, Pfeile und Datenkurven bleiben bearbeitbar.
-
 ## Downloads
 
 - Suite für Windows x64: etwa 26,4 MB.
