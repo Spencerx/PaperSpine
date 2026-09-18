@@ -25,8 +25,9 @@
   .install-section-copy { position: static; grid-column: 1; min-width: 0; max-width: 720px; }
   .install-card { grid-column: 1; min-width: 0; }
 
-  .premise, .release, .github, .community, .faq-section { grid-template-columns: 1fr; }
+  .premise, .release, .github, .community, .faq-section, .promo { grid-template-columns: 1fr; }
   .premise { gap: 42px; }
+  .promo { gap: 42px; }
   .section-label { margin-bottom: 20px; }
   .premise-note { max-width: 620px; }
   .workspace-preview { grid-column: 1; margin-top: 18px; }
@@ -96,6 +97,9 @@
   .workspace-preview figcaption { display: block; min-height: auto; padding: 11px 12px; line-height: 1.6; }
   .workspace-preview figcaption span { display: block; }
   .workspace-preview figcaption span + span { margin-top: 4px; }
+  .promo-player figcaption { display: block; min-height: auto; padding: 11px 12px; line-height: 1.6; }
+  .promo-player figcaption span { display: block; }
+  .promo-player figcaption span + span { margin-top: 4px; }
   .workspace-placeholder { min-height: 360px; }
   .media-placeholder::before { inset: 16px; }
   .placeholder-copy b { font-size: clamp(28px, 9vw, 42px); }
