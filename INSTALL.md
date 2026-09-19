@@ -6,6 +6,29 @@ platform packages. Every suite includes its matching Python runtime, the Web
 workspace, the canonical `paper-spine` Skill, and transactional profile
 update/rollback.
 
+## Which archive do I need?
+
+Only the **platform suites** (26–56 MB) contain the V5 Web workspace and the
+embedded runtime. The **standalone Skill** archive (0.72 MB) is the lightweight
+option for a host that already has a V5 runtime and product core of its own; it
+ships the Skill files but no Web core.
+
+Installing the standalone archive on a host without that runtime produces this
+as soon as the Skill tries to open the Web workspace:
+
+```text
+The standalone PaperSpine5 Web core is missing. Rebuild/install the current
+self-contained paper-spine Skill; do not fall back to the terminal intake UI.
+```
+
+That message means the wrong archive was installed for this host — it is not a
+broken download and not a missing release asset. Download the suite for your
+platform instead.
+
+Without the Web workspace the Skill can still do local work on an
+already-configured task, but configuration, user choices, previews and
+downloads all go through Web, so a fresh task cannot be started that way.
+
 ## Windows x64
 
 ```powershell
