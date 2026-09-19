@@ -13,7 +13,39 @@ param(
 $ErrorActionPreference = "Stop"
 $Version = "0.4.0-alpha.1-dev"
 $ManifestUrl = "https://github.com/WUBING2023/PaperSpine/releases/download/v$Version/manifest.json"
-$manifest = if ($ManifestPath) { Get-Content -LiteralPath $ManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json } else { Invoke-RestMethod -Uri $ManifestUrl -UseBasicParsing }
+$MirrorManifestUrl = "https://wubing2023.github.io/PaperSpine/v5/downloads/manifest.json"
+
+# GitHub only speaks TLS 1.2 and newer. Windows PowerShell 5.1 on older Windows
+# builds still offers SSL3/TLS1.0 by default, and the handshake then dies with
+# SEC_E_NO_CREDENTIALS or "Could not create SSL/TLS secure channel" before any
+# HTTP status exists. That reads like a missing file, but it is a local TLS
+# fault: the release assets are published and downloadable from a healthy host.
+try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 } catch { }
+
+if ($ManifestPath) {
+  $manifest = Get-Content -LiteralPath $ManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+} else {
+  try {
+    $manifest = Invoke-RestMethod -Uri $ManifestUrl -UseBasicParsing
+  } catch {
+    Write-Host ""
+    Write-Host "Could not read the release manifest:" -ForegroundColor Red
+    Write-Host "  $ManifestUrl"
+    Write-Host "  $($_.Exception.Message)"
+    Write-Host ""
+    Write-Host "This is a network/TLS failure on this machine, not a missing release."
+    Write-Host "The v$Version release does publish its assets."
+    Write-Host ""
+    Write-Host "  1. A proxy may be intercepting TLS:  netsh winhttp show proxy"
+    Write-Host "  2. Try the website mirror (different host):"
+    Write-Host "       $MirrorManifestUrl"
+    Write-Host "  3. Install fully offline from files fetched on another machine."
+    Write-Host "     BOTH paths are required - without -ManifestPath the installer"
+    Write-Host "     still needs the network:"
+    Write-Host "       .\install.ps1 -ManifestPath .\manifest.json -BundlePath .\paperspine5-suite-$Version.zip"
+    throw
+  }
+}
 $artifact = @($manifest.artifacts | Where-Object { $_.kind -eq "suite" }) | Select-Object -First 1
 if ($null -eq $artifact) { throw "V5 suite artifact is missing from the release manifest." }
 $profileStatePath = Join-Path $ProfileRoot ".paperspine5-lifecycle\profile-state.json"

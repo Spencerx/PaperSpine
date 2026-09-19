@@ -220,6 +220,9 @@ p { text-wrap: pretty; }
 .manual-grid > div { padding: 13px; border: 1px solid var(--rule); background: var(--paper-cool); }
 .manual-grid p { margin-bottom: 8px; color: var(--muted); font: 600 8px/1 var(--mono); letter-spacing: .06em; }
 .manual-grid code { display: block; overflow-x: auto; color: var(--ink); font: 500 10px/1.5 var(--mono); white-space: nowrap; }
+.manual-note { margin: 12px 0 4px; color: var(--muted); font-size: 13px; line-height: 1.75; }
+.manual-note code { display: inline; padding: 1px 6px; border: 1px solid var(--rule); background: var(--paper-cool); color: var(--ink); font: 500 11px/1.5 var(--mono); white-space: nowrap; }
+.manual-note a { color: var(--clay-dark); }
 
 .workspace-preview { position: relative; z-index: 1; grid-column: 2 / -1; margin: 34px 0 0; border: 1px solid var(--rule-strong); background: var(--paper); box-shadow: 0 35px 90px rgba(47,69,64,.12); transform: perspective(1400px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); transform-origin: center; transition: transform .28s ease; }
 .workspace-preview figcaption { display: flex; min-height: 45px; align-items: center; justify-content: space-between; gap: 20px; padding: 0 16px; border-bottom: 1px solid var(--rule); color: var(--muted); font: 600 9px/1 var(--mono); letter-spacing: .07em; }

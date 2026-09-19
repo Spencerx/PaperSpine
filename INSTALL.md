@@ -37,6 +37,15 @@ To verify a previously downloaded package without downloading it again:
 sh ./install.sh --bundle /path/to/platform-suite.zip --target codex --clean-legacy
 ```
 
+On Windows, **both** paths are required. The POSIX installer carries the
+platform file name, byte count and SHA-256 inside itself, but the PowerShell
+installer reads them from the manifest, so `-BundlePath` alone still needs the
+network:
+
+```powershell
+.\install.ps1 -ManifestPath .\manifest.json -BundlePath .\paperspine5-suite-0.4.0-alpha.1-dev.zip -Target codex -CleanLegacy
+```
+
 Both installers archive the existing canonical `paper-spine` Skill. Cleanup of
 known V3/V4 discovery names happens only when `-CleanLegacy` or
 `--clean-legacy` is supplied. They do not delete paper task data, host settings,
@@ -49,3 +58,41 @@ transactional update and retains task data.
 
 macOS packages in this prerelease are unsigned and not notarized. Linux support
 is limited to glibc x86_64; Linux arm64 and musl/Alpine are not claimed.
+
+## When the download itself fails
+
+Some corporate networks, TLS-inspecting proxies and antivirus products cannot
+reach `github.com` at all. The handshake then fails before any HTTP status
+exists, so the error looks like a missing file:
+
+```text
+SEC_E_NO_CREDENTIALS
+Could not create SSL/TLS secure channel
+The underlying connection was closed: An error occurred on receive
+```
+
+These are local network/TLS conditions. The release assets are published and
+downloadable from a healthy connection — confirm that from another machine
+before concluding that a release is missing.
+
+In order of effort:
+
+1. Check whether something is intercepting TLS:
+
+   ```powershell
+   netsh winhttp show proxy
+   ```
+
+2. Fetch the manifest from the website mirror. It is a different host and is
+   sometimes reachable when `github.com` is not:
+
+   <https://wubing2023.github.io/PaperSpine/v5/downloads/manifest.json>
+
+   It is a copy of the same manifest. The suite ZIPs are only published as
+   GitHub Release assets, so the mirror alone cannot complete an install.
+
+3. Install fully offline. Download `manifest.json` and the suite ZIP for this
+   platform on a machine that can reach GitHub, copy both over, then run the
+   command for your platform from the section above. The installer still checks
+   the byte count and SHA-256 against the manifest, so a copied file is verified
+   exactly like a downloaded one.
