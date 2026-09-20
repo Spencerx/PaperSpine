@@ -235,13 +235,13 @@
   const buildInstallPrompt = (manifest, primary) => {
     const manifestUrl = manifest.release_assets?.manifest_url || new URL(manifestPath, window.location.href).href;
     if (locale.startsWith("en")) {
-      return `Install PaperSpine5 ${manifest.version} from zero:\n1. Read ${manifestUrl}.\n2. Detect the operating system and CPU, then select the exactly matching Windows x64, Linux x86_64, macOS arm64, or macOS x86_64 suite. Use the standalone Skill only when a suitable host runtime already exists.\n3. Download the selected artifact from its download_url, compute SHA-256, and compare both the digest and byte count character-for-character with the manifest. Stop on any mismatch.\n4. Read README.md, INSTALL.md, UPDATE.md, and UNINSTALL.md before changing the host.\n5. On Windows x64 run: powershell -ExecutionPolicy Bypass -File .\\install.ps1 -Target codex -CleanLegacy. On macOS/Linux run: sh ./install.sh --target codex --clean-legacy. Use the documented Claude Code or both-host target if requested.\n6. Do not overwrite settings.json, config.toml, or unrelated Skills. The self-contained suites must not install a system Python.\n7. Require first-start REST/MCP READY, then restart the host and verify paper-spine is discovered.\n8. Launch the 127.0.0.1 workspace only for a real integration_job.json. Never invent a paper job or expose the local server publicly.\n9. Report the URL, platform, bytes, SHA-256, install target, backup, runtime health, host rediscovery, and workspace snapshot separately. Mark every untested layer NOT VERIFIED. macOS is unsigned and unnotarized; Linux support is glibc x86_64 only.`;
+      return `Install PaperSpine5 ${manifest.version} from zero:\n1. Read ${manifestUrl}.\n2. Default to a full platform suite: detect the operating system and CPU, then select the exactly matching Windows x64, Linux x86_64, macOS arm64, or macOS x86_64 suite. Use the standalone Skill only when the user explicitly asks for a Skill-only install and already has a complete host runtime; a host on its own does not provide that runtime.\n3. Download the selected artifact from its download_url, compute SHA-256, and compare both the digest and byte count character-for-character with the manifest. Stop on any mismatch.\n4. Read README.md, INSTALL.md, UPDATE.md, and UNINSTALL.md before changing the host.\n5. On Windows x64 run: powershell -ExecutionPolicy Bypass -File .\\install.ps1 -Target codex -CleanLegacy. On macOS/Linux run: sh ./install.sh --target codex --clean-legacy. Use the documented Claude Code or both-host target if requested.\n6. Do not overwrite settings.json, config.toml, or unrelated Skills. The self-contained suites must not install a system Python.\n7. Require first-start REST/MCP READY, then restart the host and verify paper-spine is discovered.\n8. Launch the 127.0.0.1 workspace only for a real integration_job.json. Never invent a paper job or expose the local server publicly.\n9. Report the URL, platform, bytes, SHA-256, install target, backup, runtime health, host rediscovery, and workspace snapshot separately. Mark every untested layer NOT VERIFIED. macOS is unsigned and unnotarized; Linux support is glibc x86_64 only.`;
     }
-    return `请从零开始下载并安装 PaperSpine5 ${manifest.version}：\n1. 读取 ${manifestUrl}；\n2. 识别操作系统与 CPU，并选择完全匹配的 Windows x64、Linux x86_64、macOS arm64 或 macOS x86_64 suite；只有已有合适宿主 runtime 时才选独立 Skill；\n3. 从 manifest 的 download_url 下载制品，同时核对字节数和 SHA-256；任一不一致立即停止；\n4. 改动宿主前先阅读 README.md、INSTALL.md、UPDATE.md 与 UNINSTALL.md；\n5. Windows x64 运行 powershell -ExecutionPolicy Bypass -File .\\install.ps1 -Target codex -CleanLegacy；macOS/Linux 运行 sh ./install.sh --target codex --clean-legacy；如需 Claude Code 或双宿主，使用文档中的对应 target；\n6. 不覆盖 settings.json、config.toml 或无关 Skill；自包含 suite 不应安装系统 Python；\n7. 必须确认 first-start 的 REST/MCP READY，重启宿主后确认发现 paper-spine；\n8. 只有存在真实 integration_job.json 时才启动 127.0.0.1 本地网页；不生成假论文任务，不暴露到公网；\n9. 分别报告下载 URL、平台、字节数、SHA-256、安装目标、备份、runtime health、宿主重新发现和网页 snapshot。未验证项写 NOT VERIFIED。macOS 尚未签名和 notarize；Linux 仅声明 glibc x86_64。`;
+    return `请从零开始下载并安装 PaperSpine5 ${manifest.version}：\n1. 读取 ${manifestUrl}；\n2. 默认安装平台套件：识别操作系统与 CPU，并选择完全匹配的 Windows x64、Linux x86_64、macOS arm64 或 macOS x86_64 套件；只有当用户明确要求只安装 Skill 且已自行备好完整宿主 runtime 时才选独立 Skill，仅有宿主本身并不等于具备 runtime；\n3. 从 manifest 的 download_url 下载制品，同时核对字节数和 SHA-256；任一不一致立即停止；\n4. 改动宿主前先阅读 README.md、INSTALL.md、UPDATE.md 与 UNINSTALL.md；\n5. Windows x64 运行 powershell -ExecutionPolicy Bypass -File .\\install.ps1 -Target codex -CleanLegacy；macOS/Linux 运行 sh ./install.sh --target codex --clean-legacy；如需 Claude Code 或双宿主，使用文档中的对应 target；\n6. 不覆盖 settings.json、config.toml 或无关 Skill；自包含 suite 不应安装系统 Python；\n7. 必须确认 first-start 的 REST/MCP READY，重启宿主后确认发现 paper-spine；\n8. 只有存在真实 integration_job.json 时才启动 127.0.0.1 本地网页；不生成假论文任务，不暴露到公网；\n9. 分别报告下载 URL、平台、字节数、SHA-256、安装目标、备份、runtime health、宿主重新发现和网页 snapshot。未验证项写 NOT VERIFIED。macOS 尚未签名和 notarize；Linux 仅声明 glibc x86_64。`;
   };
 
   const disableReleaseLinks = () => {
-    document.querySelectorAll("#primary-download, #artifact-grid a").forEach((link) => {
+    document.querySelectorAll("#primary-download, [data-artifact-kind]").forEach((link) => {
       link.removeAttribute("href");
       link.setAttribute("aria-disabled", "true");
     });
@@ -253,14 +253,22 @@
     if (manifest.product !== "PaperSpine5" || !manifest.version || !Array.isArray(manifest.artifacts) || manifest.artifacts.length < 2) {
       throw new Error("unexpected release manifest");
     }
-    const primary = manifest.artifacts.find((item) => item.kind === "suite") || manifest.artifacts.find((item) => item.kind === "standalone-skill");
-    if (!primary?.download_url || !primary.sha256 || !Number.isInteger(primary.bytes)) throw new Error("primary artifact is incomplete");
+    const primary = manifest.artifacts.find((item) => item.kind === "suite");
+    if (!primary?.download_url || !primary.sha256 || !Number.isInteger(primary.bytes)) throw new Error("primary suite artifact is incomplete");
     const primaryLink = document.getElementById("primary-download");
-    if (primaryLink) primaryLink.href = primary.download_url;
-    document.querySelectorAll("#artifact-grid a[data-artifact-kind]").forEach((link) => {
+    if (primaryLink) {
+      primaryLink.href = primary.download_url;
+      primaryLink.removeAttribute("aria-disabled");
+    }
+    document.querySelectorAll("[data-artifact-kind]").forEach((link) => {
       const artifact = manifest.artifacts.find((item) => item.kind === link.dataset.artifactKind);
-      if (!artifact?.download_url) return;
+      if (!artifact?.download_url || !artifact.sha256 || !Number.isInteger(artifact.bytes)) {
+        link.removeAttribute("href");
+        link.setAttribute("aria-disabled", "true");
+        return;
+      }
       link.href = artifact.download_url;
+      link.removeAttribute("aria-disabled");
       link.classList.toggle("is-primary", artifact.kind === "suite");
       link.dataset.sha256 = artifact.sha256;
       link.title = `${artifact.file} · ${formatReleaseBytes(artifact.bytes)} bytes · SHA-256 ${artifact.sha256}`;

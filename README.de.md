@@ -20,7 +20,6 @@ Vom Fließtext über Datenabbildungen und Mechanismus-Skizzen bis zu Methodenüb
 - Suite für Linux glibc x86_64: etwa 56,2 MB.
 - Suite für macOS Apple Silicon: etwa 40,5 MB.
 - Suite für macOS Intel x86_64: etwa 40,5 MB.
-- Eigenständiger `paper-spine` Skill: für vorhandene Host-Laufzeitumgebungen, etwa 0,72 MB.
 
 Alle Downloads stehen in der öffentlichen Release-Liste und sind per SHA-256 abgesichert. Aktuelle Version: `v0.4.0-alpha.1-dev` (Vorabversion).
 

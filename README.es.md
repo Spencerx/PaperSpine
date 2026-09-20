@@ -20,7 +20,6 @@ El cuerpo del texto, las figuras de datos, los esquemas de mecanismo y los diagr
 - Suite para Linux glibc x86_64: unos 56.2 MB.
 - Suite para macOS Apple Silicon: unos 40.5 MB.
 - Suite para macOS Intel x86_64: unos 40.5 MB.
-- `paper-spine` Skill independiente: para entornos que ya tienen runtime, unos 0.72 MB.
 
 Todas las descargas figuran en la lista pública de lanzamientos y se verifican con SHA-256. La versión actual es la versión preliminar `v0.4.0-alpha.1-dev`.
 

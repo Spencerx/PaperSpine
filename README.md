@@ -20,9 +20,15 @@ PaperSpine5 是一个覆盖论文全流程的 AI Skill。你提供研究方向�
 - Linux glibc x86_64 套件：约 56.2 MB。
 - macOS Apple Silicon 套件：约 40.5 MB。
 - macOS Intel x86_64 套件：约 40.5 MB。
-- 独立 `paper-spine` Skill：适用于已有宿主运行环境，约 0.72 MB。
 
 所有下载都列在公开发布清单中，并用 SHA-256 校验。完整版本号为 `v0.4.0-alpha.1-dev` 预发布。
+
+<details>
+<summary>高级 / 手动安装</summary>
+
+独立 `paper-spine` Skill 约 0.72 MB，只包含 Skill 本体，不含 runtime 和 Web 工作区，不适合首次安装。只有明确只需要 Skill、并且已经自行准备好完整依赖的高级用户才使用。它仍然列在公开发布清单中，并按 SHA-256 校验。
+
+</details>
 
 ## 安装与旧版本迁移
 

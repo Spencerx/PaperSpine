@@ -20,7 +20,6 @@ Le corps du texte, les figures de données, les schémas de mécanisme et les fi
 - Suite Linux glibc x86_64 : environ 56,2 Mo.
 - Suite macOS Apple Silicon : environ 40,5 Mo.
 - Suite macOS Intel x86_64 : environ 40,5 Mo.
-- Skill `paper-spine` autonome : pour un environnement hôte déjà en place, environ 0,72 Mo.
 
 Tous les téléchargements figurent dans la liste publique des versions et sont vérifiés par SHA-256. La version actuelle est la préversion `v0.4.0-alpha.1-dev`.
 

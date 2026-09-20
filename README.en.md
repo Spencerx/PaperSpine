@@ -20,9 +20,15 @@ Body text, data figures, mechanism diagrams, and method frameworks are all produ
 - Linux glibc x86_64 suite: about 56.2 MB.
 - macOS Apple Silicon suite: about 40.5 MB.
 - macOS Intel x86_64 suite: about 40.5 MB.
-- Standalone `paper-spine` Skill: for an existing host runtime, about 0.72 MB.
 
 Every download is listed in the public release list and verified with SHA-256. Current version: `v0.4.0-alpha.1-dev` prerelease.
+
+<details>
+<summary>Advanced / manual install</summary>
+
+The standalone `paper-spine` Skill is about 0.72 MB. It contains only the Skill itself, with no runtime and no web workspace, so it is not suitable for a first install. Use it only if you explicitly want a Skill-only install and have already prepared the full dependencies yourself. It is still listed in the public release list and verified with SHA-256.
+
+</details>
 
 ## Install and archive V3/V4 discovery conflicts
 
