@@ -5,6 +5,26 @@ as Web. The host's normal tools do the scientific work; P2 public MCP calls
 record task facts. No Runner academic answer or installed legacy MCP connection
 is required for the default host CLI.
 
+## Invocation update preflight
+
+Use the current installed Skill's verified Python to run:
+
+```text
+python scripts/paperspine_update.py --preflight --yes
+```
+
+For a managed suite this chooses the current Windows x64, Linux glibc x86_64,
+macOS Apple Silicon or macOS Intel bundle from the official update channel.
+`--preflight --check-only` checks without installing; `--source <channel.json>`
+and `--control-root <directory>` are explicit local/testing overrides. The
+existing opt-in `--auto` interval mode remains compatible. A saved explicit
+opt-out is respected; an unreachable update source does not stop an already
+working installation. Installation/validation failures are reported rather than
+presented as success. Preserve the task/profile binding; reread the installed
+Skill after an upgrade and use the new verified suite for subsequent launches.
+An already running old Web process must be stopped gracefully at a saved boundary
+and relaunched on the same profile; do not point a second server at live data.
+
 ## CLI entry and profile selection
 
 Start or reuse the public Web with the installed Skill's Python launcher:
@@ -183,6 +203,72 @@ example a milestone request contains `schema_version`, `task_id`, a stable
 `payload` with the stage, factual `summary` and actual `artifact_ids`. Do not
 substitute legacy Runner revision for the public version. Read current state
 after a conflict; do not silently replay a decision against different inputs.
+
+### Keep workbench progress aligned with actual work
+
+Before each next substantive segment or stage, the host MUST check that the
+previous segment is already represented in this same task's workbench. Read the
+current snapshot, publish completed files that should be visible, then record
+actual work with `paperspine_commit_milestone`. Read back its task ID, stage,
+summary, artifact IDs and pending choices before beginning dependent work. If
+the saved checkpoint already matches, reuse it. This also applies within a stage
+when a real deliverable has been produced, and immediately on resume; it is not
+a call after every sentence or tool invocation. For example, record `research` while studying evidence and `draft`
+when writing the manuscript. Publish actual files with
+`paperspine_publish_artifact`, then reference their returned IDs in the milestone.
+A saved file or an artifact's `stage` labels that file only; neither changes the
+task's current stage. This is why a finished local manuscript can coexist with
+an unchanged research page if the host omits the progress call.
+
+Use the discovered schema with this shape (replace all example values):
+
+```json
+{"request":{"schema_version":"1.1","task_id":"<same-task-id>","command_id":"<unique-stage-update>","expected_version":6,"payload":{"stage":"draft","summary":"Manuscript draft saved; independent review remains pending.","artifact_ids":["<published-manuscript-id>"]}}}
+```
+
+Read the latest public `task_version` after publishing; `6` above is only an
+example. Use an empty artifact list when recording ongoing work without a
+published output. Verify the returned projection and the same task's next
+snapshot/`00_task_state.json` show the intended stage. If they disagree, check
+the task/profile binding and the command result; do not recreate the paper or
+hand-edit generated workflow JSON. A milestone records progress, not scientific
+approval: retain actual choices, independent review and delivery requirements.
+
+### Select research materials; keep partial failures local
+
+List names in the user's authorized root first and identify the files needed for
+the paper. Use exact forward-slash relative file paths, not globs or directories:
+
+```json
+{"request":{"schema_version":"1.1","task_id":"<same-task-id>","command_id":"<unique-material-selection>","expected_version":6,"payload":{"replace":true,"grants":[{"grant_id":"research-inputs","uri":"<user-selected-absolute-folder>","scope":"read_only","include_paths":["results/observations.csv","draft.docx","figures/figure1.pdf"]}]}}}
+```
+
+Use `replace: true` only when this selection intentionally replaces earlier
+roots; omitted/false preserves them. Omit `include_paths` on a repeated grant to
+reuse its saved selection. Without a prior selection the compatibility scan
+reads the root while excluding common development caches and the task's own
+output tree. Do not rely on that fallback for a mixed project directory.
+Newly generated manuscripts must not silently become input materials on rescan.
+
+Read `material_inventory.entries` and `scan_issues` after registration. Successful
+files are retained even when another file is locked, missing, changes while read,
+or cannot be copied. `materials.read_failed` includes the concrete file/OS cause;
+it is a warning for an individual file, not proof that the whole root is unreadable.
+When an already read file fails, a hash-verified last successful task copy can be
+retained with `materials.saved_copy_retained`; use it as the saved version, never
+claim that the current source was reread. An empty inventory is not successful scientific reading. Explain the missing
+inputs, use actual readable evidence, and continue unaffected work. Only work
+that requires the unavailable evidence waits. Invalid roots or paths outside the
+authorized root remain errors; do not bypass them. Saved research configuration
+remains valid; material changes can still invalidate conclusions based on changed
+inputs, which must be checked before claiming current review/delivery readiness.
+Never silently claim an unreadable file was read or reinstall to fix a file lock.
+
+After a configuration, choice or feedback save, Web displays a persistent reminder
+to return to the host conversation. It also reminds at an actual recorded phase
+transition. The copied continuation message keeps the current task binding. This
+is a handoff, not an automatic wake-up: if the host is still waiting, it consumes
+the saved event normally; if its turn ended, the user sends that same-task message.
 
 ### Show the configuration node again
 

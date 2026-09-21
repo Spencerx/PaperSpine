@@ -66,7 +66,7 @@ installer reads them from the manifest, so `-BundlePath` alone still needs the
 network:
 
 ```powershell
-.\install.ps1 -ManifestPath .\manifest.json -BundlePath .\paperspine5-suite-0.4.0-alpha.1-dev.zip -Target codex -CleanLegacy
+.\install.ps1 -ManifestPath .\manifest.json -BundlePath .\paperspine5-suite-0.4.0-alpha.2.zip -Target codex -CleanLegacy
 ```
 
 Both installers archive the existing canonical `paper-spine` Skill. Cleanup of

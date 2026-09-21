@@ -6,7 +6,7 @@
 
 [中文](README.md) · [English](README.en.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Português](README.pt.md)
 
-[Page produit](https://wubing2023.github.io/PaperSpine/v5/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.1-dev)
+[Page produit](https://wubing2023.github.io/PaperSpine/v5/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.2)
 
 **PaperSpine5 : de zéro à un article complet, texte et figures compris.**
 
@@ -21,7 +21,7 @@ Le corps du texte, les figures de données, les schémas de mécanisme et les fi
 - Suite macOS Apple Silicon : environ 40,5 Mo.
 - Suite macOS Intel x86_64 : environ 40,5 Mo.
 
-Tous les téléchargements figurent dans la liste publique des versions et sont vérifiés par SHA-256. La version actuelle est la préversion `v0.4.0-alpha.1-dev`.
+Tous les téléchargements figurent dans la liste publique des versions et sont vérifiés par SHA-256. La version actuelle est la préversion `v0.4.0-alpha.2`.
 
 ## Installation et migration depuis les versions précédentes
 

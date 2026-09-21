@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>PaperSpine5 论文工作台</title>
-    <link rel="stylesheet" href="/product.css?v=20260909-elicit-workbench" />
+    <link rel="stylesheet" href="/product.css?v=20260921-host-continuation" />
   </head>
   <body>
     <div class="app-shell">
@@ -123,7 +123,7 @@
       <fieldset><legend>交付格式</legend><label class="check"><input type="checkbox" name="formats" value="pdf" data-field="formats" />PDF</label><label class="check"><input type="checkbox" name="formats" value="docx" data-field="formats" />Word</label><label class="check"><input type="checkbox" name="formats" value="tex" data-field="formats" />LaTeX 源文件</label></fieldset>
       <p class="muted">仅使用已有材料与结果时，不新增分析、实验或模型运行；仍可学习公开文献、核对引用和读取参考图。私有材料保留在本地，明确的离线要求仍有效。</p>
     </fieldset><button id="reload-saved-configuration" type="button" class="button" hidden>重新载入已保存配置（放弃本页未保存修改）</button><p id="configuration-status" class="muted" role="status"></p><button id="configuration-submit" class="button strong" type="submit">保存设置</button></form>
-    <h4>宿主提供的材料</h4><div id="task-material-roots"></div><p id="task-materials-summary" class="muted"></p><nav id="material-pagination" class="material-pagination" aria-label="材料列表分页" hidden>
+    <h4>宿主提供的材料</h4><div id="task-material-roots"></div><p id="task-materials-summary" class="muted"></p><ul id="task-material-issues" class="muted" aria-label="未读取材料与原因" hidden></ul><nav id="material-pagination" class="material-pagination" aria-label="材料列表分页" hidden>
       <button id="material-previous" class="button" type="button" aria-controls="task-material-table">上一页</button>
       <label>材料页码 <select id="material-page" aria-controls="task-material-table"></select></label>
       <button id="material-next" class="button" type="button" aria-controls="task-material-table">下一页</button>
@@ -141,18 +141,21 @@
   </section>
   <section id="host-handoff-panel" class="task-data-panel host-recovery-panel"><details><summary>交给当前 AI 接手</summary><p>可发回原对话，也可交给有权访问本地文件的新宿主。接手靠任务与成果文件，不是共享原 Agent 的记忆；请勿让两个宿主同时修改同一成果。复制或打开页面都不会启动 AI。</p><pre id="host-handoff-text"></pre><button id="copy-handoff" type="button" class="button">复制接手指令</button><p id="handoff-status" role="status"></p></details></section>
   <section class="task-data-panel"><h3>本地目录与历史</h3><p id="package-directory" class="muted"></p><button id="open-package" class="button" type="button">打开任务目录</button><details><summary>交接文件</summary><p id="task-skill-bridge-summary" class="muted"></p><div id="task-skill-bridge-files" class="task-file-list"></div></details><details id="unassigned-artifact-records" hidden><summary>归属未明的文件</summary></details><details><summary>任务历史（只读）</summary><div id="task-history-records"></div></details></section>
-</article></section></div></main><footer class="footer">PaperSpine · 宿主科研，本地协作</footer></div><aside id="save-toast" class="save-toast" aria-label="保存成功提醒" hidden>
+</article></section></div></main><footer class="footer">PaperSpine · 宿主科研，本地协作</footer></div><dialog id="save-toast" class="save-toast" aria-modal="true" aria-labelledby="save-toast-title" aria-describedby="save-toast-description" hidden>
   <span class="save-toast-icon" aria-hidden="true">✓</span>
-  <div class="save-toast-content" role="status" aria-live="polite" aria-atomic="true">
-    <strong id="save-toast-title"></strong>
-    <p>可以回到宿主 Agent 对话继续。</p>
-    <p class="save-toast-hint">告诉它：“我已保存，请继续。”<br>保存不会自动启动已停止的 AI。</p>
+  <div class="save-toast-content">
+    <h2 id="save-toast-title" tabindex="-1"></h2>
+    <p id="save-toast-description"></p>
+    <p class="save-toast-hint">网页保存不会自动启动已停止的 AI。宿主正在执行时，无需重复发送。</p>
+    <p id="save-toast-binding" class="save-toast-hint"></p>
+    <details id="save-toast-instruction-details"><summary>查看接手指令</summary><textarea id="save-toast-handoff" rows="5" readonly aria-label="发给宿主的同任务接手指令"></textarea></details>
+    <p id="save-toast-copy-status" role="status" aria-live="polite"></p>
   </div>
-  <button id="dismiss-save-toast" class="save-toast-dismiss" type="button" aria-label="关闭保存提醒">知道了</button>
-</aside><aside id="support-milestone" class="support-milestone" hidden aria-labelledby="support-milestone-title">
+  <div class="save-toast-actions"><button id="copy-save-handoff" class="button strong" type="button" disabled>复制继续指令</button><button id="dismiss-save-toast" class="button" type="button">知道了，关闭</button></div>
+</dialog><aside id="support-milestone" class="support-milestone" hidden aria-labelledby="support-milestone-title">
   <button id="support-milestone-dismiss" class="support-milestone-close" type="button" aria-label="关闭支持提示">×</button>
   <p class="support-milestone-kicker">THANK YOU · LOCAL ONLY</p>
   <h2 id="support-milestone-title">你已经使用 PaperSpine <span id="support-milestone-count"></span> 次</h2>
   <p>如果它确实帮到了你，可以自愿支持持续维护。计数只保存在本机浏览器，不上传，也不影响任何功能。</p>
   <a class="button strong" href="https://wubing2023.github.io/PaperSpine/v5/?support=1" target="_blank" rel="noopener noreferrer">支持 PaperSpine</a>
-</aside><script src="/product.js?v=20260915-support-milestones" defer></script></body></html>
+</aside><script src="/product.js?v=20260921-host-continuation" defer></script></body></html>

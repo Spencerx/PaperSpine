@@ -17,6 +17,15 @@ parallel, but it must not claim a later step is done when its required input is
 missing. The current task, material root and semantic manuscript remain the
 only writable authorities.
 
+Before moving to the next substantive segment or stage, **verify that the previous
+result is in the same task's workbench**. Publish its real user-visible outputs,
+record a factual milestone using an existing stage, and read back the same task,
+version, summary, files and pending choices. Reuse a matching checkpoint; repair
+an actual mismatch before claiming progression. Local files and artifact stage
+labels alone do not move Web progress. Several steps below can share one stage.
+This is a host continuation instruction, not seventeen new backend approvals.
+See [product-v1-workflow.md](product-v1-workflow.md) for actual calls.
+
 ## Inspect, use and repair; do not fill a checklist
 
 Apply only the steps needed for the saved workflow. A focused review/audit
@@ -80,7 +89,12 @@ Resolve the user-named material root before substantive analysis. Inventory
 original files, existing drafts, figures, references, scripts, permissions and
 known limitations. Generated work belongs below the task's returned workspace;
 authorized source roots may be elsewhere. Preserve originals and separate raw,
-derived and shareable material.
+derived and shareable material. Select the actual files with `grants[].include_paths`
+instead of recursively treating caches/logs/generated outputs as research inputs.
+Read successful inventory entries and each scan warning. One unreadable file must
+not cancel saved scope or unrelated work; only conclusions needing that file wait.
+Retry the concrete file problem, never pretend it was read, and use `replace: true`
+when the user intentionally changes roots so the old failing root is not retained.
 
 Check and use: open representative supplied results and locate the inputs
 used by each main claim/figure; reuse one material/result inventory. Repair an

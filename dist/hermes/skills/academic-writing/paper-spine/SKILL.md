@@ -1,15 +1,15 @@
 ---
 name: paper-spine
 title: PaperSpine — Academic Paper & Report Writing
-description: Write, rewrite, or build a paper or report (journal, conference, report, review, competition) end to end, then output LaTeX/PDF/Word. Contribution-first, reviewer-aware.
+description: Orchestrate evidence-bound paper work from intake through drafting, audit, and local package preparation without asserting unsupported readiness.
 category: academic-writing
 domain: academic-writing, scientific-manuscripts, latex, peer-review
 triggers:
-  - Write or rewrite a journal/conference paper end to end
+  - Orchestrate a journal/conference paper workflow from supplied evidence
   - Build a paper or report from materials and results
   - Produce LaTeX/PDF/Word manuscript with citations
   - Generate highlights, cover letter, or reviewer response
-  - Reduce AI-detection rate / humanize an academic draft
+  - Restore an author's scholarly voice without changing claims or evidence
 ---
 
 # PaperSpine Orchestrator
@@ -23,7 +23,7 @@ and small scripts support interaction, persistence, rendering and delivery.
 When configuration is missing, launch the intake UI automatically before inspecting
 materials; do not hand-write configuration or silently choose a paper root.
 For a visible launcher action, use `require_escalated` as required by the host.
-When configuration is missing, this launch must be the first tool action.
+After the update preflight below, launch is the first paper-production action when configuration is missing.
 
 **Product outcome:** an evidence-bound, coherent paper with informative figures,
 applicable venue format and editable sources. Learn from strong same-field and
@@ -49,6 +49,19 @@ visual or submission readiness; assess the actual paper.
    licensing, telemetry or external contact; obtain explicit authorization.
 6. Private materials stay local unless explicitly authorized for sharing. Apply
    the saved research mode as described below; public literature reading is normal.
+
+## Update once on invocation, then continue the paper
+
+Before starting or resuming paper production, run the installed Skill's
+`scripts/paperspine_update.py --preflight --yes` with its verified Python.
+This checks the official channel on every invocation: if current, continue;
+if newer, transactionally update the Skill, Web/runtime and updater together.
+Honor an explicit auto-update opt-out. An offline check may continue with the
+existing installation and a clear notice; a failed install must retain the old
+installation and report the actual error. Never repeatedly reinstall to repair
+paper state. After a successful update, reread this installed SKILL and the
+current public tool schemas, preserving the same task, profile and user files.
+See [product-v1-workflow.md](references/product-v1-workflow.md) for entry details.
 
 ## Start, configure and continue the current paper
 
@@ -117,6 +130,22 @@ and downstream use; repair the source at the defect location and compare
 outputs. After two unchanged attempts, change tactic, not notes/status/hash.
 Reuse valid saved work.
 
+**Mandatory before the next work segment or stage:** verify that the previous
+segment's real results have reached the same task's workbench. Read the current
+snapshot; publish any completed deliverable that the user should see; call
+`paperspine_commit_milestone` with a factual summary, the appropriate existing
+stage and actual artifact IDs. Then read back the same task/profile and current
+version: confirm its stage, milestone summary, visible files and pending choices
+match what actually happened. Only then begin the next dependent segment.
+Several protocol steps may share one existing stage; do not create 17 backend
+stages or write a milestone for every sentence/tool call. Reuse an already
+matching checkpoint rather than duplicating it. On resume apply this check first.
+Writing or publishing files alone does not advance the workbench. If read-back
+fails, fix the concrete binding/sync error before claiming progression; keep
+local results and continue only independent work within saved scope. Never fake
+review/delivery completion to move a progress indicator. Follow the exact calls
+in [product-v1-workflow.md](references/product-v1-workflow.md).
+
 Read the saved `configuration.workflow` and `research_mode` before choosing work.
 Use `build_from_materials` to develop the paper; `rewrite_existing` to improve the
 existing argument and prose while retaining valid results; `audit` and `review`
@@ -156,6 +185,19 @@ Use [current-method-routing.md](references/current-method-routing.md) to select 
 ### 1. Anchor, intake and inventory
 
 Read [intake.md](references/intake.md), [intent-configuration.md](references/intent-configuration.md) and [resume.md](references/resume.md) as applicable. Preserve originals. Inventory results, draft, figures, references, scripts, provenance, permissions and limits; identify only necessary missing decisions. Do not create placeholders.
+
+Select actual research files deliberately: pass exact root-relative files in
+`grants[].include_paths` to `paperspine_authorize_materials`. A project folder may
+contain locked logs, caches and generated drafts; do not treat all of them as
+scientific inputs. Keep generated outputs in the task workspace. Read the returned
+inventory and `scan_issues`, then actually open the files needed for each claim.
+A listed filename or successful registration does not prove reading. Individual
+`materials.read_failed` warnings do not cancel saved configuration or the entire
+paper: use readable inputs and continue unaffected research/writing. State which
+file failed and why, retry only that concrete problem, and pause only claims that
+need indispensable unavailable evidence. Never invent its contents. When the user
+replaces the material folder, use `replace: true`; otherwise retain the same roots
+and explicit selection. See the material call example in the workflow reference.
 
 ### 2. Research, target learning and citations
 

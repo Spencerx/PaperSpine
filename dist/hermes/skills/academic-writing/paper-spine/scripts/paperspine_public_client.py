@@ -1,4 +1,4 @@
-"""Public Web launcher and thin MCP-stdio transport for PaperSpine.
+"""Public Web launcher and thin MCP transport for PaperSpine.
 
 Both reuse the same ApplicationService and saved profile. No state reconstruction,
 research execution or command retries. The optional host wait repeats only normal
@@ -19,6 +19,8 @@ import time
 import traceback
 import uuid
 import webbrowser
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 from urllib.request import urlopen
@@ -525,8 +527,8 @@ def _publish_receipt(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def _run_public_job(args: argparse.Namespace, root: Path, job: dict[str, Any]) -> subprocess.CompletedProcess:
-    # A working current interpreter can run the same MCP client here. The public
-    # stdio server remains isolated; no ApplicationService call bypasses MCP.
+    # A working current interpreter can run the same MCP client here. Both
+    # transports use the public server; no ApplicationService call bypasses MCP.
     # Explicit alternate runtimes retain the existing probe/child boundary.
     if (not (getattr(args, "python_executable", None) or os.environ.get("PAPERSPINE5_PYTHON"))
             and importlib.util.find_spec("mcp") is not None):
@@ -641,42 +643,92 @@ def call(args: argparse.Namespace, root: Path) -> int:
     return result.returncode
 
 
-async def _client(job: dict[str, Any]) -> tuple[dict[str, Any], int]:
-    binding = job["binding"]
-    _enable_dependencies(Path(binding["project_root"]))
+@asynccontextmanager
+async def _stdio_session(job: dict[str, Any]) -> AsyncIterator[Any]:
+    """The existing isolated stdio child; the transport outside Windows."""
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.stdio import stdio_client
 
+    binding = job["binding"]
     params = StdioServerParameters(command=sys.executable,
         args=["-B", "-X", "utf8", str(Path(__file__).resolve()), "--server", json.dumps(binding)],
         env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"})
     async with stdio_client(params) as streams:
         async with ClientSession(*streams, read_timeout_seconds=job["timeout"]) as session:
-            await session.initialize()
-            inventory = await session.list_tools()
-            tools = [x.model_dump(mode="json", by_alias=True, exclude_none=True) for x in inventory.tools
-                     if _public_name(x.name)]
-            while getattr(inventory, "next_cursor", None):
-                inventory = await session.list_tools(params={"cursor": inventory.next_cursor})
-                tools.extend(x.model_dump(mode="json", by_alias=True, exclude_none=True) for x in inventory.tools
-                             if _public_name(x.name))
-            matches = [x for x in tools if x["name"] == job["name"]]
-            if job["name"] == "paperspine_submit_review" and not matches:
-                return {"error": {"code": "tool_unavailable", "message":
-                    "Independent review is not enabled in this process. The actual reviewer must explicitly use --trusted-reviewer-id with their existing runtime identity; the writer must not invent or substitute one."}}, 1
-            if job["operation"] == "tools":
-                if job["name"] and not matches:
-                    return {"error": {"code": "tool_unavailable", "message": f"Tool {job['name']!r} is not exposed by this public MCP process; use an exact name from host tools"}}, 1
-                return (matches[0] if job["name"] else {"tools": tools}), 0
-            if not matches:
-                return {"error": {"code": "tool_unavailable", "message": f"Tool {job['name']!r} is not exposed. Read host tools for this public process; no alternate execution route was used"}}, 1
-            if job["operation"] == "wait":
-                return await _wait_for_change(session, job["arguments"])
-            result, failed = _tool_result(await session.call_tool(job["name"], job["arguments"]))
-            # Reads never register/migrate a legacy-only task as a side effect.
-            if failed and job["operation"] == "snapshot" and (result.get("error") or {}).get("code") == "not_found":
-                result["hint"] = "Check the exact Web domain database. For a Kernel-only historical task, explicit --legacy-runner snapshot remains available; no resume/import was submitted."
-            return result, 1 if failed else 0
+            yield session
+
+
+@asynccontextmanager
+async def _memory_session(job: dict[str, Any]) -> AsyncIterator[Any]:
+    """Serve the identical public MCP server in-process over official memory streams.
+
+    A stdio child needs OS pipes that Windows forbids in this sandbox, so the
+    same p2_facades server, schemas, validation, identity binding and lazy
+    startup are kept while the transport becomes a pair of in-memory streams.
+    The kernel is always closed, including on failure or cancellation.
+    """
+    import anyio
+    from mcp import ClientSession
+    from mcp.shared.memory import create_client_server_memory_streams
+
+    binding = job["binding"]
+    sys.path.insert(0, str(Path(binding["project_root"]) / "03_联合开发/src"))
+    from paperspine_figure_integration.p2_facades import build_application, create_mcp_server
+    service, kernel = build_application(
+        **{key: binding[key] for key in ("user_data_root", "core_root", "domain_database", "contracts_root")},
+        initialize_on_startup=False)
+    try:
+        server = create_mcp_server(service, principal_id=binding["principal_id"],
+                                   reviewer_id=binding.get("reviewer_id"))
+        lowlevel = server._lowlevel_server
+        async with create_client_server_memory_streams() as (client_streams, server_streams):
+            async with anyio.create_task_group() as task_group:
+                task_group.start_soon(lowlevel.run, server_streams[0], server_streams[1],
+                                      lowlevel.create_initialization_options())
+                try:
+                    async with ClientSession(*client_streams, read_timeout_seconds=job["timeout"]) as session:
+                        yield session
+                finally:
+                    # The server task ends only on stream EOF or cancellation;
+                    # never leave it serving after the session or any failure.
+                    task_group.cancel_scope.cancel()
+    finally:
+        kernel.close(flush=not service._startup_pending)
+
+
+async def _client(job: dict[str, Any]) -> tuple[dict[str, Any], int]:
+    binding = job["binding"]
+    _enable_dependencies(Path(binding["project_root"]))
+    # Confined Windows hosts may deny asyncio named pipes. Select the exact
+    # same public MCP server over memory streams before any request. Other
+    # platforms keep the existing stdio route; the operation body below is shared.
+    transport = _memory_session(job) if os.name == "nt" else _stdio_session(job)
+    async with transport as session:
+        await session.initialize()
+        inventory = await session.list_tools()
+        tools = [x.model_dump(mode="json", by_alias=True, exclude_none=True) for x in inventory.tools
+                 if _public_name(x.name)]
+        while getattr(inventory, "next_cursor", None):
+            inventory = await session.list_tools(params={"cursor": inventory.next_cursor})
+            tools.extend(x.model_dump(mode="json", by_alias=True, exclude_none=True) for x in inventory.tools
+                         if _public_name(x.name))
+        matches = [x for x in tools if x["name"] == job["name"]]
+        if job["name"] == "paperspine_submit_review" and not matches:
+            return {"error": {"code": "tool_unavailable", "message":
+                "Independent review is not enabled in this process. The actual reviewer must explicitly use --trusted-reviewer-id with their existing runtime identity; the writer must not invent or substitute one."}}, 1
+        if job["operation"] == "tools":
+            if job["name"] and not matches:
+                return {"error": {"code": "tool_unavailable", "message": f"Tool {job['name']!r} is not exposed by this public MCP process; use an exact name from host tools"}}, 1
+            return (matches[0] if job["name"] else {"tools": tools}), 0
+        if not matches:
+            return {"error": {"code": "tool_unavailable", "message": f"Tool {job['name']!r} is not exposed. Read host tools for this public process; no alternate execution route was used"}}, 1
+        if job["operation"] == "wait":
+            return await _wait_for_change(session, job["arguments"])
+        result, failed = _tool_result(await session.call_tool(job["name"], job["arguments"]))
+        # Reads never register/migrate a legacy-only task as a side effect.
+        if failed and job["operation"] == "snapshot" and (result.get("error") or {}).get("code") == "not_found":
+            result["hint"] = "Check the exact Web domain database. For a Kernel-only historical task, explicit --legacy-runner snapshot remains available; no resume/import was submitted."
+        return result, 1 if failed else 0
 
 
 def _tool_result(response: Any) -> tuple[dict[str, Any], bool]:

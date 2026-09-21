@@ -1,4 +1,4 @@
-param(
+﻿param(
   [ValidateSet("codex", "claude-code", "both")]
   [string]$Target = "codex",
   [switch]$CleanLegacy,
@@ -11,8 +11,8 @@ param(
   [string]$LegacyArchiveRoot = (Join-Path $env:USERPROFILE ".paperspine5\legacy-migrations")
 )
 $ErrorActionPreference = "Stop"
-$Version = "0.4.0-alpha.1-dev"
-$ManifestUrl = "https://github.com/WUBING2023/PaperSpine/releases/download/v$Version/manifest.json"
+$Version = "0.4.0-alpha.2"
+$ManifestUrl = "https://raw.githubusercontent.com/WUBING2023/PaperSpine/main/website/downloads/manifest.json"
 $MirrorManifestUrl = "https://wubing2023.github.io/PaperSpine/v5/downloads/manifest.json"
 
 # GitHub only speaks TLS 1.2 and newer. Windows PowerShell 5.1 on older Windows
@@ -22,43 +22,67 @@ $MirrorManifestUrl = "https://wubing2023.github.io/PaperSpine/v5/downloads/manif
 # fault: the release assets are published and downloadable from a healthy host.
 try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 } catch { }
 
+$nativeArch = if ($env:PROCESSOR_ARCHITEW6432) { $env:PROCESSOR_ARCHITEW6432 } else { $env:PROCESSOR_ARCHITECTURE }
+try { $nativeArch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString() } catch { }
+if ($env:OS -ne "Windows_NT" -or $nativeArch -notin @("AMD64", "X64")) {
+  throw "This installer supports Windows x64 only; detected $($env:OS)/$nativeArch."
+}
 if ($ManifestPath) {
   $manifest = Get-Content -LiteralPath $ManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
 } else {
-  try {
-    $manifest = Invoke-RestMethod -Uri $ManifestUrl -UseBasicParsing
-  } catch {
-    Write-Host ""
-    Write-Host "Could not read the release manifest:" -ForegroundColor Red
-    Write-Host "  $ManifestUrl"
-    Write-Host "  $($_.Exception.Message)"
-    Write-Host ""
-    Write-Host "This is a network/TLS failure on this machine, not a missing release."
-    Write-Host "The v$Version release does publish its assets."
-    Write-Host ""
-    Write-Host "  1. A proxy may be intercepting TLS:  netsh winhttp show proxy"
-    Write-Host "  2. Try the website mirror (different host):"
-    Write-Host "       $MirrorManifestUrl"
-    Write-Host "  3. Install fully offline from files fetched on another machine."
-    Write-Host "     BOTH paths are required - without -ManifestPath the installer"
-    Write-Host "     still needs the network:"
-    Write-Host "       .\install.ps1 -ManifestPath .\manifest.json -BundlePath .\paperspine5-suite-$Version.zip"
-    throw
+  try { $manifest = Invoke-RestMethod -Uri $ManifestUrl -UseBasicParsing }
+  catch {
+    try { $manifest = Invoke-RestMethod -Uri $MirrorManifestUrl -UseBasicParsing }
+    catch { throw "Cannot read the current manifest from GitHub or the website. For offline installation supply BOTH -ManifestPath and -BundlePath. $($_.Exception.Message)" }
   }
 }
-$artifact = @($manifest.artifacts | Where-Object { $_.kind -eq "suite" }) | Select-Object -First 1
-if ($null -eq $artifact) { throw "V5 suite artifact is missing from the release manifest." }
+$suiteCandidates = @($manifest.artifacts | Where-Object { $_.kind -eq "suite" -and $_.platform -eq "windows-amd64" })
+if ($suiteCandidates.Count -ne 1) { throw "Expected exactly one Windows x64 suite artifact in the current manifest." }
+$artifact = $suiteCandidates[0]
+$availableBuild = [string]$artifact.build_id
+if ($availableBuild -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$' -or [string]$manifest.version -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$' -or
+    [string]$artifact.file -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*\.zip$' -or [string]$artifact.sha256 -notmatch '^[a-fA-F0-9]{64}$' -or
+    [string]$artifact.bytes -notmatch '^[1-9][0-9]*$' -or [string]$artifact.download_url -notmatch '^https://github\.com/WUBING2023/PaperSpine/releases/download/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+\.zip$') {
+  throw "The selected suite metadata is invalid; no package will be guessed or installed."
+}
+if (($artifact.download_url -split "/")[-1] -ne $artifact.file) { throw "The artifact URL does not match its filename." }
+$Version = [string]$manifest.version
 $profileStatePath = Join-Path $ProfileRoot ".paperspine5-lifecycle\profile-state.json"
+$currentBuild = $null
+if (Test-Path -LiteralPath $profileStatePath) {
+  $profileState = Get-Content -LiteralPath $profileStatePath -Raw -Encoding UTF8 | ConvertFrom-Json
+  $currentBuild = [string]$profileState.active_build_id
+}
+$targets = if ($Target -eq "both") { @("codex", "claude-code") } else { @($Target) }
+$roots = @{}
+foreach ($name in $targets) {
+  $roots[$name] = if ($name -eq "codex") { if ($CodexSkillsRoot) { $CodexSkillsRoot } else { Join-Path $env:USERPROFILE ".codex\skills" } } else { if ($ClaudeSkillsRoot) { $ClaudeSkillsRoot } else { Join-Path $env:USERPROFILE ".claude\skills" } }
+}
+$skillsReady = $true
+foreach ($root in $roots.Values) { if (-not (Test-Path -LiteralPath (Join-Path $root "paper-spine\SKILL.md") -PathType Leaf)) { $skillsReady = $false } }
+$status = if (-not $currentBuild) { "not_installed" } elseif ($currentBuild -eq $availableBuild) { "up_to_date" } else { "update_available" }
 if ($CheckOnly) {
-  $currentBuild = $null
-  if (Test-Path -LiteralPath $profileStatePath) {
-    $profileState = Get-Content -LiteralPath $profileStatePath -Raw -Encoding UTF8 | ConvertFrom-Json
-    $currentBuild = $profileState.active_build_id
-  }
-  $status = if (-not $currentBuild) { "not_installed" } elseif ($currentBuild -eq $manifest.build_id) { "up_to_date" } else { "update_available" }
-  [ordered]@{ status = $status; current_build_id = $currentBuild; available_build_id = $manifest.build_id; version = $manifest.version; release_url = $manifest.release_url } | ConvertTo-Json
+  [ordered]@{ status = $status; platform = "windows-amd64"; current_build_id = $currentBuild; available_build_id = $availableBuild; version = $Version; skills_ready = $skillsReady; release_url = $manifest.release_url } | ConvertTo-Json
   return
 }
+if ($status -eq "up_to_date" -and $skillsReady) {
+  if ($CleanLegacy) {
+    $installed = Join-Path $ProfileRoot ".paperspine5-lifecycle\installs\$availableBuild"
+    $localLauncher = Join-Path $installed "paperspine.cmd"
+    $localPython = Join-Path $installed "runtime_vendor\windows-py312\python.exe"
+    $localMigrator = Join-Path $installed "standalone\paper-spine\scripts\skill_discovery_migration.py"
+    if (-not (Test-Path -LiteralPath $localLauncher) -or -not (Test-Path -LiteralPath $localPython) -or -not (Test-Path -LiteralPath $localMigrator)) { throw "The current profile is incomplete; cannot safely clean legacy discovery folders." }
+    & $localLauncher verify-bundle --bundle $installed | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "The installed suite failed verification; legacy folders were not touched." }
+    $migrationArgs = @("-I", "-B", $localMigrator, "migrate", "--archive-root", $LegacyArchiveRoot, "--operation-id", ("v5-clean-" + [guid]::NewGuid().ToString("N")))
+    foreach ($entry in $roots.GetEnumerator()) { $migrationArgs += @("--skills-root", "$($entry.Key)=$($entry.Value)") }
+    & $localPython @migrationArgs | Out-Host
+    if ($LASTEXITCODE -ne 0) { throw "Known legacy Skill migration did not complete." }
+  }
+  Write-Output "PaperSpine5 $Version is up to date. Existing profile and Skills retained; no suite download required."
+  return
+}
+$tempBase = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
 $downloadRoot = Join-Path ([IO.Path]::GetTempPath()) ("paperspine5-v5-" + [guid]::NewGuid().ToString("N"))
 $extractRoot = Join-Path $downloadRoot "suite"
 New-Item -ItemType Directory -Path $extractRoot -Force | Out-Null
@@ -73,13 +97,8 @@ try {
   $runtime = Join-Path $extractRoot "runtime_vendor\windows-py312\python.exe"
   $migrator = Join-Path $extractRoot "standalone\paper-spine\scripts\skill_discovery_migration.py"
   if (-not (Test-Path -LiteralPath $launcher) -or -not (Test-Path -LiteralPath $runtime)) { throw "The downloaded V5 suite is incomplete." }
-  & $launcher verify-bundle --bundle $zipPath | Out-Host
+  & $launcher verify-bundle --bundle $zipPath | Out-Null
   if ($LASTEXITCODE -ne 0) { throw "The downloaded V5 suite failed its internal verification." }
-  $targets = if ($Target -eq "both") { @("codex", "claude-code") } else { @($Target) }
-  $roots = @{}
-  foreach ($name in $targets) {
-    $roots[$name] = if ($name -eq "codex") { if ($CodexSkillsRoot) { $CodexSkillsRoot } else { Join-Path $env:USERPROFILE ".codex\skills" } } else { if ($ClaudeSkillsRoot) { $ClaudeSkillsRoot } else { Join-Path $env:USERPROFILE ".claude\skills" } }
-  }
   $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
   $backupRoot = Join-Path $env:USERPROFILE ".paperspine5\backups\v5-install\$stamp"
   $operationId = if (Test-Path -LiteralPath $profileStatePath) { "v5-update-$stamp" } else { "v5-install-$stamp" }
@@ -91,18 +110,25 @@ try {
   }
   $skillSource = Join-Path $extractRoot "standalone\paper-spine"
   foreach ($entry in $roots.GetEnumerator()) {
-    $hostRoot = $entry.Value; $destination = Join-Path $hostRoot "paper-spine"
+    $hostRoot = [IO.Path]::GetFullPath($entry.Value); $destination = Join-Path $hostRoot "paper-spine"
+    if ($status -eq "up_to_date" -and (Test-Path -LiteralPath (Join-Path $destination "SKILL.md") -PathType Leaf)) { continue }
     New-Item -ItemType Directory -Path $hostRoot -Force | Out-Null
     if (Test-Path -LiteralPath $destination) {
       $targetBackup = Join-Path $backupRoot (Join-Path $entry.Key "paper-spine")
       New-Item -ItemType Directory -Path (Split-Path $targetBackup) -Force | Out-Null
-      Move-Item -LiteralPath $destination -Destination $targetBackup
+      $resolvedSource = [IO.Path]::GetFullPath($destination)
+      $resolvedBackup = [IO.Path]::GetFullPath($targetBackup)
+      $expectedBackupRoot = [IO.Path]::GetFullPath($backupRoot).TrimEnd('\') + '\'
+      if ([IO.Path]::GetDirectoryName($resolvedSource) -ne $hostRoot.TrimEnd('\') -or -not $resolvedBackup.StartsWith($expectedBackupRoot, [StringComparison]::OrdinalIgnoreCase)) { throw "Skill backup path escaped its intended directory." }
+      Move-Item -LiteralPath $resolvedSource -Destination $resolvedBackup
     }
     Copy-Item -LiteralPath $skillSource -Destination $destination -Recurse -Force
     Write-Output "Installed V5 paper-spine Skill for $($entry.Key): $destination"
   }
   New-Item -ItemType Directory -Path $ProfileRoot -Force | Out-Null
-  if (Test-Path -LiteralPath $profileStatePath) {
+  if ($status -eq "up_to_date") {
+    Write-Output "Current profile retained; installed only missing target Skills."
+  } elseif (Test-Path -LiteralPath $profileStatePath) {
     & $launcher update --profile-root $ProfileRoot --bundle $zipPath --operation-id $operationId --confirm | Out-Host
   } else {
     & $launcher install --profile-root $ProfileRoot --bundle $zipPath --operation-id $operationId | Out-Host
@@ -115,5 +141,10 @@ try {
   if ($CleanLegacy) { Write-Output "Known V3/V4 discovery folders were archived; user task data was retained." }
   Write-Output "Backup root: $backupRoot"
 } finally {
-  if (Test-Path -LiteralPath $downloadRoot) { Remove-Item -LiteralPath $downloadRoot -Recurse -Force }
+  if (Test-Path -LiteralPath $downloadRoot) {
+    $cleanup = [IO.Path]::GetFullPath($downloadRoot)
+    $item = Get-Item -LiteralPath $cleanup -Force
+    if ([IO.Path]::GetDirectoryName($cleanup) -ne $tempBase -or [IO.Path]::GetFileName($cleanup) -notmatch '^paperspine5-v5-[0-9a-f]{32}$' -or ($item.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw "Refusing cleanup outside the unique installer temporary directory." }
+    Remove-Item -LiteralPath $cleanup -Recurse -Force
+  }
 }

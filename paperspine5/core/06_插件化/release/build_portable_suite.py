@@ -17,8 +17,9 @@ def rewrite_packaged_runtime(raw: bytes, *, build_id: str) -> bytes:
         text = raw.decode("utf-8")
     except UnicodeError as exc:
         raise core.ReleaseError("runtime is not UTF-8") from exc
-    pattern = r'(?m)^PRODUCT_BUILD_ID = "[^"]+"$'
-    rewritten, count = re.subn(pattern, f'PRODUCT_BUILD_ID = "{build_id}"', text)
+    # Match only the assignment; leave its LF/CRLF terminator byte-for-byte intact.
+    pattern = r'(?m)^PRODUCT_BUILD_ID = "[^"\r\n]+"(?=\r?$)'
+    rewritten, count = re.subn(pattern, lambda _: f'PRODUCT_BUILD_ID = "{build_id}"', text)
     if count != 1:
         raise core.ReleaseError("runtime build identity anchor is missing or ambiguous")
     return rewritten.encode()
@@ -41,17 +42,46 @@ def runtime_payload(runtime_root: Path) -> dict[str, bytes]:
     return payload
 
 
+def refresh_canonical_skill(payload: dict[str, bytes], source_root: Path) -> None:
+    """Replace both Skill projections, including deletions, from current source."""
+    sources = {"01_PaperSpine4/src/skill", "01_PaperSpine4/src/scripts"}
+    rules = [rule for rule in core.TREE_RULES if rule.source in sources]
+    fresh = dict(item for rule in rules for item in core._iter_tree(source_root, rule))
+    prefixes = tuple(rule.destination.rstrip("/") + "/" for rule in rules)
+    # Explicit projections (for example the stable updater) may originate outside
+    # the Skill trees, but would otherwise be removed by the prefix replacement.
+    for rule in core.FILE_RULES:
+        if not rule.destination.startswith(prefixes):
+            continue
+        source = source_root / rule.source
+        if not source.is_file():
+            raise core.ReleaseError(f"allowlisted source file is missing: {rule.source}")
+        if core._is_link_or_junction(source):
+            raise core.ReleaseError(f"allowlisted source file is a link/reparse point: {rule.source}")
+        destination = core._safe_archive_path(rule.destination)
+        if destination in fresh:
+            raise core.ReleaseError(f"duplicate allowlist destination: {destination}")
+        fresh[destination] = source.read_bytes()
+    # Collect first: an unreadable source must not leave a partly updated payload.
+    for relative in list(payload):
+        if relative.startswith(prefixes):
+            del payload[relative]
+    payload.update(fresh)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-suite", type=Path, required=True)
     parser.add_argument("--runtime-root", type=Path, required=True)
     parser.add_argument("--lock", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--dsh-output", type=Path, help="also build the native DSH bundle")
     parser.add_argument("--variant", default="release")
     args = parser.parse_args()
     lock = json.loads(args.lock.read_text(encoding="utf-8"))
     if lock.get("platform") not in {"linux-x86_64", "macos-arm64", "macos-x86_64"}:
         raise core.ReleaseError("unsupported portable suite platform")
+    core.verify_bundle(args.base_suite.resolve())
     files, _ = core._read_bundle(args.base_suite.resolve())
     payload = {
         path: content for path, content in files.items()
@@ -60,6 +90,7 @@ def main() -> int:
         and path not in {"runtime_vendor/requirements.lock.json", "paperspine.cmd", "release/stable-update.cmd"}
     }
     source_root = Path(__file__).resolve().parents[2]
+    refresh_canonical_skill(payload, source_root)
     replacements = {
         "release/suite_release.py": source_root / "06_插件化/release/suite_release.py",
         "release/product_runtime.py": source_root / "06_插件化/release/product_runtime.py",
@@ -69,6 +100,14 @@ def main() -> int:
     }
     for relative, source in replacements.items():
         payload[relative] = source.read_bytes()
+    # Use the same adapter source for every platform, including older base suites.
+    from dsh_release import ADAPTER_FILES, build_dsh_bundle
+    for relative in ADAPTER_FILES:
+        payload["adapters/dsh/" + relative] = (
+            source_root / "06_插件化/dsh/paperspine5" / relative
+        ).read_bytes()
+    for relative in ("dsh_release.py", "release_cli.py"):
+        payload["release/" + relative] = (source_root / "06_插件化/release" / relative).read_bytes()
     payload.update(runtime_payload(args.runtime_root))
     payload["runtime_vendor/requirements.lock.json"] = core.canonical_json_bytes(lock)
     payload["PORTABLE-VARIANT.txt"] = f"{args.variant}\n".encode()
@@ -109,6 +148,8 @@ def main() -> int:
             archive.writestr(info, archive_files[relative], compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
     os.replace(temporary, output)
     verified = core.verify_bundle(output)
+    if args.dsh_output:
+        build_dsh_bundle(output, args.dsh_output)
     print(json.dumps({
         "status": verified["status"], "platform": verified["platform"],
         "build_id": verified["build_id"], "archive_sha256": verified["archive_sha256"],

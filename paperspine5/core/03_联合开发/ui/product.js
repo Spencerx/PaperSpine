@@ -198,6 +198,19 @@ function hostHandoffText(task, handoff, origin) {
     "本指令须由用户发给选定宿主；复制没有启动 AI。"
   ].filter(Boolean).join("\n");
 }
+// A milestone records host work; files or unrelated version changes do not finish a phase.
+function continuationProgress(task, previous) {
+  const latest = (task?.milestones || []).at(-1);
+  const snapshot = {taskId: task?.task_id, phase: task?.stage || "intake", milestone: latest?.milestone_id || null};
+  const pending = decisionsOf(task).some(d => d.status === "pending" && !d.stale);
+  const changed = previous?.taskId === snapshot.taskId && previous.phase !== snapshot.phase
+    && snapshot.milestone && previous.milestone !== snapshot.milestone && latest.stage === snapshot.phase;
+  const notice = changed && !pending && !task.configuration_stale
+    && !["intake", "delivery"].includes(snapshot.phase) && task.status !== "completed"
+    ? {title: "阶段记录已更新", description: `工作台已记录「${phaseLabel(snapshot.phase)}」阶段。请回到宿主 Agent 对话确认进展并继续下一步。`}
+    : null;
+  return {snapshot, notice};
+}
 function configurationDraftMessage(task, draft) {
   if (!draft) return "";
   const changed = Object.keys(draft.values || {}).some(key => !same(draft.base?.[key], task.configuration?.[key]));
@@ -284,7 +297,7 @@ function orderedFigureUnits(decisions) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = {pairedFigureRows, referenceOriginalLinks, safeOriginalPaperUrl, orderedFigureUnits, hostHandoffText, configurationDraftMessage, preferredFigureFile, configurationStatus, PHASES, decisionsOf, decisionPhase, currentPhase, optionDetails, decisionBinding,
+  module.exports = {pairedFigureRows, referenceOriginalLinks, safeOriginalPaperUrl, orderedFigureUnits, hostHandoffText, continuationProgress, configurationDraftMessage, preferredFigureFile, configurationStatus, PHASES, decisionsOf, decisionPhase, currentPhase, optionDetails, decisionBinding,
     canRebase, performMutation, PublicError, allowedTaskUrl, optionFiles,
     literatureValues, literaturePreset, validatedLiterature, figureUnits, artifactGroup};
 }
@@ -300,33 +313,77 @@ if (typeof document !== "undefined") {
     if (className) node.className = className;
     return node;
   }
-  let saveToastTimer = null;
+  let continuationFocus = null;
+  const continuationSnapshots = new Map();
+  function restoreContinuationFocus() {
+    if (!continuationFocus) return;
+    const target = continuationFocus.isConnected && !continuationFocus.disabled ? continuationFocus : $("#refresh");
+    continuationFocus = null;
+    target.focus({preventScroll: true});
+  }
   function hideSaveToast() {
-    clearTimeout(saveToastTimer); saveToastTimer = null;
-    $("#save-toast").hidden = true;
+    const dialog = $("#save-toast");
+    if (dialog.open) dialog.close();
+    dialog.hidden = true;
+    restoreContinuationFocus();
   }
-  function scheduleSaveToastDismissal() {
-    clearTimeout(saveToastTimer);
-    const toast = $("#save-toast");
-    if (toast.hidden || toast.matches(":hover, :focus-within")) return;
-    saveToastTimer = setTimeout(hideSaveToast, 10000);
+  function syncContinuationHandoff() {
+    const dialog = $("#save-toast");
+    if (dialog.hidden || dialog.dataset.taskId !== state.taskId) return;
+    const instruction = hostHandoffText(state.task, state.handoff, location.origin);
+    if ($("#save-toast-handoff").value !== instruction) $("#save-toast-handoff").value = instruction;
+    $("#copy-save-handoff").disabled = !instruction;
+    setText("#save-toast-binding", instruction ? `当前论文 · 已保存版本 ${state.task.task_version}`
+      : "正在读取同一任务的接手指令；暂未就绪时可先回到原宿主对话。");
   }
-  function showSaveToast(taskId) {
+  function showSaveToast(taskId, content = {}, returnFocus = document.activeElement) {
     if (state.taskId !== taskId) return;
-    const toast = $("#save-toast");
-    toast.dataset.taskId = taskId; toast.hidden = false;
-    setText("#save-toast-title", "已保存");
-    scheduleSaveToastDismissal();
+    const dialog = $("#save-toast");
+    dialog.dataset.taskId = taskId;
+    setText("#save-toast-title", content.title || "已保存，请回到宿主对话");
+    const pending = decisionsOf(state.task).some(d => d.status === "pending" && !d.stale);
+    setText("#save-toast-description", content.description || (pending
+      ? "本次选择或意见已保存。还有待确认的选择，可先完成这些选择，再回到宿主 Agent 对话继续。"
+      : "请回到宿主 Agent 对话，告诉它继续下一步。"));
+    setText("#save-toast-copy-status", "");
+    dialog.hidden = false;
+    syncContinuationHandoff();
+    if (!dialog.open) {
+      continuationFocus = returnFocus;
+      dialog.showModal();
+      $("#save-toast-title").focus();
+    }
+  }
+  function observeContinuation(task) {
+    const key = `paperspine.public.continuation:${task.task_id}`;
+    let previous = continuationSnapshots.get(task.task_id);
+    if (!previous) {
+      try { previous = JSON.parse(sessionStorage.getItem(key) || "null"); } catch (_) { /* In-memory dedupe still works. */ }
+    }
+    const result = continuationProgress(task, previous);
+    continuationSnapshots.set(task.task_id, result.snapshot);
+    try { sessionStorage.setItem(key, JSON.stringify(result.snapshot)); } catch (_) { /* Keep memory fallback. */ }
+    return result.notice;
   }
   $("#dismiss-save-toast").addEventListener("click", hideSaveToast);
-  $("#support-milestone-dismiss")?.addEventListener("click", () => { $("#support-milestone").hidden = true; });
-  $("#save-toast").addEventListener("mouseenter", () => clearTimeout(saveToastTimer));
-  $("#save-toast").addEventListener("mouseleave", scheduleSaveToastDismissal);
-  $("#save-toast").addEventListener("focusin", () => clearTimeout(saveToastTimer));
-  $("#save-toast").addEventListener("focusout", () => setTimeout(scheduleSaveToastDismissal, 0));
-  $("#save-toast").addEventListener("keydown", (event) => {
-    if (event.key === "Escape") { event.stopPropagation(); hideSaveToast(); }
+  $("#save-toast").addEventListener("cancel", event => { event.preventDefault(); hideSaveToast(); });
+  $("#save-toast").addEventListener("close", () => {
+    $("#save-toast").hidden = true;
+    restoreContinuationFocus();
   });
+  $("#copy-save-handoff").addEventListener("click", async () => {
+    const instruction = hostHandoffText(state.task, state.handoff, location.origin);
+    if (!instruction || $("#save-toast").dataset.taskId !== state.taskId) { syncContinuationHandoff(); return; }
+    try {
+      await navigator.clipboard.writeText(instruction);
+      setText("#save-toast-copy-status", "已复制，请粘贴到宿主 Agent 对话并发送。");
+    } catch (_) {
+      $("#save-toast-instruction-details").open = true;
+      $("#save-toast-handoff").focus(); $("#save-toast-handoff").select();
+      setText("#save-toast-copy-status", "自动复制不可用，已选中指令，请手动复制后发给宿主。");
+    }
+  });
+  $("#support-milestone-dismiss")?.addEventListener("click", () => { $("#support-milestone").hidden = true; });
   let notice = null, noticeTimer = null;
   function message(text, error = false) {
     if (error) hideSaveToast();
@@ -386,7 +443,7 @@ if (typeof document !== "undefined") {
   }
   async function mutate(key, makeEntry) {
     if (state.inFlight.has(key)) return;
-    const taskId = state.taskId;
+    const taskId = state.taskId, returnFocus = document.activeElement;
     state.inFlight.add(key); renderEditability();
     let entry = state.pending.get(key);
     try {
@@ -413,7 +470,7 @@ if (typeof document !== "undefined") {
             && saved.task_version >= (state.task?.task_version ?? 0)) state.task = {...state.task, ...saved};
         if (entry.kind === "feedback" && !entry.figurePath) { $("#feedback-form").reset(); setText("#feedback-file-name", ""); setText("#feedback-status", result.feedback_file ? `意见已保存：${result.feedback_file}` : "意见已保存到同一任务，宿主 Agent 可读取后继续。"); }
         message("");
-        showSaveToast(taskId);
+        showSaveToast(taskId, {}, returnFocus);
         await refreshTask({force: true});
       }
       return result;
@@ -493,6 +550,7 @@ if (typeof document !== "undefined") {
       if (sequence !== state.loadSequence || id !== state.taskId) return;
       if (state.task && task.task_version < state.task.task_version) return;
       state.task = task;
+      const continuation = observeContinuation(task);
       $("#task-load-state").classList.add("hidden");
       render();
       const [files, events, handoff] = await ancillary;
@@ -517,6 +575,7 @@ if (typeof document !== "undefined") {
       if (handoff.status === "fulfilled" && handoff.value.handoff?.task_id === id) state.handoff = handoff.value.handoff;
       state.filesError = files.status === "rejected";
       render();
+      if (continuation && !state.inFlight.size && !document.querySelector("dialog[open]")) showSaveToast(id, continuation);
     })().finally(() => {
       if (state.refreshRequest === refresh) state.refreshRequest = null;
     });
@@ -606,6 +665,7 @@ if (typeof document !== "undefined") {
     const handoff = hostHandoffText(task, state.handoff, location.origin);
     setText("#host-handoff-text", handoff || "暂未读取到与当前任务版本一致的接手指令，请刷新重试。配置、选择和成果保持不变。");
     $("#copy-handoff").disabled = !handoff;
+    syncContinuationHandoff();
   }
   function renderFocus() {
     const task = state.task, phase = currentPhase(task);
@@ -675,13 +735,14 @@ if (typeof document !== "undefined") {
   function renderMaterials() {
     const roots = (state.task.material_grants || []).map((grant) => grant.root || grant.uri).filter(Boolean);
     const entries = state.task.material_inventory?.entries || [];
+    const issues = state.task.material_inventory?.scan_issues || [];
     const pages = Math.max(1, Math.ceil(entries.length / MATERIAL_PAGE_SIZE));
     materialPage = Math.min(materialPage, pages - 1);
     const start = materialPage * MATERIAL_PAGE_SIZE;
     const visible = entries.slice(start, start + MATERIAL_PAGE_SIZE);
     // Polls render twice. Compare only displayed data, so unchanged polls retain
     // the rows, focus and scroll position without rebuilding thousands of nodes.
-    const key = JSON.stringify([state.taskId, roots, entries.length, materialPage,
+    const key = JSON.stringify([state.taskId, roots, entries.length, materialPage, issues,
       visible.map(file => [file.relative_path || file.source_id, file.size_bytes])]);
     if (key === renderedMaterials) return;
     for (const selector of ["#sidebar-material-roots", "#task-material-roots"]) {
@@ -694,9 +755,15 @@ if (typeof document !== "undefined") {
       return row;
     });
     body.replaceChildren(...rows);
-    setText("#task-materials-summary", entries.length
+    const summary = entries.length
       ? `${entries.length} 个材料文件；显示 ${start + 1}–${start + visible.length}；每页 ${MATERIAL_PAGE_SIZE} 个，仅供查看。`
-      : "宿主尚未提供可读取的材料清单。");
+      : "宿主尚未提供可读取的材料清单。";
+    setText("#task-materials-summary", summary + (issues.length ? (entries.length
+      ? " 部分文件未读取，宿主可继续处理已读取材料。"
+      : " 请宿主核对下方路径，继续不依赖这些材料的工作。") : ""));
+    const issueList = $("#task-material-issues");
+    issueList.replaceChildren(...issues.map(issue => el("li", [issue.code, issue.details].filter(Boolean).join("："))));
+    issueList.hidden = !issues.length;
     const select = $("#material-page");
     if (select.options.length !== pages) {
       select.replaceChildren(...Array.from({length: pages}, (_, index) => {

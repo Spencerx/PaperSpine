@@ -10,7 +10,6 @@ import re
 from pathlib import Path
 from typing import Any
 
-
 SCHEMA_VERSION = "1.0"
 KINDS = {"figure", "table", "data", "method", "note"}
 SEMANTIC_STATES = {"pass", "blocked"}

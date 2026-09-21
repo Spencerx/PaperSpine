@@ -1210,27 +1210,33 @@ body.task-open .workspace-layout { grid-template-columns: 244px minmax(0, 1fr); 
 #task-material-table td:first-child { overflow-wrap: anywhere; }
 #task-material-table th { position: sticky; top: 0; font-size: 12px; }
 
-/* Confirmed saves: small nonmodal prompt, visible even after the form scrolls away. */
+/* Confirmed saves and real host phase records: explicit, persistent continuation. */
 .save-toast {
-  position: fixed; right: max(16px, env(safe-area-inset-right));
-  bottom: max(20px, env(safe-area-inset-bottom)); z-index: 60;
-  display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 8px 12px;
-  width: min(380px, calc(100vw - 32px)); padding: 18px;
-  max-height: calc(100dvh - 40px); overflow: auto;
-  border: 1px solid #bcded0; border-radius: 16px; background: #fff;
-  box-shadow: 0 12px 40px rgba(24, 61, 48, .18); color: #183b31;
-  animation: save-toast-appear .16s ease-out;
+  position: fixed; inset: 0; margin: auto; padding: 24px;
+  width: min(490px, calc(100vw - 32px)); max-height: calc(100dvh - 40px);
+  box-sizing: border-box; overflow: auto;
+  border: 1px solid #bcded0; border-radius: 18px; background: #fff;
+  box-shadow: 0 20px 80px rgba(24, 61, 48, .28); color: #183b31;
 }
-.save-toast[hidden] { display: none !important; }
-.save-toast-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #e6f5ee; color: #227052; font-weight: 800; }
-.save-toast-content strong { font-size: 16px; }
-.save-toast-content p { margin: 4px 0 0; line-height: 1.55; overflow-wrap: anywhere; }
-.save-toast-content .save-toast-hint { margin-top: 8px; color: #66776f; font-size: 12px; }
-.save-toast-dismiss { grid-column: 2; justify-self: end; min-height: 32px; padding: 4px 12px; border: 1px solid #c4dfd2; border-radius: 8px; background: #f0f8f4; color: #245d47; cursor: pointer; }
-.save-toast-dismiss:hover { background: #e3f1e9; }
-.save-toast-dismiss:focus-visible { outline: 3px solid #397ccd; outline-offset: 3px; }
-@keyframes save-toast-appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@media (prefers-reduced-motion: reduce) { .save-toast { animation: none; } }
+.save-toast[open] { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; }
+.save-toast[hidden], .save-toast:not([open]) { display: none !important; }
+.save-toast::backdrop { background: rgba(17, 35, 64, .48); }
+.save-toast-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #e6f5ee; color: #227052; font-weight: 800; }
+.save-toast-content h2 { margin: 2px 0 12px; font-size: 21px; line-height: 1.4; }
+.save-toast-content p { margin: 8px 0 0; line-height: 1.65; overflow-wrap: anywhere; }
+.save-toast-content .save-toast-hint { margin-top: 12px; color: #53675e; font-size: 13px; }
+.save-toast-content details { margin-top: 14px; }
+.save-toast-content summary { cursor: pointer; font-size: 13px; }
+.save-toast-content textarea { margin-top: 8px; width: 100%; box-sizing: border-box; resize: vertical; font: inherit; font-size: 12px; }
+.save-toast-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+.save-toast-actions button { min-height: 44px; }
+.save-toast :focus-visible { outline: 3px solid #397ccd; outline-offset: 3px; }
+body:has(.save-toast[open]) { overflow: hidden; }
+@media (max-width: 460px) {
+  .save-toast { padding: 18px; }
+  .save-toast-content h2 { font-size: 19px; }
+  .save-toast-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+}
 
 /* Optional choice notes: the empty-state hint is not inserted into editable text. */
 .choice-reason:focus::placeholder { color: transparent; }

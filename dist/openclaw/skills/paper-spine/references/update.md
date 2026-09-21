@@ -1,51 +1,60 @@
-# PaperSpine5 V5 update
+# PaperSpine5 invocation checks and updates
 
-Use this playbook only for an explicit update/check request. It does not start or
-modify a paper task. V3/V4 `paperspine_update.py` and
-`dist/paperspine_version.json` are legacy component routes, not the V5 release
-channel.
-
-## Check the current V5 channel
-
-The stable public channel is:
+Before paper production/resume, run the installed Skill's existing helper with
+its verified Python (the bundled interpreter is sufficient):
 
 ```text
-https://wubing2023.github.io/PaperSpine/v5/downloads/manifest.json
+python -B scripts/paperspine_update.py --preflight --yes
 ```
 
-On Windows, download that JSON and its `release_assets.installer_url` into a new
-temporary directory. Before running the installer, compare its byte count and
-SHA-256 with `release_assets.installer_bytes` and
-`release_assets.installer_sha256`. Stop on any mismatch. Then run:
+It checks on each invocation, continues immediately when current, and applies a
+newer full suite transactionally when available. Explicitly disabling automatic
+updates with `--disable-auto-update` remains effective. The older opt-in `--auto`
+mode retains its interval behavior. `--preflight --check-only` does not install.
+A metadata network failure may continue the existing installation with a notice;
+a corrupt package or install failure is an error, never a successful update.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1 -CheckOnly -ManifestPath .\manifest.json
+## Stable channel and platform selection
+
+The automatic suite channel is:
+
+```text
+https://raw.githubusercontent.com/WUBING2023/PaperSpine/main/website/downloads/update-channel.json
 ```
 
-The result is one of `not_installed`, `up_to_date`, or `update_available`, based
-on the profile's actual active build ID rather than the older component version.
-Checking does not replace files.
+The channel supplies separate Windows x64, Linux glibc x86_64, macOS arm64 and
+macOS x86_64 bundles. Unknown systems/architectures are rejected instead of falling
+back to the Windows ZIP. Local diagnostics can use `--source <channel.json>`,
+`--skill-root <paper-spine>` and `--control-root <updater-directory>`.
+Never substitute a developer checkout for an installed release.
 
-## Apply an explicitly requested update
+The installed wrapper uses the same canonical stable bootstrap bundled with the
+Skill. Existing managed installs retain their configured update control directory.
+An older public Skill without an installed-suite pointer can migrate through this
+same transaction, preserving its previous files as a rollback backup. Paper data
+and saved profiles are not moved or cleared. After an update reread the installed
+Skill and current tool schemas. Gracefully restart a running old Web service on
+its existing profile before using the new code; do not start duplicate writers.
 
-After a verified `update_available` result, use the same verified installer and
-manifest:
+## Getting the patch through an old entry
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install.ps1 -Target codex -ManifestPath .\manifest.json
-```
+The published `paperspine-updater/1` apply protocol remains supported. An old
+stable updater can install the new platform-specific channel (or exact ZIP plus
+SHA-256), which carries both the workflow patch and new updater. Then invoke the
+new installed `scripts/paperspine_update.py --preflight --yes` once: it also
+refreshes the external old bootstrap from the verified installed bundle, without
+redownloading when already current. Historical Linux/macOS bootstraps need the
+matching `update-channel-<platform>.json` for this first hop because they do not
+understand the new `bundles` mapping. The universal channel keeps a Windows
+compatibility `bundle` for historical Windows bootstraps.
 
-Use `-Target claude-code` or `-Target both` when requested. An existing V5 profile
-uses the transactional lifecycle `update`; it verifies the suite, retains task
-data, runs REST/MCP readiness and first-start, and requires a new host session.
-Use `-CleanLegacy` only when the user explicitly wants known V3/V4 discovery
-folders archived. Never delete unknown folders, settings, or paper data.
+The older V4 component updater still discovers `dist/paperspine_version.json`.
+Compatibility version 4.0.1 carries the new wrapper/bootstrap; the actual V5
+product version is 0.4.0-alpha.2. These are separate version sequences. After
+that one-time component update, the preflight selects the full suite for the
+current operating system. It must not compare V5 0.4.x as a downgrade of V4 4.x.
 
-The self-contained full-suite update is currently Windows x64 only. For another
-platform, update only the standalone Skill using its verified release archive and
-package installer; do not claim full-suite runtime validation.
-
-Compatibility note: the installed legacy component helper remains at
-`paper-spine\scripts\paperspine_update.py` on Windows and
-`paper-spine/scripts/paperspine_update.py` on POSIX. Do not use it as the V5
-release authority; the verified manifest/installer route above supersedes it.
+The website manifest and install.ps1/install.sh remain supported explicit
+installation/update entries. Verify manifest hashes and sizes before executing
+downloaded code. A successful installer transaction, a reloaded host and a running
+Web process are distinct observations; report only what actually ran.

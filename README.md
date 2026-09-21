@@ -6,7 +6,7 @@
 
 [中文](README.md) · [English](README.en.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Português](README.pt.md)
 
-[产品页](https://wubing2023.github.io/PaperSpine/v5/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.1-dev)
+[产品页](https://wubing2023.github.io/PaperSpine/v5/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.2)
 
 **PaperSpine5：从零开始，快速完成一篇图文完整的论文。**
 
@@ -21,7 +21,7 @@ PaperSpine5 是一个覆盖论文全流程的 AI Skill。你提供研究方向�
 - macOS Apple Silicon 套件：约 40.5 MB。
 - macOS Intel x86_64 套件：约 40.5 MB。
 
-所有下载都列在公开发布清单中，并用 SHA-256 校验。完整版本号为 `v0.4.0-alpha.1-dev` 预发布。
+所有下载都列在公开发布清单中，并用 SHA-256 校验。完整版本号为 `v0.4.0-alpha.2` 预发布。
 
 <details>
 <summary>高级 / 手动安装</summary>

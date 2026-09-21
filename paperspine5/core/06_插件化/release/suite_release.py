@@ -23,7 +23,7 @@ from typing import Any
 SUITE_CONTRACT = "paperspine5.suite-manifest"
 SUITE_SCHEMA_VERSION = "1.0"
 PRODUCT_ID = "paperspine5"
-PRODUCT_VERSION = "0.4.0-alpha.1-dev"
+PRODUCT_VERSION = "0.4.0-alpha.2"
 PRODUCT_CHANNEL = "development"
 PLUGIN_NAME = "paperspine5"
 FIXED_ZIP_TIME = (2026, 8, 24, 0, 0, 0)
@@ -199,6 +199,7 @@ class FileRule:
 
 
 FILE_RULES = (
+    FileRule("06_插件化/release/dsh_release.py", "release/dsh_release.py"),
     FileRule("06_插件化/packages/paperspine5/.codex-plugin/plugin.json", ".codex-plugin/plugin.json"),
     FileRule("06_插件化/packages/paperspine5/.mcp.json", ".mcp.json"),
     FileRule("06_插件化/packages/paperspine5/README.md", "README.md"),
@@ -219,6 +220,7 @@ FILE_RULES = (
     FileRule("06_插件化/release/release_cli.py", "release/release_cli.py"),
     FileRule("06_插件化/release/user_update.py", "release/user_update.py"),
     FileRule("06_插件化/release/stable_updater.py", "release/stable_updater.py"),
+    FileRule("06_插件化/release/stable_updater.py", "standalone/paper-spine/scripts/paperspine_stable_update.py"),
     FileRule("06_插件化/release/stable_update_adapter.py", "release/stable_update_adapter.py"),
     FileRule("06_插件化/release/updater-protocol.json", "updater-protocol.json"),
     FileRule("06_插件化/release/stable-update.cmd", "release/stable-update.cmd"),
@@ -248,6 +250,7 @@ FILE_RULES = (
 )
 
 TREE_RULES = (
+    TreeRule("06_插件化/dsh/paperspine5", "adapters/dsh"),
     TreeRule("06_插件化/runtime_vendor/windows-py312", "runtime_vendor/windows-py312", frozenset(ALLOWED_SUFFIXES | {".exe", ".zip", "._pth", ".txt"})),
     TreeRule("06_插件化/packages/paperspine5/assets", "assets", frozenset({".png", ".svg"})),
     TreeRule("06_插件化/release/contracts", "release/contracts", frozenset({".json"})),
