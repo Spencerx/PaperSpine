@@ -60,7 +60,7 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-If an install is already present, the second command performs a rollback-safe update, keeps your task data, and runs a startup self-check. Automatic update is disabled by default.
+If an install is already present, the second command performs a rollback-safe update, keeps your task data, and runs a startup self-check. Each Skill invocation checks for updates and upgrades the full suite and updater when needed; an explicit opt-out is respected.
 
 ## Boundaries
 

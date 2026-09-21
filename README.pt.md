@@ -53,7 +53,7 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-Se já houver uma instalação, o segundo comando faz uma atualização reversível, mantém os dados das tarefas e roda uma verificação na inicialização. A atualização automática fica desligada por padrão.
+Se já houver uma instalação, o segundo comando faz uma atualização reversível, mantém os dados das tarefas e roda uma verificação na inicialização. Cada chamada da Skill verifica atualizações e atualiza a suíte e o atualizador quando necessário; uma desativação explícita é respeitada.
 
 ## Limites
 

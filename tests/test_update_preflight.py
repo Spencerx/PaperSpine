@@ -26,7 +26,9 @@ spec.loader.exec_module(wrapper)
 class UpdatePreflightTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix="paperspine-preflight-")
-        self.root = Path(self.tmp.name)
+        # Normalize macOS /var aliases and Windows short-name temp paths before
+        # writing installation pointers or constructing exact mock expectations.
+        self.root = Path(self.tmp.name).resolve()
         self.skill = self.root / "skills" / "paper-spine"
         self.control = self.root / "control"
         self.suite = self.control / "transactions" / "first" / "suite"

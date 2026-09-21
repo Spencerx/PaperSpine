@@ -75,9 +75,11 @@ known V3/V4 discovery names happens only when `-CleanLegacy` or
 or unknown folders. Restart the host after installation.
 
 The default profile is `%USERPROFILE%\.paperspine5\profiles\default` on
-Windows and `~/.paperspine5/profiles/default` on macOS/Linux. Automatic update
-is disabled by default; rerunning the platform installer performs an explicit
-transactional update and retains task data.
+Windows and `~/.paperspine5/profiles/default` on macOS/Linux. Each Skill invocation
+checks the current platform channel and updates the suite and updater when needed,
+unless explicitly disabled. Rerunning the platform installer also performs a
+transactional update and retains task data. Reload the host after an upgrade;
+restart an already running workbench with the same profile to load the new code.
 
 macOS packages in this prerelease are unsigned and not notarized. Linux support
 is limited to glibc x86_64; Linux arm64 and musl/Alpine are not claimed.

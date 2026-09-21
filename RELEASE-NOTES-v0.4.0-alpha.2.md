@@ -19,6 +19,7 @@ are advanced migration assets and do not include a runtime or Web workspace.
 Local evidence: material/stage regressions 8 PASS; updater 25 PASS; original
 wrapper tests 19 PASS and preflight 15 PASS; relevant UI checks 21 + 8 PASS;
 unchanged published old updater to final Windows candidate and bundled Python
-Web/host smoke PASS. Native POSIX candidate verification is tracked separately.
+Web/host smoke PASS. All four platforms passed native old-updater upgrades, updater self-refresh,
+and bundled Python workspace/host startup: [CI evidence](https://github.com/WUBING2023/PaperSpine/actions/runs/35599624088).
 Task data and configuration were retained in isolated upgrade replays.
 This remains an alpha prerelease. macOS packages are unsigned/unnotarized.

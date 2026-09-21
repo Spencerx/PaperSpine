@@ -53,7 +53,7 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-Ist bereits eine Installation vorhanden, führt der zweite Befehl ein rückgängigfähiges Update aus, behält die Aufgabendaten und macht einen Selbsttest beim Start. Automatische Updates sind standardmäßig aus.
+Ist bereits eine Installation vorhanden, führt der zweite Befehl ein rückgängigfähiges Update aus, behält die Aufgabendaten und macht einen Selbsttest beim Start. Bei jedem Skill-Aufruf wird auf Updates geprüft; bei Bedarf werden Suite und Updater aktualisiert. Eine ausdrücklich deaktivierte automatische Aktualisierung wird respektiert.
 
 ## Grenzen
 
