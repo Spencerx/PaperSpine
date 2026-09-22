@@ -14,13 +14,10 @@ jobs:
         include:
           - runner: ubuntu-24.04
             platform: linux-x86_64
-            asset: paperspine5-suite-0.4.0-alpha.1-dev-linux-x86_64.zip
           - runner: macos-15
             platform: macos-arm64
-            asset: paperspine5-suite-0.4.0-alpha.1-dev-macos-arm64.zip
           - runner: macos-15-intel
             platform: macos-x86_64
-            asset: paperspine5-suite-0.4.0-alpha.1-dev-macos-x86_64.zip
     runs-on: ${{ matrix.runner }}
     env:
       PYTHONUTF8: "1"
@@ -30,6 +27,27 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Resolve current release inputs and stage the canonical Skill
+        env:
+          TARGET_PLATFORM: ${{ matrix.platform }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, re, shutil
+          from pathlib import Path
+          manifest = json.loads(Path("website/downloads/manifest.json").read_text())
+          base, = [item for item in manifest["artifacts"] if item["kind"] == "suite"]
+          target, = [item for item in manifest["artifacts"] if item.get("platform") == os.environ["TARGET_PLATFORM"] and item["kind"].startswith("suite")]
+          assert manifest["tag"] == "v" + manifest["version"]
+          values = {"RELEASE_TAG": manifest["tag"], "BASE_ASSET": base["file"],
+                    "BASE_SHA256": base["sha256"], "BASE_BYTES": str(base["bytes"]),
+                    "OUTPUT_ASSET": target["file"]}
+          assert all(re.fullmatch(r"[A-Za-z0-9._-]+", value) for value in values.values())
+          with open(os.environ["GITHUB_ENV"], "a") as stream:
+              for key, value in values.items():
+                  stream.write(key + "=" + value + "\n")
+          shutil.copytree("src", "paperspine5/core/01_PaperSpine4/src")
+          PY
       - name: Read pinned runtime lock
         shell: bash
         run: |
@@ -46,7 +64,15 @@ jobs:
           PY
       - name: Download current verified Windows source suite
         shell: bash
-        run: gh release download v0.4.0-alpha.1-dev --pattern paperspine5-suite-0.4.0-alpha.1-dev.zip --dir work
+        run: |
+          gh release download "$RELEASE_TAG" --pattern "$BASE_ASSET" --dir work
+          python - <<'PY'
+          import hashlib, os
+          from pathlib import Path
+          source = Path("work") / os.environ["BASE_ASSET"]
+          assert source.stat().st_size == int(os.environ["BASE_BYTES"])
+          assert hashlib.sha256(source.read_bytes()).hexdigest() == os.environ["BASE_SHA256"]
+          PY
       - name: Download and verify portable Python
         shell: bash
         run: |
@@ -59,18 +85,18 @@ jobs:
           python paperspine5/core/06_插件化/release/prepare_posix_runtime.py \
             --lock "$LOCK" \
             --interpreter-archive "work/$RUNTIME_ASSET" \
-            --base-suite work/paperspine5-suite-0.4.0-alpha.1-dev.zip \
+            --base-suite "work/$BASE_ASSET" \
             --destination work/runtime
       - name: Build release and update fixture
         shell: bash
         run: |
           mkdir -p out
           python paperspine5/core/06_插件化/release/build_portable_suite.py \
-            --base-suite work/paperspine5-suite-0.4.0-alpha.1-dev.zip \
+            --base-suite "work/$BASE_ASSET" \
             --runtime-root work/runtime/python \
-            --lock "$LOCK" --output "out/${{ matrix.asset }}"
+            --lock "$LOCK" --output "out/$OUTPUT_ASSET"
           python paperspine5/core/06_插件化/release/build_portable_suite.py \
-            --base-suite work/paperspine5-suite-0.4.0-alpha.1-dev.zip \
+            --base-suite "work/$BASE_ASSET" \
             --runtime-root work/runtime/python \
             --lock "$LOCK" --variant update-smoke --output out/successor.zip
       - name: Verify install, REST/MCP, update and rollback
@@ -78,17 +104,18 @@ jobs:
         run: |
           export PYTHONPATH="paperspine5/core/06_插件化/release"
           python - <<'PY'
+          import os
           from suite_release import extract_verified_bundle
-          extract_verified_bundle("out/${{ matrix.asset }}", "work/bootstrap")
+          extract_verified_bundle("out/" + os.environ["OUTPUT_ASSET"], "work/bootstrap")
           PY
           chmod +x work/bootstrap/paperspine
           INITIAL=$(python - <<'PY'
-          import json, zipfile
-          with zipfile.ZipFile("out/${{ matrix.asset }}") as z:
+          import json, os, zipfile
+          with zipfile.ZipFile("out/" + os.environ["OUTPUT_ASSET"]) as z:
               print(json.loads(z.read("suite-manifest.json"))["suite"]["build_id"])
           PY
           )
-          work/bootstrap/paperspine install --profile-root work/profile --bundle "out/${{ matrix.asset }}" --operation-id install
+          work/bootstrap/paperspine install --profile-root work/profile --bundle "out/$OUTPUT_ASSET" --operation-id install
           work/bootstrap/paperspine first-start --profile-root work/profile
           work/bootstrap/paperspine update --profile-root work/profile --bundle out/successor.zip --operation-id update --confirm
           work/bootstrap/paperspine first-start --profile-root work/profile
@@ -97,6 +124,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.platform }}
-          path: ${{ github.workspace }}/out/${{ matrix.asset }}
+          path: ${{ github.workspace }}/out/${{ env.OUTPUT_ASSET }}
           if-no-files-found: error
           compression-level: 0

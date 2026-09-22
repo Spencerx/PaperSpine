@@ -53,7 +53,7 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-Si une installation existe déjà, la seconde commande applique une mise à jour réversible, conserve les données de tâches et exécute une vérification au démarrage. Chaque invocation de la Skill vérifie les mises à jour et actualise la suite et son outil de mise à jour si nécessaire ; une désactivation explicite est respectée.
+Relancer le programme d’installation vérifie la version. Une nouvelle version entraîne une mise à jour réversible et une vérification au démarrage, en conservant les données. Une installation complète et à jour évite tout téléchargement ou remplacement inutile. Chaque invocation de la Skill vérifie les mises à jour et actualise la suite et son outil de mise à jour si nécessaire ; une désactivation explicite est respectée.
 
 ## Limites
 

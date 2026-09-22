@@ -16,9 +16,9 @@ PaperSpine5는 논문의 전 과정을 다루는 AI Skill입니다. 연구 주�
 
 ## 다운로드
 
-- Windows x64 suite: 약 26.4 MB.
+- Windows x64 suite: 약 26.5 MB.
 - Linux glibc x86_64 suite: 약 56.2 MB.
-- macOS Apple Silicon suite: 약 40.5 MB.
+- macOS Apple Silicon suite: 약 40.6 MB.
 - macOS Intel x86_64 suite: 약 40.5 MB.
 
 모든 다운로드는 공개 릴리스 목록에 올라 있으며 SHA-256으로 검증됩니다. 현재 버전은 `v0.4.0-alpha.2` 프리릴리스입니다.
@@ -53,7 +53,7 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-이미 설치되어 있으면 두 번째 명령은 되돌릴 수 있는 업데이트로 동작하며, 작업 데이터를 유지하고 첫 실행 자체 점검을 수행합니다. Skill을 호출할 때마다 업데이트를 확인하고 필요하면 suite와 업데이트 도구를 함께 갱신합니다. 명시적으로 자동 업데이트를 끈 설정은 존중합니다.
+설치 프로그램을 다시 실행하면 버전을 확인합니다. 새 버전이 있으면 작업 데이터를 보존한 채 되돌릴 수 있는 업데이트와 실행 점검을 진행합니다. 최신 버전이고 Skill이 온전하면 다시 다운로드하거나 덮어쓰지 않습니다. Skill을 호출할 때마다 업데이트를 확인하고 필요하면 suite와 업데이트 도구를 함께 갱신합니다. 명시적으로 자동 업데이트를 끈 설정은 존중합니다.
 
 ## 경계
 

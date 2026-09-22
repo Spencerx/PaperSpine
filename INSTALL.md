@@ -9,7 +9,7 @@ update/rollback.
 ## Which archive do I need?
 
 Only the **platform suites** (26–56 MB) contain the V5 Web workspace and the
-embedded runtime. The **standalone Skill** archive (0.72 MB) is the lightweight
+embedded runtime. The **standalone Skill** archive (0.70 MB) is the lightweight
 option for a host that already has a V5 runtime and product core of its own; it
 ships the Skill files but no Web core.
 
@@ -57,19 +57,20 @@ sh ./install.sh --check-only
 To verify a previously downloaded package without downloading it again:
 
 ```sh
-sh ./install.sh --bundle /path/to/platform-suite.zip --target codex --clean-legacy
+sh ./install.sh --manifest /path/to/manifest.json --bundle /path/to/platform-suite.zip --target codex --clean-legacy
 ```
 
-On Windows, **both** paths are required. The POSIX installer carries the
-platform file name, byte count and SHA-256 inside itself, but the PowerShell
-installer reads them from the manifest, so `-BundlePath` alone still needs the
-network:
+For a fully offline installation, **both installers need the manifest and the
+matching suite ZIP**. Without a local manifest, `--bundle` or `-BundlePath` alone
+still fetches the current manifest online. On Windows, supply both paths:
 
 ```powershell
 .\install.ps1 -ManifestPath .\manifest.json -BundlePath .\paperspine5-suite-0.4.0-alpha.2.zip -Target codex -CleanLegacy
 ```
 
-Both installers archive the existing canonical `paper-spine` Skill. Cleanup of
+When applying a new version or repairing a missing Skill, the installers archive
+the existing canonical `paper-spine` Skill if present. A complete current install
+skips archive downloads and replacement. Cleanup of
 known V3/V4 discovery names happens only when `-CleanLegacy` or
 `--clean-legacy` is supplied. They do not delete paper task data, host settings,
 or unknown folders. Restart the host after installation.
@@ -77,8 +78,8 @@ or unknown folders. Restart the host after installation.
 The default profile is `%USERPROFILE%\.paperspine5\profiles\default` on
 Windows and `~/.paperspine5/profiles/default` on macOS/Linux. Each Skill invocation
 checks the current platform channel and updates the suite and updater when needed,
-unless explicitly disabled. Rerunning the platform installer also performs a
-transactional update and retains task data. Reload the host after an upgrade;
+unless explicitly disabled. Rerunning the platform installer checks the version, applies a transactional
+update only when needed, and retains task data. Reload the host after an upgrade;
 restart an already running workbench with the same profile to load the new code.
 
 macOS packages in this prerelease are unsigned and not notarized. Linux support

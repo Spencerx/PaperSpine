@@ -16,9 +16,9 @@ PaperSpine5 是一个覆盖论文全流程的 AI Skill。你提供研究方向�
 
 ## 下载
 
-- Windows x64 套件：约 26.4 MB。
+- Windows x64 套件：约 26.5 MB。
 - Linux glibc x86_64 套件：约 56.2 MB。
-- macOS Apple Silicon 套件：约 40.5 MB。
+- macOS Apple Silicon 套件：约 40.6 MB。
 - macOS Intel x86_64 套件：约 40.5 MB。
 
 所有下载都列在公开发布清单中，并用 SHA-256 校验。完整版本号为 `v0.4.0-alpha.2` 预发布。
@@ -26,7 +26,7 @@ PaperSpine5 是一个覆盖论文全流程的 AI Skill。你提供研究方向�
 <details>
 <summary>高级 / 手动安装</summary>
 
-独立 `paper-spine` Skill 约 0.72 MB，只包含 Skill 本体，不含 runtime 和 Web 工作区，不适合首次安装。只有明确只需要 Skill、并且已经自行准备好完整依赖的高级用户才使用。它仍然列在公开发布清单中，并按 SHA-256 校验。
+独立 `paper-spine` Skill 约 0.70 MB，只包含 Skill 本体，不含 runtime 和 Web 工作区，不适合首次安装。只有明确只需要 Skill、并且已经自行准备好完整依赖的高级用户才使用。它仍然列在公开发布清单中，并按 SHA-256 校验。
 
 </details>
 
@@ -60,7 +60,7 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-已经安装过时，第二条命令执行可回滚更新，保留任务数据并做一次启动自检。每次调用 Skill 时检查更新，有新版则自动升级完整套件和更新器；尊重明确关闭自动更新的设置。
+重新运行安装器会检查版本：有新版时执行可回滚更新，保留任务数据并做启动自检；已是最新版且 Skill 完整时直接继续，不重复下载或覆盖。每次调用 Skill 时检查更新，有新版则自动升级完整套件和更新器；尊重明确关闭自动更新的设置。
 
 ## 边界
 

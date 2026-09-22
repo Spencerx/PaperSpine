@@ -16,9 +16,9 @@ Body text, data figures, mechanism diagrams, and method frameworks are all produ
 
 ## Downloads
 
-- Windows x64 suite: about 26.4 MB.
+- Windows x64 suite: about 26.5 MB.
 - Linux glibc x86_64 suite: about 56.2 MB.
-- macOS Apple Silicon suite: about 40.5 MB.
+- macOS Apple Silicon suite: about 40.6 MB.
 - macOS Intel x86_64 suite: about 40.5 MB.
 
 Every download is listed in the public release list and verified with SHA-256. Current version: `v0.4.0-alpha.2` prerelease.
@@ -26,7 +26,7 @@ Every download is listed in the public release list and verified with SHA-256. C
 <details>
 <summary>Advanced / manual install</summary>
 
-The standalone `paper-spine` Skill is about 0.72 MB. It contains only the Skill itself, with no runtime and no web workspace, so it is not suitable for a first install. Use it only if you explicitly want a Skill-only install and have already prepared the full dependencies yourself. It is still listed in the public release list and verified with SHA-256.
+The standalone `paper-spine` Skill is about 0.70 MB. It contains only the Skill itself, with no runtime and no web workspace, so it is not suitable for a first install. Use it only if you explicitly want a Skill-only install and have already prepared the full dependencies yourself. It is still listed in the public release list and verified with SHA-256.
 
 </details>
 
@@ -60,7 +60,7 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-If an install is already present, the second command performs a rollback-safe update, keeps your task data, and runs a startup self-check. Each Skill invocation checks for updates and upgrades the full suite and updater when needed; an explicit opt-out is respected.
+Rerunning the installer checks the version: it applies a rollback-safe update and startup check when a newer version is available, preserving task data. A complete current installation skips downloads and overwrites. Each Skill invocation checks for updates and upgrades the full suite and updater when needed; an explicit opt-out is respected.
 
 ## Boundaries
 

@@ -16,9 +16,9 @@ El cuerpo del texto, las figuras de datos, los esquemas de mecanismo y los diagr
 
 ## Descargas
 
-- Suite para Windows x64: unos 26.4 MB.
+- Suite para Windows x64: unos 26.5 MB.
 - Suite para Linux glibc x86_64: unos 56.2 MB.
-- Suite para macOS Apple Silicon: unos 40.5 MB.
+- Suite para macOS Apple Silicon: unos 40.6 MB.
 - Suite para macOS Intel x86_64: unos 40.5 MB.
 
 Todas las descargas figuran en la lista pública de lanzamientos y se verifican con SHA-256. La versión actual es la versión preliminar `v0.4.0-alpha.2`.
@@ -53,7 +53,7 @@ sh ./install.sh --check-only
 sh ./install.sh --target codex
 ```
 
-Si ya hay una instalación, el segundo comando aplica una actualización reversible, conserva los datos de las tareas y hace una comprobación al arrancar. Cada invocación de la Skill busca actualizaciones y actualiza la suite y el actualizador cuando es necesario; se respeta la desactivación explícita.
+Al ejecutar de nuevo el instalador se comprueba la versión. Si hay una nueva, se actualiza de forma reversible y se comprueba el arranque, conservando los datos. Una instalación completa y actual no se vuelve a descargar ni sobrescribir. Cada invocación de la Skill busca actualizaciones y actualiza la suite y el actualizador cuando es necesario; se respeta la desactivación explícita.
 
 ## Límites
 
