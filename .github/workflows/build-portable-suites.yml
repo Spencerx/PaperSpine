@@ -27,13 +27,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Resolve current release inputs and stage the canonical Skill
+      - name: Resolve current release inputs
         env:
           TARGET_PLATFORM: ${{ matrix.platform }}
         shell: bash
         run: |
           python - <<'PY'
-          import json, os, re, shutil
+          import json, os, re
           from pathlib import Path
           manifest = json.loads(Path("website/downloads/manifest.json").read_text())
           base, = [item for item in manifest["artifacts"] if item["kind"] == "suite"]
@@ -46,7 +46,6 @@ jobs:
           with open(os.environ["GITHUB_ENV"], "a") as stream:
               for key, value in values.items():
                   stream.write(key + "=" + value + "\n")
-          shutil.copytree("src", "paperspine5/core/01_PaperSpine4/src")
           PY
       - name: Read pinned runtime lock
         shell: bash
