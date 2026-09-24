@@ -64,7 +64,7 @@ Rerunning the installer checks the version: it applies a rollback-safe update an
 
 ## Boundaries
 
-- All four suites passed archive and SHA-256 verification. Windows x64 passed local installation, update, and workspace checks; native Linux/macOS validation for this release is pending. Linux arm64 and musl/Alpine are not claimed.
+- All four suites passed archive and SHA-256 verification. Windows x64 passed local installation, update, and workspace checks; [post-release native CI](https://github.com/WUBING2023/PaperSpine/actions/runs/35944185453) passed old-updater upgrades and workspace startup on Windows, Linux x86_64, macOS arm64, and macOS x86_64. Linux arm64 and musl/Alpine are not claimed.
 - macOS packages are not signed or notarized; first launch may require explicit user approval.
 - This is an alpha prerelease without an independent cryptographic signature.
 - Publishing the product never authorizes manuscript submission, private-data upload, payment, or external contact.

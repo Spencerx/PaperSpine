@@ -64,7 +64,7 @@ sh ./install.sh --target codex
 
 ## 边界
 
-- 四个平台套件均已通过归档和 SHA-256 校验。Windows x64 已通过本地安装、更新和工作台验证；本版 Linux/macOS 原生验证仍待完成。Linux arm64、musl/Alpine 未声明支持。
+- 四个平台套件均已通过归档和 SHA-256 校验。Windows x64 已通过本地安装、更新和工作台验证；[发版后原生 CI](https://github.com/WUBING2023/PaperSpine/actions/runs/35944185453) 在 Windows、Linux x86_64、macOS arm64 和 macOS x86_64 均通过旧更新器升级与工作台启动。Linux arm64、musl/Alpine 未声明支持。
 - macOS 套件尚未签名或公证，首次运行可能需要用户明确允许。
 - 当前为 alpha 预发布，无独立密码学签名。
 - 产品发布不授权投稿、上传私有材料、付款或外部联系。

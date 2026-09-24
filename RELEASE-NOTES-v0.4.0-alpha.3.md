@@ -20,5 +20,8 @@ release does not offer a separate Skill-only ZIP.
 Windows local evidence: long-path publish/download/replay and P1 read PASS;
 bundled pywintypes PASS; full install/update/rollback task retention PASS;
 offline installer with a non-writable unused archive parent PASS. Four archives
-passed exact manifest verification. Native Linux/macOS release CI is pending.
+passed exact manifest verification. After publication, [native CI on all four
+platforms](https://github.com/WUBING2023/PaperSpine/actions/runs/35944185453)
+passed the old-updater upgrade and bundled workspace startup checks. The exact
+alpha.2-to-alpha.3 updater path was also tested locally on Windows.
 This remains an alpha prerelease; macOS packages are unsigned and unnotarized.
