@@ -117,7 +117,7 @@ def _parser() -> argparse.ArgumentParser:
     serve.add_argument("--mode", choices=("mcp-stdio", "business-http"), required=True)
     serve.add_argument("--principal-id", default="local-user")
     serve.add_argument("--session-id", default="local-session")
-    serve.add_argument("--reviewer-id", default="independent-reviewer")
+    serve.add_argument("--reviewer-id", default=None)
     serve.add_argument("--port", type=int, default=0)
 
     _add_surface_commands(subparsers, "plugin")

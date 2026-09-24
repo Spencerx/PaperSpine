@@ -20,7 +20,7 @@ class ProductRuntimeError(RuntimeError):
     pass
 
 
-PRODUCT_RUNTIME_REVISION = 4
+PRODUCT_RUNTIME_REVISION = 5
 
 
 def application_root(install: Path) -> Path:
@@ -119,15 +119,37 @@ def migrate_profile(profile_root: str | Path, install: Path, build_id: str) -> d
     schema = int(previous.get("schema_version", 0))
     if schema not in {0, 1}:
         raise ProductRuntimeError("PaperSpine data configuration is newer than this product")
+    # The Web launcher used ``profile/user`` before suite installation.  Do not
+    # strand those task bytes by creating a fresh ``profile/data/tasks`` root.
+    legacy_root = profile / "user"
+    fresh_root = data / "tasks"
+    def has_tasks(root: Path) -> bool:
+        task_dir = root / "tasks"
+        return task_dir.is_dir() and any(path.is_dir() for path in task_dir.iterdir())
+    legacy_has_tasks = has_tasks(legacy_root)
+    fresh_has_tasks = has_tasks(fresh_root)
+    if legacy_has_tasks and fresh_has_tasks:
+        raise ProductRuntimeError("Both the retained Web task root and the suite task root contain tasks; select a verified profile before startup")
+    if legacy_has_tasks:
+        old_database = legacy_root / "registry" / "application.sqlite3"
+        if not old_database.is_file():
+            raise ProductRuntimeError("Retained Web task files exist but their registry database is missing; the original profile must be recovered")
+        user_data_root = legacy_root
+        domain_database = old_database
+    else:
+        user_data_root = Path(str(previous.get("user_data_root") or fresh_root)).expanduser().resolve()
+        domain_database = Path(str(previous.get("domain_database") or data / "domain-events.sqlite3")).expanduser().resolve()
+        # A broken earlier installation may have recorded this new empty root;
+        # preserve it when there is no populated legacy root to restore.
+        user_data_root.mkdir(parents=True, exist_ok=True)
     config = {
         **previous,
         "contract": "paperspine5.product-profile/1.0",
         "schema_version": 1,
         "active_build_id": build_id,
-        "user_data_root": str(data / "tasks"),
-        "domain_database": str(data / "domain-events.sqlite3"),
+        "user_data_root": str(user_data_root),
+        "domain_database": str(domain_database),
     }
-    (data / "tasks").mkdir(exist_ok=True)
     temporary = config_path.with_suffix(".tmp")
     temporary.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     os.replace(temporary, config_path)
@@ -164,7 +186,7 @@ def prepare(profile_root: str | Path) -> dict[str, Any]:
 
 
 def serve(profile_root: str | Path, mode: str, *, principal_id: str, session_id: str,
-          reviewer_id: str, port: int) -> None:
+          reviewer_id: str | None, port: int) -> None:
     ready = prepare(profile_root)
     install = Path(ready["install_root"])
     config = _read_json(Path(profile_root).resolve() / "data" / "product-config.json")
@@ -179,10 +201,12 @@ def serve(profile_root: str | Path, mode: str, *, principal_id: str, session_id:
     )
     try:
         if mode == "mcp-stdio":
-            create_mcp_server(service, principal_id=principal_id).run()
+            create_mcp_server(service, principal_id=principal_id, reviewer_id=reviewer_id).run()
         elif mode == "business-http":
+            if reviewer_id is not None:
+                raise ProductRuntimeError("reviewer HTTP access requires a credential-bound reviewer launcher")
             server = create_business_server(service, principal_id=principal_id,
-                                            session_id=session_id, reviewer_id=reviewer_id, port=port)
+                                            session_id=session_id, port=port)
             print(json.dumps({**ready, "port": server.server_port}, ensure_ascii=False), flush=True)
             server.serve_forever()
         else:

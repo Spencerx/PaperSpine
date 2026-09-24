@@ -17,7 +17,9 @@ def main()->int:
     assert manifest["product"]=="PaperSpine5"
     assert manifest["tag"]=="v"+manifest["version"]
     assert manifest["repository"]=="https://github.com/WUBING2023/PaperSpine"
-    assert {x["kind"] for x in manifest["artifacts"]} >= {"suite","standalone-skill"}
+    assert {x["kind"] for x in manifest["artifacts"]} == {
+        "suite", "suite-linux-x86_64", "suite-macos-arm64", "suite-macos-x86_64"
+    }
     checksum=(ROOT/"website"/"downloads"/"checksums.sha256").read_text(encoding="ascii")
     for item in manifest["artifacts"]:
         assert len(item["sha256"])==64 and item["bytes"]>0

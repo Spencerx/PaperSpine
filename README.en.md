@@ -6,7 +6,7 @@
 
 [中文](README.md) · [English](README.en.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Português](README.pt.md)
 
-[Product page](https://wubing2023.github.io/PaperSpine/v5/en/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.2)
+[Product page](https://wubing2023.github.io/PaperSpine/v5/en/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.3)
 
 **PaperSpine5: from zero to a complete paper, text and figures together.**
 
@@ -21,12 +21,12 @@ Body text, data figures, mechanism diagrams, and method frameworks are all produ
 - macOS Apple Silicon suite: about 40.6 MB.
 - macOS Intel x86_64 suite: about 40.5 MB.
 
-Every download is listed in the public release list and verified with SHA-256. Current version: `v0.4.0-alpha.2` prerelease.
+Every download is listed in the public release list and verified with SHA-256. Current version: `v0.4.0-alpha.3` prerelease.
 
 <details>
 <summary>Advanced / manual install</summary>
 
-The standalone `paper-spine` Skill is about 0.70 MB. It contains only the Skill itself, with no runtime and no web workspace, so it is not suitable for a first install. Use it only if you explicitly want a Skill-only install and have already prepared the full dependencies yourself. It is still listed in the public release list and verified with SHA-256.
+This release offers only the four full platform suites. The historical Skill-only ZIP has no Web core or runtime and cannot repair a missing suite pointer. Advanced users can manage the Skill from a verified full suite.
 
 </details>
 
@@ -64,7 +64,7 @@ Rerunning the installer checks the version: it applies a rollback-safe update an
 
 ## Boundaries
 
-- Self-contained suites are verified on Windows x64, Linux glibc x86_64, macOS arm64, and macOS x86_64. Linux arm64 and musl/Alpine are not claimed.
+- All four suites passed archive and SHA-256 verification. Windows x64 passed local installation, update, and workspace checks; native Linux/macOS validation for this release is pending. Linux arm64 and musl/Alpine are not claimed.
 - macOS packages are not signed or notarized; first launch may require explicit user approval.
 - This is an alpha prerelease without an independent cryptographic signature.
 - Publishing the product never authorizes manuscript submission, private-data upload, payment, or external contact.

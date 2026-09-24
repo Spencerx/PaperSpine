@@ -4,9 +4,11 @@
 
 # PaperSpine5
 
+> Release note: alpha.3 provides full Windows, Linux, and macOS suites only. The historical 0.70 MB Skill-only ZIP has no Web core or runtime and is not a current install option.
+
 [中文](README.md) · [English](README.en.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Português](README.pt.md)
 
-[Página del producto](https://wubing2023.github.io/PaperSpine/v5/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.2)
+[Página del producto](https://wubing2023.github.io/PaperSpine/v5/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.3)
 
 **PaperSpine5: de cero a un artículo completo con texto y figuras.**
 
@@ -21,7 +23,7 @@ El cuerpo del texto, las figuras de datos, los esquemas de mecanismo y los diagr
 - Suite para macOS Apple Silicon: unos 40.6 MB.
 - Suite para macOS Intel x86_64: unos 40.5 MB.
 
-Todas las descargas figuran en la lista pública de lanzamientos y se verifican con SHA-256. La versión actual es la versión preliminar `v0.4.0-alpha.2`.
+Todas las descargas figuran en la lista pública de lanzamientos y se verifican con SHA-256. La versión actual es la versión preliminar `v0.4.0-alpha.3`.
 
 ## Instalación y migración desde versiones anteriores
 

@@ -23,7 +23,7 @@ from typing import Any
 SUITE_CONTRACT = "paperspine5.suite-manifest"
 SUITE_SCHEMA_VERSION = "1.0"
 PRODUCT_ID = "paperspine5"
-PRODUCT_VERSION = "0.4.0-alpha.2"
+PRODUCT_VERSION = "0.4.0-alpha.3"
 PRODUCT_CHANNEL = "development"
 PLUGIN_NAME = "paperspine5"
 FIXED_ZIP_TIME = (2026, 8, 24, 0, 0, 0)
@@ -222,6 +222,7 @@ FILE_RULES = (
     FileRule("06_插件化/release/stable_updater.py", "release/stable_updater.py"),
     FileRule("06_插件化/release/stable_updater.py", "standalone/paper-spine/scripts/paperspine_stable_update.py"),
     FileRule("06_插件化/release/stable_update_adapter.py", "release/stable_update_adapter.py"),
+    FileRule("06_插件化/release/install_skill.py", "release/install_skill.py"),
     FileRule("06_插件化/release/updater-protocol.json", "updater-protocol.json"),
     FileRule("06_插件化/release/stable-update.cmd", "release/stable-update.cmd"),
     FileRule("06_插件化/release/product_runtime.py", "release/product_runtime.py"),

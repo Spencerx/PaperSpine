@@ -23,6 +23,7 @@ from uuid import uuid4
 from jsonschema import Draft202012Validator, FormatChecker
 from referencing import Registry, Resource
 from .p6_recovery import WorkFailure, command_lock
+from .filesystem_paths import native_path
 
 from .product_kernel import (
     ContractError,
@@ -670,7 +671,7 @@ class LegacyStageAdapter:
             raise TaskNotFoundError(f"fresh artifact does not exist: {artifact_id}")
         receipt = matches[0]["receipt"]
         path = Path(receipt["path"]).resolve()
-        body = path.read_bytes()
+        body = native_path(path).read_bytes()
         if hashlib.sha256(body).hexdigest() != receipt["sha256"] or len(body) != receipt["size_bytes"]:
             raise ContractError("registered artifact bytes changed")
         return path
@@ -1724,7 +1725,7 @@ class ApplicationService:
                 item["bytes_verified"] = item.get('bytes_verified', False) if item.get('historical') else item["freshness"] == "fresh"
                 if view and item["freshness"] == "stale":
                     try:
-                        body = Path(view["receipt"]["path"]).read_bytes()
+                        body = native_path(view["receipt"]["path"]).read_bytes()
                         item["bytes_verified"] = len(body) == item["size_bytes"] and hashlib.sha256(body).hexdigest() == item["sha256"]
                     except OSError:
                         pass
@@ -1833,7 +1834,7 @@ class ApplicationService:
                 raise ValueError("Artifact is not published in this task")
             path = self.legacy_adapter.artifact_path(task_id, artifact_id,
                 expected_sha256=artifact["sha256"], allow_historical=allow_historical)
-            body = path.read_bytes()
+            body = native_path(path).read_bytes()
             if hashlib.sha256(body).hexdigest() != artifact["sha256"]:
                 raise ValueError("Artifact changed while reading")
             view = next(view for view in self.legacy_adapter._kernel.list_artifacts(task_id)

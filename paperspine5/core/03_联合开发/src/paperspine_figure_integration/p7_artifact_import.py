@@ -10,6 +10,7 @@ import zlib
 from pathlib import Path, PureWindowsPath
 
 from .product_kernel import ContractError
+from .filesystem_paths import native_path
 
 
 MAX_SOURCE_BYTES = 128 * 1024 * 1024
@@ -25,7 +26,7 @@ class ArtifactCheckError(ContractError):
 
 def checked_path(path: Path) -> None:
     for part in (path, *path.parents):
-        info = part.lstat()
+        info = native_path(part).lstat()
         if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & 0x400:
             raise ContractError('links and reparse points are not allowed')
 
@@ -57,11 +58,11 @@ def read_source(kernel, task_id: str, root: str | None, relative: str) -> tuple[
         path = kernel.resolve_material_path(task_id, grant['grant_id'], value)
         if path.is_relative_to(kernel.user_data_root) or path.is_relative_to(kernel.core_root):
             raise ContractError('product data and installation cannot be imported as materials')
-    before = path.stat()
+    before = native_path(path).stat()
     if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or before.st_size > MAX_SOURCE_BYTES:
         raise ArtifactCheckError('source must be a regular single-link file at most 128 MiB',
                                  {'size_bytes': before.st_size, 'max_size_bytes': MAX_SOURCE_BYTES})
-    with path.open('rb') as stream:
+    with native_path(path).open('rb') as stream:
         opened = os.fstat(stream.fileno())
         checked_path(supplied)
         if (opened.st_dev, opened.st_ino) != (before.st_dev, before.st_ino):
@@ -134,27 +135,27 @@ def import_artifact(kernel, command: dict, source_root: str | None) -> dict:
     if run != expected_run:
         raise ContractError('task output root does not match product layout')
     checked_path(run)
-    output = run / 'public-artifacts'; output.mkdir(exist_ok=True); checked_path(output)
+    output = run / 'public-artifacts'; native_path(output).mkdir(exist_ok=True); checked_path(output)
     # Hash the identifier to avoid filesystem aliases (case, reserved names, colons).
     identity = hashlib.sha256(payload['artifact_id'].encode()).hexdigest()
     target = output / (identity + '-' + digest + Path(name).suffix.lower())
     temporary = output / (identity + '.partial')
     created = False
     try:
-        if target.exists():
+        if native_path(target).exists():
             checked_path(target)
-            if target.stat().st_nlink != 1 or target.read_bytes() != body:
+            if native_path(target).stat().st_nlink != 1 or native_path(target).read_bytes() != body:
                 raise ContractError('retained output bytes differ')
         else:
-            if temporary.exists():
+            if native_path(temporary).exists():
                 checked_path(temporary)
-                if not temporary.is_file() or temporary.stat().st_nlink != 1:
+                if not native_path(temporary).is_file() or native_path(temporary).stat().st_nlink != 1:
                     raise ContractError('unsafe partial output')
-                temporary.unlink()
-            with temporary.open('xb') as stream:
+                native_path(temporary).unlink()
+            with native_path(temporary).open('xb') as stream:
                 stream.write(body); stream.flush(); os.fsync(stream.fileno())
             checked_path(output)
-            os.replace(temporary, target); created = True
+            os.replace(native_path(temporary), native_path(target)); created = True
         receipt = {'contract':'paperspine5.artifact-receipt','schema_version':'1.0',
             'receipt_id':'public-'+hashlib.sha256((task_id+':'+payload['artifact_id']).encode()).hexdigest(),
             'artifact_id':payload['artifact_id'],'artifact_type':'paper.'+payload['artifact_type'].replace('_','-'),
@@ -170,13 +171,13 @@ def import_artifact(kernel, command: dict, source_root: str | None) -> dict:
     except Exception:
         # Keep a fully registered file after a lost acknowledgement; never delete its bytes.
         registered = any(v['receipt']['artifact_id'] == payload['artifact_id'] for v in kernel.list_artifacts(task_id))
-        if created and not registered and target.exists():
-            target.unlink()
+        if created and not registered and native_path(target).exists():
+            native_path(target).unlink()
         raise
     finally:
         kernel.release_writer_lease(task_id, 'public-artifact-import')
-        if temporary.exists():
-            checked_path(temporary); temporary.unlink()
+        if native_path(temporary).exists():
+            checked_path(temporary); native_path(temporary).unlink()
     return metadata
 
 

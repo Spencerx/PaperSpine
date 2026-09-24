@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-VERSION="0.4.0-alpha.2"
+VERSION="0.4.0-alpha.3"
 MANIFEST_PATH=""
 MANIFEST_URL="https://raw.githubusercontent.com/WUBING2023/PaperSpine/main/website/downloads/manifest.json"
 MIRROR_MANIFEST_URL="https://wubing2023.github.io/PaperSpine/v5/downloads/manifest.json"
@@ -36,6 +36,7 @@ while [ "$#" -gt 0 ]; do
     *) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
   esac
 done
+case "$PROFILE_ROOT" in /*) ;; *) PROFILE_ROOT="$(pwd -P)/$PROFILE_ROOT" ;; esac
 
 case "$TARGET" in codex|claude-code|both) ;; *) echo "Invalid target: $TARGET" >&2; exit 2 ;; esac
 
@@ -152,7 +153,13 @@ if [ "$TARGET" = "both" ]; then targets="codex claude-code"; else targets="$TARG
 skills_ready=true
 for target in $targets; do
   if [ "$target" = "codex" ]; then root="$CODEX_SKILLS_ROOT"; else root="$CLAUDE_SKILLS_ROOT"; fi
-  [ -f "$root/paper-spine/SKILL.md" ] || skills_ready=false
+  pointer="$root/paper-spine/references/installed-suite.json"
+  installed="$PROFILE_ROOT/.paperspine5-lifecycle/installs/$BUILD_ID"
+  if [ ! -f "$root/paper-spine/SKILL.md" ] || [ ! -f "$pointer" ] ||
+     [ ! -x "$installed/runtime_vendor/python/bin/python3" ] ||
+     ! "$installed/runtime_vendor/python/bin/python3" -I -B -c 'import json,sys; p=json.load(open(sys.argv[1],encoding="utf-8")); sys.exit(0 if p.get("build_id")==sys.argv[2] and p.get("suite_root")==sys.argv[3] else 1)' "$pointer" "$BUILD_ID" "$installed"; then
+    skills_ready=false
+  fi
 done
 if [ -z "$current" ]; then status="not_installed"; elif [ "$current" = "$BUILD_ID" ]; then status="up_to_date"; else status="update_available"; fi
 if [ "$CHECK_ONLY" -eq 1 ]; then
@@ -163,12 +170,20 @@ if [ "$status" = "up_to_date" ] && [ "$skills_ready" = "true" ]; then
   if [ "$CLEAN_LEGACY" -eq 1 ]; then
     installed="$PROFILE_ROOT/.paperspine5-lifecycle/installs/$BUILD_ID"
     "$installed/paperspine" verify-bundle --bundle "$installed" >/dev/null
-    set -- "$installed/runtime_vendor/python/bin/python3" -I -B "$installed/standalone/paper-spine/scripts/skill_discovery_migration.py" migrate --archive-root "$HOME/.paperspine5/legacy-migrations" --operation-id "v5-clean-$(date -u +%Y%m%d-%H%M%S)"
+    set -- "$installed/runtime_vendor/python/bin/python3" -I -B "$installed/standalone/paper-spine/scripts/skill_discovery_migration.py" preview --archive-root "$HOME/.paperspine5/legacy-migrations" --operation-id "v5-preview-$(date -u +%Y%m%d-%H%M%S)"
     for target in $targets; do
       if [ "$target" = "codex" ]; then root="$CODEX_SKILLS_ROOT"; else root="$CLAUDE_SKILLS_ROOT"; fi
       set -- "$@" --skills-root "$target=$root"
     done
-    "$@" >/dev/null
+    "$@" > "$work/legacy-preview.json"
+    if ! grep -Eq '"item_count"[[:space:]]*:[[:space:]]*0([,}])' "$work/legacy-preview.json"; then
+      set -- "$installed/runtime_vendor/python/bin/python3" -I -B "$installed/standalone/paper-spine/scripts/skill_discovery_migration.py" migrate --archive-root "$HOME/.paperspine5/legacy-migrations" --operation-id "v5-clean-$(date -u +%Y%m%d-%H%M%S)"
+      for target in $targets; do
+        if [ "$target" = "codex" ]; then root="$CODEX_SKILLS_ROOT"; else root="$CLAUDE_SKILLS_ROOT"; fi
+        set -- "$@" --skills-root "$target=$root"
+      done
+      "$@" >/dev/null
+    fi
   fi
   printf 'PaperSpine5 %s is up to date for %s. Existing profile and Skills retained; no suite download required.\n' "$VERSION" "$PLATFORM"
   exit 0
@@ -192,25 +207,21 @@ backup_root="$HOME/.paperspine5/backups/v5-install/$stamp"
 archive_root="$HOME/.paperspine5/legacy-migrations"
 if [ "$TARGET" = "both" ]; then targets="codex claude-code"; else targets="$TARGET"; fi
 if [ "$CLEAN_LEGACY" -eq 1 ]; then
-  set -- "$extract/runtime_vendor/python/bin/python3" -I -B "$extract/standalone/paper-spine/scripts/skill_discovery_migration.py" migrate --archive-root "$archive_root" --operation-id "$operation"
+  set -- "$extract/runtime_vendor/python/bin/python3" -I -B "$extract/standalone/paper-spine/scripts/skill_discovery_migration.py" preview --archive-root "$archive_root" --operation-id "$operation"
   for target in $targets; do
     if [ "$target" = "codex" ]; then root="$CODEX_SKILLS_ROOT"; else root="$CLAUDE_SKILLS_ROOT"; fi
     set -- "$@" --skills-root "$target=$root"
   done
-  "$@" >/dev/null
-fi
-for target in $targets; do
-  if [ "$target" = "codex" ]; then root="$CODEX_SKILLS_ROOT"; else root="$CLAUDE_SKILLS_ROOT"; fi
-  destination="$root/paper-spine"
-  if [ "$status" = "up_to_date" ] && [ -f "$destination/SKILL.md" ]; then continue; fi
-  mkdir -p "$root"
-  if [ -e "$destination" ]; then
-    mkdir -p "$backup_root/$target"
-    mv "$destination" "$backup_root/$target/paper-spine"
+  "$@" > "$work/legacy-preview.json"
+  if ! grep -Eq '"item_count"[[:space:]]*:[[:space:]]*0([,}])' "$work/legacy-preview.json"; then
+    set -- "$extract/runtime_vendor/python/bin/python3" -I -B "$extract/standalone/paper-spine/scripts/skill_discovery_migration.py" migrate --archive-root "$archive_root" --operation-id "$operation"
+    for target in $targets; do
+      if [ "$target" = "codex" ]; then root="$CODEX_SKILLS_ROOT"; else root="$CLAUDE_SKILLS_ROOT"; fi
+      set -- "$@" --skills-root "$target=$root"
+    done
+    "$@" >/dev/null
   fi
-  cp -R "$extract/standalone/paper-spine" "$destination"
-  printf 'Installed V5 paper-spine Skill for %s: %s\n' "$target" "$destination"
-done
+fi
 mkdir -p "$PROFILE_ROOT"
 if [ "$status" = "up_to_date" ]; then
   echo "Current profile retained; installed only missing target Skills."
@@ -220,5 +231,20 @@ else
   "$extract/paperspine" install --profile-root "$PROFILE_ROOT" --bundle "$zip" --operation-id "$operation"
 fi
 "$extract/paperspine" first-start --profile-root "$PROFILE_ROOT"
+installed="$PROFILE_ROOT/.paperspine5-lifecycle/installs/$BUILD_ID"
+for target in $targets; do
+  if [ "$target" = "codex" ]; then root="$CODEX_SKILLS_ROOT"; else root="$CLAUDE_SKILLS_ROOT"; fi
+  destination="$root/paper-spine"
+  if [ "$status" = "up_to_date" ] && [ "$skills_ready" = "true" ]; then continue; fi
+  prepared="$work/prepared-skill-$target"
+  "$extract/runtime_vendor/python/bin/python3" -I -B "$extract/release/install_skill.py" --archive "$zip" --installed-root "$installed" --prepared-root "$prepared" >/dev/null
+  mkdir -p "$root"
+  if [ -e "$destination" ]; then
+    mkdir -p "$backup_root/$target"
+    mv "$destination" "$backup_root/$target/paper-spine"
+  fi
+  mv "$prepared" "$destination"
+  printf 'Installed V5 paper-spine Skill for %s: %s\n' "$target" "$destination"
+done
 printf 'PaperSpine5 %s installed for %s. Restart the host before invoking paper-spine.\n' "$VERSION" "$PLATFORM"
 printf 'Profile: %s\nBackup root: %s\n' "$PROFILE_ROOT" "$backup_root"

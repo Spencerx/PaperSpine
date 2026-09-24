@@ -6,7 +6,7 @@
 
 [中文](README.md) · [English](README.en.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Português](README.pt.md)
 
-[产品页](https://wubing2023.github.io/PaperSpine/v5/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.2)
+[产品页](https://wubing2023.github.io/PaperSpine/v5/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.3)
 
 **PaperSpine5：从零开始，快速完成一篇图文完整的论文。**
 
@@ -21,12 +21,12 @@ PaperSpine5 是一个覆盖论文全流程的 AI Skill。你提供研究方向�
 - macOS Apple Silicon 套件：约 40.6 MB。
 - macOS Intel x86_64 套件：约 40.5 MB。
 
-所有下载都列在公开发布清单中，并用 SHA-256 校验。完整版本号为 `v0.4.0-alpha.2` 预发布。
+所有下载都列在公开发布清单中，并用 SHA-256 校验。完整版本号为 `v0.4.0-alpha.3` 预发布。
 
 <details>
 <summary>高级 / 手动安装</summary>
 
-独立 `paper-spine` Skill 约 0.70 MB，只包含 Skill 本体，不含 runtime 和 Web 工作区，不适合首次安装。只有明确只需要 Skill、并且已经自行准备好完整依赖的高级用户才使用。它仍然列在公开发布清单中，并按 SHA-256 校验。
+当前发布仅提供四个平台的完整套件。历史约 0.70 MB 的 Skill-only ZIP 不含 Web 核心与运行时，不能用于首次安装或修复缺失套件指针。高级用户可从已验证的完整套件管理 Skill。
 
 </details>
 
@@ -44,7 +44,7 @@ macOS / Linux：
 sh ./install.sh --target codex --clean-legacy
 ```
 
-`-CleanLegacy` 只归档已知 V3/V4 Skill 发现目录，不删除论文任务数据、宿主设置或未知文件。两个平台安装器都会校验字节数、SHA-256、套件内部完整性和首次启动自检。
+`-CleanLegacy` 先只读预览，仅在发现旧版冲突时写归档；不删除论文任务数据、宿主设置或未知文件。两个平台安装器都会校验字节数、SHA-256、套件内部完整性和首次启动自检。
 
 ## 检查与应用更新
 
@@ -64,7 +64,7 @@ sh ./install.sh --target codex
 
 ## 边界
 
-- 自包含套件已在 Windows x64、Linux glibc x86_64、macOS arm64 和 macOS x86_64 验证；Linux arm64、musl/Alpine 未声明支持。
+- 四个平台套件均已通过归档和 SHA-256 校验。Windows x64 已通过本地安装、更新和工作台验证；本版 Linux/macOS 原生验证仍待完成。Linux arm64、musl/Alpine 未声明支持。
 - macOS 套件尚未签名或公证，首次运行可能需要用户明确允许。
 - 当前为 alpha 预发布，无独立密码学签名。
 - 产品发布不授权投稿、上传私有材料、付款或外部联系。

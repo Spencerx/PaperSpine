@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any, Callable, Iterator
 from uuid import uuid4
 
+from .filesystem_paths import native_path
 from .contracts import ContractError, load_json, write_json_atomic
 from .product_contracts import (
     PRODUCT_SCHEMA_VERSION,
@@ -83,7 +84,7 @@ def _canonical_json(value: Any) -> str:
 
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
-    with path.open("rb") as stream:
+    with native_path(path).open("rb") as stream:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
@@ -1947,11 +1948,11 @@ class ProductKernel:
             if not artifact_path.is_absolute():
                 artifact_path = run_root / artifact_path
             artifact_path = artifact_path.resolve()
-            if not _is_relative_to(artifact_path, run_root) or not artifact_path.is_file():
+            if not _is_relative_to(artifact_path, run_root) or not native_path(artifact_path).is_file():
                 raise ContractError(
                     "registered handler artifact path must be a file within the active run_root"
                 )
-            if _sha256(artifact_path) != receipt["sha256"] or artifact_path.stat().st_size != receipt["size_bytes"]:
+            if _sha256(artifact_path) != receipt["sha256"] or native_path(artifact_path).stat().st_size != receipt["size_bytes"]:
                 raise ContractError("registered handler artifact hash or size does not match bytes")
             receipt["path"] = str(artifact_path)
             receipt["recorded_at"] = _now()
@@ -2003,7 +2004,7 @@ class ProductKernel:
         )
         verified = []
         for item in receipts:
-            artifact_bytes = Path(item["path"]).read_bytes()
+            artifact_bytes = native_path(item["path"]).read_bytes()
             verified.append((item, artifact_bytes))
             projections = _verified_receipt_authority_projections(
                 item, artifact_bytes
@@ -2105,16 +2106,16 @@ class ProductKernel:
             run_root = Path(row["run_root"]).resolve()
             if not _is_relative_to(artifact_path, run_root):
                 raise ContractError("artifact_receipt.path must resolve within the active run_root")
-            if not artifact_path.is_file():
+            if not native_path(artifact_path).is_file():
                 raise ContractError(f"artifact_receipt.path does not exist: {artifact_path}")
             actual_hash = _sha256(artifact_path)
-            actual_size = artifact_path.stat().st_size
+            actual_size = native_path(artifact_path).stat().st_size
             if actual_hash != normalized["sha256"] or actual_size != normalized["size_bytes"]:
                 raise ContractError("artifact_receipt hash or size does not match the artifact bytes")
             if normalized.get("artifact_type") == "figure.final-mapping":
                 if normalized.get("metadata", {}).get("product_build_id") != self.product_manifest["build_id"]:
                     raise ContractError("final mapping validation build is not current")
-                _verified_receipt_authority_hash(normalized, artifact_path.read_bytes())
+                _verified_receipt_authority_hash(normalized, native_path(artifact_path).read_bytes())
             if normalized["artifact_type"].startswith("quality.") and artifact_path.suffix.lower() == ".json":
                 try:
                     quality_payload = json.loads(artifact_path.read_text(encoding="utf-8-sig"))
@@ -2231,9 +2232,9 @@ class ProductKernel:
             path = Path(row["path"])
             payload: Any = None
             freshness = "missing"
-            if path.is_file():
+            if native_path(path).is_file():
                 try:
-                    artifact_bytes = path.read_bytes()
+                    artifact_bytes = native_path(path).read_bytes()
                 except OSError:
                     freshness = "missing"
                 else:
@@ -2307,10 +2308,10 @@ class ProductKernel:
         verified = []
         for row in rows:
             path = Path(row["path"]).resolve()
-            if not _is_relative_to(path, run_root) or not path.is_file():
+            if not _is_relative_to(path, run_root) or not native_path(path).is_file():
                 continue
             try:
-                artifact_bytes = path.read_bytes()
+                artifact_bytes = native_path(path).read_bytes()
             except OSError:
                 continue
             receipt = json.loads(row["receipt_json"])

@@ -4,9 +4,11 @@
 
 # PaperSpine5
 
+> Release note: alpha.3 provides full Windows, Linux, and macOS suites only. The historical 0.70 MB Skill-only ZIP has no Web core or runtime and is not a current install option.
+
 [中文](README.md) · [English](README.en.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Português](README.pt.md)
 
-[製品ページ](https://wubing2023.github.io/PaperSpine/v5/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.2)
+[製品ページ](https://wubing2023.github.io/PaperSpine/v5/) · [GitHub Release](https://github.com/WUBING2023/PaperSpine/releases/tag/v0.4.0-alpha.3)
 
 **PaperSpine5：ゼロから、図表までそろった論文をすばやく仕上げる。**
 
@@ -21,7 +23,7 @@ PaperSpine5 は、論文の全工程をカバーする AI Skill です。研究�
 - macOS Apple Silicon suite：約 40.6 MB。
 - macOS Intel x86_64 suite：約 40.5 MB。
 
-すべてのダウンロードは公開リリース一覧に掲載され、SHA-256 で照合できます。現在のバージョンは `v0.4.0-alpha.2` プレリリースです。
+すべてのダウンロードは公開リリース一覧に掲載され、SHA-256 で照合できます。現在のバージョンは `v0.4.0-alpha.3` プレリリースです。
 
 ## インストールと旧バージョンからの移行
 

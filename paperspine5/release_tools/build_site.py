@@ -117,8 +117,9 @@ def main() -> int:
     if manifest.get("product") != "PaperSpine5" or len(manifest.get("artifacts", [])) < 2:
         raise RuntimeError("refusing to build from an invalid PaperSpine5 manifest")
     kinds = {item.get("kind") for item in manifest.get("artifacts", [])}
-    if not {"suite", "standalone-skill"}.issubset(kinds):
-        raise RuntimeError("manifest must expose both suite and standalone-skill artifacts")
+    required = {"suite", "suite-linux-x86_64", "suite-macos-arm64", "suite-macos-x86_64"}
+    if kinds != required:
+        raise RuntimeError("manifest must expose the four complete platform suites")
     figure_evidence = verify_figure_showcase()
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)

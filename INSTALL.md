@@ -9,9 +9,8 @@ update/rollback.
 ## Which archive do I need?
 
 Only the **platform suites** (26–56 MB) contain the V5 Web workspace and the
-embedded runtime. The **standalone Skill** archive (0.70 MB) is the lightweight
-option for a host that already has a V5 runtime and product core of its own; it
-ships the Skill files but no Web core.
+embedded runtime. Alpha.3 offers no separate Skill-only download. The historical
+0.70 MB archive cannot repair a missing suite pointer or start a fresh task.
 
 Installing the standalone archive on a host without that runtime produces this
 as soon as the Skill tries to open the Web workspace:
@@ -21,9 +20,9 @@ The standalone PaperSpine5 Web core is missing. Rebuild/install the current
 self-contained paper-spine Skill; do not fall back to the terminal intake UI.
 ```
 
-That message means the wrong archive was installed for this host — it is not a
-broken download and not a missing release asset. Download the suite for your
-platform instead.
+That message means the Skill is not bound to a verified full suite. Keep the
+same profile and task data, then run the current platform installer to repair
+the Skill pointer and verify startup.
 
 Without the Web workspace the Skill can still do local work on an
 already-configured task, but configuration, user choices, previews and
@@ -65,7 +64,7 @@ matching suite ZIP**. Without a local manifest, `--bundle` or `-BundlePath` alon
 still fetches the current manifest online. On Windows, supply both paths:
 
 ```powershell
-.\install.ps1 -ManifestPath .\manifest.json -BundlePath .\paperspine5-suite-0.4.0-alpha.2.zip -Target codex -CleanLegacy
+.\install.ps1 -ManifestPath .\manifest.json -BundlePath .\paperspine5-suite-0.4.0-alpha.3.zip -Target codex -CleanLegacy
 ```
 
 When applying a new version or repairing a missing Skill, the installers archive
